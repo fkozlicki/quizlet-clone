@@ -1,13 +1,18 @@
-import { Bars2Icon, TrashIcon } from "@heroicons/react/24/solid";
+import { Bars2Icon } from "@heroicons/react/24/solid";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import React, { useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { DragSourceMonitor } from "react-dnd/dist/types";
 import type { Identifier, XYCoord } from "dnd-core";
+import type { UseFormRegisterReturn } from "react-hook-form";
 
 export interface CreateCardProps {
-  id: number;
+  id: string;
   index: number;
   moveCard: (dragIndex: number, hoverIndex: number) => void;
+  term: UseFormRegisterReturn;
+  definition: UseFormRegisterReturn;
+  removeCallback: () => void;
 }
 
 interface DragItem {
@@ -16,7 +21,14 @@ interface DragItem {
   type: string;
 }
 
-const CreateCard = ({ id, index, moveCard }: CreateCardProps) => {
+const CreateCard = ({
+  id,
+  index,
+  moveCard,
+  term,
+  definition,
+  removeCallback,
+}: CreateCardProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [isInputHovered, setIsInputHovered] = useState<boolean>(false);
   const [{ handlerId }, drop] = useDrop<
@@ -95,61 +107,66 @@ const CreateCard = ({ id, index, moveCard }: CreateCardProps) => {
 
   return (
     <div
-      className={`relative mb-2 cursor-move rounded-lg bg-white p-4 opacity-${
+      className={`relative mb-2 cursor-move overflow-hidden rounded-lg sm:mb-5 opacity-${
         isDragging ? 0 : "100"
       }`}
       ref={ref}
       data-handler-id={handlerId}
     >
-      <div className="flex flex-col">
-        <div className="mb-4">
-          <div
-            className="relative z-20"
-            onMouseEnter={() => setIsInputHovered(true)}
-            onMouseLeave={() => setIsInputHovered(false)}
-          >
-            <div className="mb-4 flex flex-col pt-5">
-              <input
-                type="text"
-                className="mb-1 border-b-2 border-black outline-none placeholder:font-light"
-                placeholder="Enter term"
-              />
-              <label
-                htmlFor=""
-                className="text-xs font-medium uppercase text-gray-400"
-              >
-                Term
-              </label>
+      <div className="">
+        <div className="mb-[2px] flex items-center justify-between bg-white p-3">
+          <div className="p-2">{index + 1}</div>
+          <div className="flex items-center">
+            <div>
+              <Bars2Icon width={20} className="stroke-2" />
             </div>
-          </div>
-          <div
-            className="relative z-20"
-            onMouseEnter={() => setIsInputHovered(true)}
-            onMouseLeave={() => setIsInputHovered(false)}
-          >
-            <div className="flex flex-col pt-5">
-              <input
-                type="text"
-                className="mb-1 border-b-2 border-black outline-none placeholder:font-light "
-                placeholder="Enter term"
-              />
-              <label
-                htmlFor=""
-                className="text-xs font-medium uppercase text-gray-400"
-              >
-                Term
-              </label>
-            </div>
+            <button
+              onClick={removeCallback}
+              className="ml-4 p-2 hover:text-yellow-300"
+            >
+              <TrashIcon width={18} />
+            </button>
           </div>
         </div>
-        <div className="flex justify-between">
-          <div>{index + 1}</div>
-          <div className="flex">
-            <div>
-              <Bars2Icon width={24} />
+        <div className="flex flex-col bg-white p-4 pt-0 sm:flex-row sm:gap-10 md:p-6 md:pt-0">
+          <div className="relative z-20 flex-1 pt-5">
+            <div
+              className="mb-4 flex cursor-auto flex-col "
+              onMouseEnter={() => setIsInputHovered(true)}
+              onMouseLeave={() => setIsInputHovered(false)}
+            >
+              <input
+                type="text"
+                className="border-b-2 border-black outline-none placeholder:font-light"
+                placeholder="Enter term"
+                {...term}
+              />
+              <label
+                htmlFor=""
+                className="mt-[10px] text-xs font-medium uppercase text-gray-400"
+              >
+                Term
+              </label>
             </div>
-            <div>
-              <TrashIcon width={24} />
+          </div>
+          <div className="relative z-20 flex-1 pt-5">
+            <div
+              className="flex cursor-auto flex-col"
+              onMouseEnter={() => setIsInputHovered(true)}
+              onMouseLeave={() => setIsInputHovered(false)}
+            >
+              <input
+                type="text"
+                className="border-b-2 border-black outline-none placeholder:font-light"
+                placeholder="Enter definition"
+                {...definition}
+              />
+              <label
+                htmlFor=""
+                className="mt-[10px] text-xs font-medium uppercase text-gray-400"
+              >
+                Definition
+              </label>
             </div>
           </div>
         </div>
