@@ -1,54 +1,95 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MagnifyingGlassIcon,
   ChevronDownIcon,
   PlusIcon,
   Bars3Icon,
 } from "@heroicons/react/24/solid";
-import { useAuthFormContext } from "../contexts/AuthFormContext";
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
-const Navbar = () => {
+interface NavbarProps {
+  openSignup: () => void;
+  openLogin: () => void;
+  openMobileMenu: () => void;
+}
+
+const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
   const { data: session } = useSession();
-  const [, dispatch] = useAuthFormContext();
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
+  const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
+  const { push } = useRouter();
 
-  const openLogin = () => {
-    dispatch("openLogin");
+  const toggleMenuDropdown = () => {
+    setMenuDropdownOpen((prev) => !prev);
   };
-  const openSignup = () => {
-    dispatch("openSignup");
+
+  const toggleCreateDropdown = () => {
+    setCreateDropdownOpen((prev) => !prev);
+  };
+
+  const linkIfLoggedIn = async (link: string) => {
+    session ? await push(link) : openLogin();
   };
 
   return (
-    <div className="sticky top-0 z-[100] bg-white">
-      <div className="h-12 px-4 md:h-16">
+    <div className="sticky top-0 z-30 border-b bg-white">
+      <div className="h-16 px-4 md:h-16">
         <div className="flex h-full justify-between">
           <div className="flex">
-            <div className="hidden h-full px-2 leading-[4rem] md:block">
+            <Link
+              href="/"
+              className="hidden h-full px-2 leading-[4rem] md:block"
+            >
               Flash.it
-            </div>
+            </Link>
             <div className="hidden h-full md:flex">
-              <div className="mx-3 hidden h-full leading-[4rem] lg:block">
+              <Link
+                href="/"
+                className="mx-3 hidden h-full leading-[4rem] lg:block"
+              >
                 Home
-              </div>
+              </Link>
               <div className="mx-3 h-full leading-[4rem]">Subject areas</div>
               <div className="mx-3 h-full leading-[4rem]">Expert solutions</div>
             </div>
             <div className="hidden items-center px-2 md:flex">
-              <div className="flex gap-2 rounded bg-blue-600 px-3 py-[6px] font-medium text-white hover:bg-blue-700">
-                <span className="hidden lg:block">Create</span>
-                <ChevronDownIcon width={20} className="hidden lg:block" />
-                <PlusIcon width={20} className="lg:hidden" />
+              <div className="relative">
+                <div
+                  onClick={toggleCreateDropdown}
+                  className="flex items-center gap-2 rounded bg-blue-600 px-3 py-[6px] font-medium text-white hover:bg-blue-700"
+                >
+                  <span className="hidden lg:block">Create</span>
+                  <ChevronDownIcon width={20} className="hidden lg:block" />
+                  <PlusIcon width={20} className="lg:hidden" />
+                </div>
+                {createDropdownOpen && (
+                  <div className="absolute top-[110%] left-0 min-w-[10rem] rounded-2xl border bg-white py-2 shadow-lg">
+                    <button
+                      onClick={() => linkIfLoggedIn("/create-set")}
+                      className="w-full px-6 py-2 text-start hover:bg-slate-100"
+                    >
+                      Study set
+                    </button>
+                    <button
+                      onClick={() => linkIfLoggedIn("/create-folder")}
+                      className="w-full px-6 py-2 text-start hover:bg-slate-100"
+                    >
+                      Folder
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
-            <button className="md:hidden">
+            <button onClick={openMobileMenu} className="md:hidden">
               <Bars3Icon width={32} height={32} />
             </button>
           </div>
           <div className="flex items-center">
             <div className="flex h-full items-center px-2">
-              <div className="hidden max-w-[15rem] items-center gap-2 rounded-md border border-gray-200 bg-indigo-50 px-2 py-1 lg:flex">
+              <div className="hidden max-w-[15rem] items-center gap-2 rounded-md border border-gray-200 bg-slate-100 px-2 py-1 lg:flex">
                 <MagnifyingGlassIcon className="h-5 w-5" />
                 <input
                   type="text"
@@ -79,8 +120,11 @@ const Navbar = () => {
               </>
             )}
             {session && session.user && (
-              <div>
-                <button className="flex items-center">
+              <div className="relative">
+                <button
+                  onClick={toggleMenuDropdown}
+                  className="flex items-center"
+                >
                   {session.user.image ? (
                     <Image
                       src={session.user.image}
@@ -95,6 +139,56 @@ const Navbar = () => {
                     </div>
                   )}
                 </button>
+                <div
+                  className={`absolute top-[120%] right-0 z-20 min-w-[14rem] rounded-2xl border bg-white shadow-lg ${
+                    menuDropdownOpen ? "block" : "hidden"
+                  }`}
+                >
+                  <div className="border-b">
+                    <div className="flex items-center gap-4 py-4 px-6">
+                      {session.user.image && (
+                        <Image
+                          src={session.user.image}
+                          alt=""
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      )}
+                      <div className="text-start">
+                        <p className="text-sm">{session.user.name}</p>
+                        <p className="max-w-[7rem] overflow-hidden text-ellipsis text-sm">
+                          {session.user.email}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col border-b py-2">
+                    <Link
+                      href={`/${session.user.id}`}
+                      className="py-2 px-6 text-start hover:bg-slate-100"
+                    >
+                      Profile
+                    </Link>
+                    <Link
+                      href={`settings`}
+                      className="py-2 px-6 text-start hover:bg-slate-100"
+                    >
+                      Settings
+                    </Link>
+                    <button className="py-2 px-6 text-start hover:bg-slate-100">
+                      Dark mode
+                    </button>
+                  </div>
+                  <div className="py-2">
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full whitespace-nowrap py-2 px-6 text-start hover:bg-slate-100"
+                    >
+                      Log out
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
