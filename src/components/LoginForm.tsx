@@ -1,10 +1,33 @@
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn, useSession } from "next-auth/react";
 import React from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const loginSchema = z.object({
+  email: z.string().min(1).email(),
+  password: z.string().min(1),
+});
+
+type LoginInputs = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
+  const { register, handleSubmit } = useForm<LoginInputs>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const login = async (data: LoginInputs) => {
+    const res = await signIn("credentials", {
+      ...data,
+      redirect: false,
+    });
+  };
+
   return (
-    <form>
+    <form onSubmit={handleSubmit(login)}>
       <div className="flex flex-col">
         <input
+          {...register("email")}
           type="email"
           id="email"
           placeholder="Type your email address or username"
@@ -20,6 +43,7 @@ const LoginForm = () => {
       </div>
       <div className="mt-6 flex flex-col">
         <input
+          {...register("password")}
           type="password"
           id="password"
           placeholder="Type your password"
