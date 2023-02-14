@@ -50,9 +50,11 @@ model Session {
 model User {
     id            String     @id @default(cuid())
     name          String?
+    password      String?
     email         String?    @unique
     emailVerified DateTime?
     image         String?
+    birthday      DateTime?
     accounts      Account[]
     sessions      Session[]
     studySets     StudySet[]
