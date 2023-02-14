@@ -1,46 +1,114 @@
-import React from "react";
-import { useAuthFormContext } from "../contexts/AuthFormContext";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { api } from "../utils/api";
+import { toast } from "react-hot-toast";
+
+const credentialsSchema = z.object({
+  birthday: z.object({
+    month: z.number().positive(),
+    day: z.number().positive(),
+    year: z.number().positive(),
+  }),
+  email: z.string().min(1, "Enter your email").email("Enter a valid email"),
+  username: z.string().min(1, "Enter your username"),
+  password: z.string().min(1, "Enter your password"),
+  accepted: z.literal(true),
+});
+
+type CredentialsInputs = z.infer<typeof credentialsSchema>;
 
 const SignupForm = () => {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<CredentialsInputs>({
+    mode: "onChange",
+    resolver: zodResolver(credentialsSchema),
+  });
+  const { mutate } = api.user.create.useMutation({
+    onSuccess: () => {
+      toast("Created successfuly", {
+        icon: "✅",
+      });
+    },
+    onError: () => {
+      toast("Couldn't create user", {
+        icon: "❌",
+      });
+    },
+  });
   const months = [
-    { value: "month", label: "Month" },
-    { value: "january", label: "January" },
-    { value: "february", label: "February" },
-    { value: "march", label: "March" },
-    { value: "april", label: "April" },
-    { value: "may", label: "May" },
-    { value: "june", label: "June" },
-    { value: "july", label: "July" },
-    { value: "august", label: "August" },
-    { value: "september", label: "September" },
-    { value: "october", label: "October" },
-    { value: "november", label: "November" },
-    { value: "december", label: "December" },
+    { value: 0, label: "Month" },
+    { value: 1, label: "January" },
+    { value: 2, label: "February" },
+    { value: 3, label: "March" },
+    { value: 4, label: "April" },
+    { value: 5, label: "May" },
+    { value: 6, label: "June" },
+    { value: 7, label: "July" },
+    { value: 8, label: "August" },
+    { value: 9, label: "September" },
+    { value: 10, label: "October" },
+    { value: 11, label: "November" },
+    { value: 12, label: "December" },
   ];
-  const days = ["Day"].concat(
-    Array.from({ length: 31 }, (_, i) => (i + 1).toString())
+  const days = [{ value: 0, label: "Day" }].concat(
+    Array.from({ length: 31 }, (_, i) => ({
+      value: i + 1,
+      label: (i + 1).toString(),
+    }))
+  );
+  const years = [{ value: 0, label: "Year" }].concat(
+    Array.from({ length: 130 }, (_, i) => ({
+      value: new Date().getFullYear() - i,
+      label: (new Date().getFullYear() - i).toString(),
+    }))
   );
 
-  const years = ["Year"].concat(
-    Array.from({ length: 2023 - 1894 + 1 }, (_, i) => (2023 - i).toString())
-  );
-  const [, dispatch] = useAuthFormContext();
+  const notFilledAllFields = () => {
+    if (Object.keys(watch()).length === 0) return true;
+    return Object.values(watch()).some((field) => !field);
+  };
 
-  const openLogin = () => {
-    dispatch("openLogin");
+  const createAccount = (data: CredentialsInputs) => {
+    const {
+      birthday: { month, day, year },
+      email,
+      password,
+      username,
+    } = data;
+    const birthday = new Date(`${month}/${day}/${year}`);
+    mutate({
+      birthday,
+      email,
+      password,
+      username,
+    });
   };
 
   return (
-    <form className="mt-8">
+    <form onSubmit={handleSubmit(createAccount)} className="mt-8">
       <fieldset>
         <legend className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-          Birthday
+          {errors.birthday ? (
+            <span className="text-red-500">Enter your birthday</span>
+          ) : (
+            <span>Birthday</span>
+          )}
         </legend>
         <div className="mt-2 flex gap-6">
           <div className="">
             <select
-              name="birthday"
-              className="rounded border-2 border-black p-2"
+              {...register("birthday.month", {
+                valueAsNumber: true,
+              })}
+              className={`rounded border-2 p-2 outline-none ${
+                errors.birthday?.month ? "border-red-500" : "border-black"
+              }`}
             >
               {months.map(({ label, value }, index) => (
                 <option key={index} value={value}>
@@ -51,24 +119,29 @@ const SignupForm = () => {
           </div>
           <div>
             <select
-              name="birthday"
-              className="rounded border-2 border-black p-2"
+              {...register("birthday.day", { valueAsNumber: true })}
+              className={`rounded border-2 border-black p-2 outline-none ${
+                errors.birthday?.day ? "border-red-500" : ""
+              }`}
             >
-              {days.map((day, index) => (
-                <option className="" key={index}>
-                  {day}
+              {days.map(({ value, label }, index) => (
+                <option className="" key={index} value={value}>
+                  {label}
                 </option>
               ))}
             </select>
           </div>
           <div>
             <select
-              name="birthday"
-              className="rounded border-2 border-black p-2"
+              {...register("birthday.year", { valueAsNumber: true })}
+              className={`rounded border-2 border-black p-2 outline-none ${
+                errors.birthday?.year ? "border-red-500" : ""
+              }`}
             >
-              <option>Year</option>
-              {years.map((year, index) => (
-                <option key={index}>{year}</option>
+              {years.map(({ value, label }, index) => (
+                <option key={index} value={value}>
+                  {label}
+                </option>
               ))}
             </select>
           </div>
@@ -79,22 +152,33 @@ const SignupForm = () => {
           htmlFor=""
           className="mb-[10px] text-xs font-semibold uppercase tracking-wider text-slate-400"
         >
-          EMAIL
+          {errors.email ? (
+            <span className="text-red-600">{errors.email.message}</span>
+          ) : (
+            <span>EMAIL</span>
+          )}
         </label>
         <input
+          {...register("email")}
           type="text"
           placeholder="user@flashit.com"
           className="rounded border-2 border-black p-3 text-lg"
         />
+        {}
       </div>
       <div className="mt-6 flex flex-col">
         <label
           htmlFor=""
           className="mb-[10px] text-xs font-semibold uppercase tracking-wider text-slate-400"
         >
-          USERNAME
+          {errors.username ? (
+            <span className="text-red-600">{errors.username.message}</span>
+          ) : (
+            <span>USERNAME</span>
+          )}
         </label>
         <input
+          {...register("username")}
           type="text"
           placeholder="andrew123"
           className="rounded border-2 border-black p-3 text-lg"
@@ -105,18 +189,28 @@ const SignupForm = () => {
           htmlFor=""
           className="mb-[10px] text-xs font-semibold uppercase tracking-wider text-slate-400"
         >
-          PASSWORD
+          {errors.password ? (
+            <span className="text-red-600">{errors.password.message}</span>
+          ) : (
+            <span>PASSWORD</span>
+          )}
         </label>
         <input
+          {...register("password")}
           type="password"
           placeholder="●●●●●●●●"
           className="rounded border-2 border-black p-3 text-lg"
         />
       </div>
-      <div className="mt-6 flex items-center gap-6">
+      <div className="mt-6 flex flex-col items-start gap-6">
         <label htmlFor="tos" className="flex items-center gap-5">
-          <input type="checkbox" className="peer hidden" id="tos" />
-          <div className="h-5 w-5 border-2 border-slate-400 peer-checked:border-yellow-400" />
+          <input
+            {...register("accepted")}
+            type="checkbox"
+            className="peer hidden"
+            id="tos"
+          />
+          <div className="relative h-5 w-5 border-2 border-slate-400 before:absolute before:top-1/2 before:left-1/2 before:hidden before:-translate-x-1/2 before:-translate-y-1/2 before:content-['✓'] peer-checked:border-yellow-400 peer-checked:before:block" />
           <p className="text-lg font-light">
             I accept Flash.it&apos;s{" "}
             <span className="font-normal text-cyan-400">Terms of Service</span>{" "}
@@ -124,16 +218,23 @@ const SignupForm = () => {
             <span className="font-normal text-cyan-400">Privacy Policy</span>
           </p>
         </label>
+        {errors.accepted && (
+          <div className="w-full border-2 border-red-500 p-3 text-xs font-semibold text-red-500">
+            PLEASE ACCEPT QUIZLET&apos;S TERMS OF SERVICE AND PRIVACY POLICY TO
+            CONTINUE.
+          </div>
+        )}
       </div>
-      <button className="mt-6 w-full rounded bg-slate-300 px-6 py-3 text-sm font-semibold text-white">
+      <button
+        disabled={notFilledAllFields()}
+        type="submit"
+        className="mt-6 w-full rounded bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+      >
         Sign up
       </button>
       <div className="mt-4 rounded border-2 border-slate-200 p-2">
         <p className="text-center font-medium text-slate-500">
-          Already have an account?{" "}
-          <span onClick={openLogin} className="text-cyan-400">
-            Log in
-          </span>
+          Already have an account? <span className="text-cyan-400">Log in</span>
         </p>
       </div>
     </form>
