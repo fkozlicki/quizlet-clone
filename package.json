@@ -20,6 +20,7 @@
     "@trpc/next": "^10.7.0",
     "@trpc/react-query": "^10.7.0",
     "@trpc/server": "^10.7.0",
+    "bcrypt": "^5.1.0",
     "dnd-core": "^16.0.1",
     "immutability-helper": "^3.1.1",
     "next": "13.1.1",
@@ -29,10 +30,13 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.42.1",
+    "react-hot-toast": "^2.4.0",
+    "react-minimal-pie-chart": "^8.4.0",
     "superjson": "1.9.1",
     "zod": "^3.20.2"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/node": "^18.11.18",
     "@types/prettier": "^2.7.2",
     "@types/react": "^18.0.26",
