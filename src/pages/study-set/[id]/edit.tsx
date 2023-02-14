@@ -1,18 +1,12 @@
-import React, { useCallback } from "react";
+import React from "react";
 import type { NextPage } from "next";
 import { type GetServerSideProps } from "next";
-import { getSession, useSession } from "next-auth/react";
-import CreateCard from "../../../components/CreateCard";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { DndProvider } from "react-dnd";
-import type { FieldArrayWithId } from "react-hook-form";
-import { useForm } from "react-hook-form";
-import { useFieldArray } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { getSession } from "next-auth/react";
 import { api } from "../../../utils/api";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
+import type { CreateSetInputs } from "../../../components/StudySetForm";
+import StudySetForm from "../../../components/StudySetForm";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -33,72 +27,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const studySetSchema = z.object({
-  title: z.string().min(1),
-  description: z.string(),
-  cards: z
-    .array(
-      z.object({
-        term: z.string(),
-        definition: z.string(),
-      })
-    )
-    .refine((data) => {
-      let count = 0;
-      data.forEach((el) => {
-        if (el.term.length > 0 && el.definition.length > 0) ++count;
-      });
-      return count >= 2;
-    }, "You need two cards to create a set."),
-});
-
-type CreateSetInputs = z.infer<typeof studySetSchema>;
-
 const Edit: NextPage = () => {
   const { query } = useRouter();
-  api.studySet.getById.useQuery(
+  const { data: studySet, isLoading } = api.studySet.getById.useQuery(
     { id: query.id as string },
     {
       enabled: !!query.id,
       refetchOnWindowFocus: false,
-      onSuccess: (data) => {
-        setValue("cards", data.cards);
-        setValue("title", data.title);
-        setValue("description", data.description);
-      },
     }
   );
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    setValue,
-  } = useForm<CreateSetInputs>({
-    resolver: zodResolver(studySetSchema),
-    defaultValues: {
-      cards: [
-        //creating 4 blank cards
-        { term: "", definition: "" },
-        { term: "", definition: "" },
-        { term: "", definition: "" },
-        { term: "", definition: "" },
-      ],
-    },
-    mode: "onSubmit",
-  });
-  const { fields, remove, swap, append } = useFieldArray({
-    control,
-    name: "cards",
-  });
   const updateSet = api.studySet.editById.useMutation({
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast("Editted study set successfuly", {
         icon: "✅",
       });
-      setValue("cards", data.cards);
-      setValue("title", data.title);
-      setValue("description", data.description);
     },
     onError: () => {
       toast("Couldn't create study set", {
@@ -106,35 +48,6 @@ const Edit: NextPage = () => {
       });
     },
   });
-
-  const appendCard = () => {
-    append({
-      definition: "",
-      term: "",
-    });
-  };
-
-  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
-    swap(dragIndex, hoverIndex);
-  }, []);
-
-  const renderCard = useCallback((card: FieldArrayWithId, index: number) => {
-    const handleRemoveCard = () => {
-      remove(index);
-    };
-
-    return (
-      <CreateCard
-        key={card.id}
-        index={index}
-        id={card.id}
-        moveCard={moveCard}
-        term={register(`cards.${index}.term`)}
-        definition={register(`cards.${index}.definition`)}
-        removeCallback={handleRemoveCard}
-      />
-    );
-  }, []);
 
   const updateStudySet = (data: CreateSetInputs) => {
     const convertedData = {
@@ -159,47 +72,15 @@ const Edit: NextPage = () => {
     });
   };
 
+  if (isLoading) return <div>Loading...</div>;
+
   return (
     <div className="bg-slate-100">
-      <form
-        onSubmit={handleSubmit(updateStudySet)}
-        className="mx-4 max-w-[75rem] pb-4 sm:mx-10 xl:mx-auto"
-      >
-        <div className="mb-8">
-          <h1 className="py-4 text-lg font-semibold">Create new study set</h1>
-          <button className="hidden">Create</button>
-        </div>
-        <input
-          className="mb-6 w-full rounded-lg bg-white px-4 py-2 text-lg outline-none placeholder:text-lg placeholder:font-semibold placeholder:text-gray-500"
-          type="text"
-          placeholder="Enter title"
-          {...register("title")}
-        />
-        <textarea
-          className="mb-6 h-[120px] w-full resize-none rounded-lg bg-white px-4 py-2 text-lg outline-none placeholder:text-base placeholder:font-semibold placeholder:text-gray-500"
-          placeholder="Add a description..."
-          {...register("description")}
-        />
-        {errors.cards && <p>{errors.cards.message}</p>}
-        <DndProvider backend={HTML5Backend}>
-          {fields.map((field, index) => renderCard(field, index))}
-        </DndProvider>
-        <button
-          type="button"
-          onClick={appendCard}
-          className="group mb-8 flex w-full justify-center rounded-md bg-white p-4 shadow md:py-8"
-        >
-          <p className="border-b-4 border-cyan-400 pb-2 font-semibold uppercase group-hover:border-yellow-500 group-hover:text-yellow-500">
-            + add card
-          </p>
-        </button>
-        <button
-          type="submit"
-          className="ml-auto block rounded-lg bg-blue-600 px-8 py-5 text-white hover:bg-blue-700"
-        >
-          {updateSet.isLoading ? "Loading..." : "Edit"}
-        </button>
-      </form>
+      <div className="mx-4 max-w-[75rem] pb-4 sm:mx-10 xl:mx-auto">
+        {studySet && (
+          <StudySetForm formCallback={updateStudySet} initialData={studySet} />
+        )}
+      </div>
     </div>
   );
 };
