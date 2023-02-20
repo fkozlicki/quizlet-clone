@@ -6,7 +6,6 @@ import {
   Bars3Icon,
 } from "@heroicons/react/24/solid";
 import { signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ProfileImage from "../ProfileImage";
@@ -15,9 +14,15 @@ interface NavbarProps {
   openSignup: () => void;
   openLogin: () => void;
   openMobileMenu: () => void;
+  openCreateFolder: () => void;
 }
 
-const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
+const Navbar = ({
+  openSignup,
+  openLogin,
+  openMobileMenu,
+  openCreateFolder,
+}: NavbarProps) => {
   const { data: session } = useSession();
   const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
   const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
@@ -36,8 +41,21 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
     setCreateDropdownOpen((prev) => !prev);
   };
 
-  const linkIfLoggedIn = async (link: string) => {
-    session ? await push(link) : openLogin();
+  const handleCreateFolder = () => {
+    if (session) {
+      setCreateDropdownOpen(false);
+      openCreateFolder();
+    } else {
+      openLogin();
+    }
+  };
+
+  const handleCreateStudySet = async (link: string) => {
+    if (session) {
+      await push(link);
+    } else {
+      openLogin();
+    }
   };
 
   return (
@@ -72,13 +90,13 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
                 {createDropdownOpen && (
                   <div className="absolute top-[110%] left-0 min-w-[10rem] rounded-2xl border bg-white py-2 shadow-lg">
                     <button
-                      onClick={() => linkIfLoggedIn("/create-set")}
+                      onClick={() => handleCreateStudySet("/create-set")}
                       className="w-full px-6 py-2 text-start hover:bg-slate-100"
                     >
                       Study set
                     </button>
                     <button
-                      onClick={() => linkIfLoggedIn("/create-folder")}
+                      onClick={handleCreateFolder}
                       className="w-full px-6 py-2 text-start hover:bg-slate-100"
                     >
                       Folder
