@@ -1,7 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn, useSession } from "next-auth/react";
-import React from "react";
+import { signIn } from "next-auth/react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -15,16 +16,25 @@ const LoginForm = () => {
   const { register, handleSubmit } = useForm<LoginInputs>({
     resolver: zodResolver(loginSchema),
   });
+  const [error, setError] = useState<string>();
 
-  const login = async (data: LoginInputs) => {
+  const handleLogin = async (data: LoginInputs) => {
     const res = await signIn("credentials", {
       ...data,
-      redirect: false,
     });
+
+    if (!res) return;
+
+    if (res?.status === 200) {
+      toast("Successfuly logged in");
+    } else {
+      toast("Couldn't log in");
+      setError(res?.error);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit(login)}>
+    <form onSubmit={handleSubmit(handleLogin)}>
       <div className="flex flex-col">
         <input
           {...register("email")}

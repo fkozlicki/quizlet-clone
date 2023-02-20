@@ -61,7 +61,11 @@ const AuthDropdown = ({
           {status === "login" && (
             <div className="mb-8 flex flex-col gap-4">
               <button
-                onClick={() => signIn("google")}
+                onClick={() =>
+                  signIn("google", {
+                    redirect: false,
+                  })
+                }
                 className="relative rounded border-2 p-6 text-lg font-bold"
               >
                 <Image
@@ -102,7 +106,7 @@ const AuthDropdown = ({
             <>
               <div className="mb-8 flex flex-col gap-4">
                 <button
-                  onClick={() => signIn("google")}
+                  onClick={() => signIn("google", { redirect: false })}
                   className="relative flex items-center justify-center gap-2 rounded-lg border border-gray-300 py-5 px-8 font-semibold text-gray-500 hover:bg-gray-100"
                 >
                   <Image src="/google.png" alt="" width={25} height={25} />

@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { api } from "../utils/api";
+import { api } from "../../utils/api";
 import { toast } from "react-hot-toast";
 
 const credentialsSchema = z.object({
@@ -12,7 +12,7 @@ const credentialsSchema = z.object({
     year: z.number().positive(),
   }),
   email: z.string().min(1, "Enter your email").email("Enter a valid email"),
-  username: z.string().min(1, "Enter your username"),
+  name: z.string().min(1, "Enter your name"),
   password: z.string().min(1, "Enter your password"),
   accepted: z.literal(true),
 });
@@ -25,12 +25,14 @@ const SignupForm = () => {
     handleSubmit,
     watch,
     formState: { errors },
+    reset,
   } = useForm<CredentialsInputs>({
     mode: "onChange",
     resolver: zodResolver(credentialsSchema),
   });
-  const { mutate } = api.user.create.useMutation({
+  const createUser = api.user.create.useMutation({
     onSuccess: () => {
+      reset();
       toast("Created successfuly", {
         icon: "✅",
       });
@@ -70,8 +72,13 @@ const SignupForm = () => {
   );
 
   const notFilledAllFields = () => {
+    const { birthday, email, name, password, accepted } = watch();
     if (Object.keys(watch()).length === 0) return true;
-    return Object.values(watch()).some((field) => !field);
+    return (
+      Object.values(birthday).some((value) => value === 0) ||
+      [email, name, password].some((value) => value.length === 0) ||
+      !accepted
+    );
   };
 
   const createAccount = (data: CredentialsInputs) => {
@@ -79,14 +86,14 @@ const SignupForm = () => {
       birthday: { month, day, year },
       email,
       password,
-      username,
+      name,
     } = data;
     const birthday = new Date(`${month}/${day}/${year}`);
-    mutate({
+    createUser.mutate({
       birthday,
       email,
       password,
-      username,
+      name,
     });
   };
 
@@ -171,14 +178,14 @@ const SignupForm = () => {
           htmlFor=""
           className="mb-[10px] text-xs font-semibold uppercase tracking-wider text-slate-400"
         >
-          {errors.username ? (
-            <span className="text-red-600">{errors.username.message}</span>
+          {errors.name ? (
+            <span className="text-red-600">{errors.name.message}</span>
           ) : (
-            <span>USERNAME</span>
+            <span>NAME</span>
           )}
         </label>
         <input
-          {...register("username")}
+          {...register("name")}
           type="text"
           placeholder="andrew123"
           className="rounded border-2 border-black p-3 text-lg"

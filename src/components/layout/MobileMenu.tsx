@@ -12,6 +12,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState } from "react";
+import ProfileImage from "../ProfileImage";
 
 interface MobileMenuProps {
   status: boolean;
@@ -43,24 +44,22 @@ const MobileMenu = ({ status, close }: MobileMenuProps) => {
       <div>
         <div>
           <div className="p-4 text-xl font-medium">Home</div>
-          <div className="p-4 text-xl font-medium">Expert solutions</div>
           <div className="">
             <div onClick={toggleCreate} className="p-4 text-xl font-medium">
               Create
             </div>
             {createOpen && (
               <div className="mx-4 mb-4 overflow-hidden border-l transition-transform">
-                <div className="group flex items-center gap-4 px-6 py-3 text-xl font-medium">
+                <Link
+                  href="/create-set"
+                  className="group flex items-center gap-4 px-6 py-3 text-xl font-medium"
+                >
                   <Square2StackIcon width={24} className="text-slate-500" />
                   <span className="group-hover:text-slate-500">Study set</span>
-                </div>
+                </Link>
                 <div className="group flex items-center gap-4 px-6 py-3 text-xl font-medium">
                   <FolderIcon width={24} className="text-slate-500" />
                   <span className="group-hover:text-slate-500">Folder</span>
-                </div>
-                <div className="group flex items-center gap-4 px-6 py-3 text-xl font-medium">
-                  <UsersIcon width={24} className="text-slate-500" />
-                  <span className="group-hover:text-slate-500">Class</span>
                 </div>
               </div>
             )}
@@ -70,17 +69,12 @@ const MobileMenu = ({ status, close }: MobileMenuProps) => {
         {session && session.user && (
           <div className="px-6 py-8">
             <div className="mb-4 flex items-center gap-4">
-              {session.user.image ? (
-                <Image
-                  src={session.user.image}
-                  alt=""
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-              ) : (
-                <div className="h-5 w-5 rounded-full bg-slate-500"></div>
-              )}
+              <ProfileImage
+                image={session.user.image}
+                userName={session.user.name}
+                size={40}
+                fontSize={20}
+              />
               <div>
                 <p className="text-xl font-bold">{session.user.name}</p>
                 <p>{session.user.email}</p>
@@ -89,8 +83,8 @@ const MobileMenu = ({ status, close }: MobileMenuProps) => {
             <div className="flex items-center gap-4 py-4 text-xl font-medium">
               <BellIcon width={24} />
               Notifications
-              <span className="rounded bg-blue-600 px-2 text-sm font-normal text-white">
-                Soon
+              <span className="rounded bg-blue-700 px-2 text-sm font-normal text-white">
+                soon
               </span>
             </div>
             <Link
@@ -107,13 +101,13 @@ const MobileMenu = ({ status, close }: MobileMenuProps) => {
               <Cog6ToothIcon width={24} />
               Settings
             </Link>
-            <Link
-              href="/settings/#dark-mode"
-              className="flex gap-4 py-4 text-xl font-medium"
-            >
+            <button className="flex items-center gap-4 py-4 text-xl font-medium">
               <MoonIcon width={24} />
               Dark mode
-            </Link>
+              <span className="rounded bg-blue-700 px-2 text-sm font-normal text-white">
+                soon
+              </span>
+            </button>
             <button
               onClick={() => signOut()}
               className="mt-4 w-full rounded-lg border py-2 text-center font-semibold text-gray-500 hover:bg-slate-100"

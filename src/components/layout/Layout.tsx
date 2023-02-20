@@ -1,3 +1,4 @@
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import React, { useEffect, useState, type PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
@@ -11,6 +12,7 @@ const Layout = ({ children }: PropsWithChildren) => {
   >(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const { pathname } = useRouter();
+  const { data: session } = useSession();
 
   useEffect(() => {
     closeMobileMenu();
@@ -53,12 +55,14 @@ const Layout = ({ children }: PropsWithChildren) => {
         openMobileMenu={openMobileMenu}
       />
       {children}
-      <AuthDropdown
-        status={authDropdownOpen}
-        openSignup={openSignup}
-        openLogin={openLogin}
-        close={closeAuthDropdown}
-      />
+      {!session && (
+        <AuthDropdown
+          status={authDropdownOpen}
+          openSignup={openSignup}
+          openLogin={openLogin}
+          close={closeAuthDropdown}
+        />
+      )}
       <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
     </div>
   );

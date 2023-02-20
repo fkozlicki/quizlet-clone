@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MagnifyingGlassIcon,
   ChevronDownIcon,
@@ -9,6 +9,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ProfileImage from "../ProfileImage";
 
 interface NavbarProps {
   openSignup: () => void;
@@ -20,7 +21,12 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
   const { data: session } = useSession();
   const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
   const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
-  const { push } = useRouter();
+  const { push, pathname } = useRouter();
+
+  useEffect(() => {
+    setMenuDropdownOpen(false);
+    setCreateDropdownOpen(false);
+  }, [pathname]);
 
   const toggleMenuDropdown = () => {
     setMenuDropdownOpen((prev) => !prev);
@@ -52,8 +58,6 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
               >
                 Home
               </Link>
-              <div className="mx-3 h-full leading-[4rem]">Subject areas</div>
-              <div className="mx-3 h-full leading-[4rem]">Expert solutions</div>
             </div>
             <div className="hidden items-center px-2 md:flex">
               <div className="relative">
@@ -125,19 +129,12 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
                   onClick={toggleMenuDropdown}
                   className="flex items-center"
                 >
-                  {session.user.image ? (
-                    <Image
-                      src={session.user.image}
-                      alt="profile image"
-                      width={32}
-                      height={32}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <div className="h-8 w-8 rounded-full bg-slate-500">
-                      {session.user.name ? session.user.name.charAt(0) : "?"}
-                    </div>
-                  )}
+                  <ProfileImage
+                    image={session.user.image}
+                    userName={session.user.name}
+                    size={32}
+                    fontSize={16}
+                  />
                 </button>
                 <div
                   className={`absolute top-[120%] right-0 z-20 min-w-[14rem] rounded-2xl border bg-white shadow-lg ${
@@ -146,15 +143,12 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
                 >
                   <div className="border-b">
                     <div className="flex items-center gap-4 py-4 px-6">
-                      {session.user.image && (
-                        <Image
-                          src={session.user.image}
-                          alt=""
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                      )}
+                      <ProfileImage
+                        image={session.user.image}
+                        userName={session.user.name}
+                        size={32}
+                        fontSize={16}
+                      />
                       <div className="text-start">
                         <p className="text-sm">{session.user.name}</p>
                         <p className="max-w-[7rem] overflow-hidden text-ellipsis text-sm">
@@ -178,6 +172,9 @@ const Navbar = ({ openSignup, openLogin, openMobileMenu }: NavbarProps) => {
                     </Link>
                     <button className="py-2 px-6 text-start hover:bg-slate-100">
                       Dark mode
+                      <span className="ml-2 rounded-md bg-blue-700 px-2 text-sm text-white">
+                        soon
+                      </span>
                     </button>
                   </div>
                   <div className="py-2">
