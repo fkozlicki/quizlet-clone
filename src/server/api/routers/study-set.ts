@@ -19,17 +19,23 @@ export type StudySetTest = {
 };
 
 export const studySetRouter = createTRPCRouter({
-  getUserSets: protectedProcedure.query(async ({ ctx }) => {
-    return await ctx.prisma.studySet.findMany({
-      where: {
-        userId: ctx.session.user.id,
-      },
-      include: {
-        user: true,
-        cards: true,
-      },
-    });
-  }),
+  getUserSets: publicProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.prisma.studySet.findMany({
+        where: {
+          userId: input.id,
+        },
+        include: {
+          user: true,
+          cards: true,
+        },
+      });
+    }),
 
   create: protectedProcedure
     .input(
