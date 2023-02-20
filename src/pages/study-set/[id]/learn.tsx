@@ -1,3 +1,4 @@
+import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
 import React, { useState, type MouseEvent } from "react";
 import CardPreview from "../../../components/CardPreview";
@@ -7,9 +8,13 @@ import Result from "../../../components/Result";
 import { api } from "../../../utils/api";
 
 const Learn = () => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const setId = query.id?.toString();
-  const { data: cards, isLoading } = api.studySet.getLearnSet.useQuery(
+  const {
+    data: cards,
+    isLoading,
+    refetch,
+  } = api.studySet.getLearnSet.useQuery(
     { id: setId! },
     {
       refetchOnWindowFocus: false,
@@ -21,7 +26,8 @@ const Learn = () => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [correct, setCorrect] = useState<number>(0);
 
-  const resetLearning = () => {
+  const resetLearning = async () => {
+    await refetch();
     setCardIndex(0);
     setCorrect(0);
   };
@@ -55,6 +61,10 @@ const Learn = () => {
 
   if (isLoading || !setId) return <div>Loading...</div>;
 
+  const backToStudySet = async () => {
+    await push(`/study-set/${setId}`);
+  };
+
   return (
     <div className="bg-slate-100">
       <div className="m-auto max-w-[65rem] p-4 md:py-12">
@@ -74,7 +84,16 @@ const Learn = () => {
             <Result
               know={correct}
               learning={cards.length - correct}
-              studySetId={setId}
+              firstButton={{
+                text: "Lear with new set",
+                Icon: ArrowPathIcon,
+                callback: resetLearning,
+              }}
+              secondButton={{
+                text: "Back to study set",
+                Icon: ArrowUturnLeftIcon,
+                callback: backToStudySet,
+              }}
             />
             <div>
               <div className="mb-4 text-xl font-bold text-gray-600">

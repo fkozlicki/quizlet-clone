@@ -1,3 +1,4 @@
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import FlippingCard from "../../../components/FlippingCard";
@@ -83,7 +84,15 @@ const StudySet = () => {
             />
           )}
           {cardIndex === cards.length && (
-            <Result know={cards.length} learning={0} studySetId={setId} />
+            <Result
+              know={cards.length}
+              learning={0}
+              firstButton={{
+                text: "Reset Flashcards",
+                callback: resetFlashcards,
+                Icon: ArrowPathIcon,
+              }}
+            />
           )}
         </div>
         <StudyModes setId={setId} />

@@ -1,3 +1,8 @@
+import {
+  AcademicCapIcon,
+  ArrowPathIcon,
+  ArrowUturnLeftIcon,
+} from "@heroicons/react/24/solid";
 import type { Flashcard } from "@prisma/client";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -12,7 +17,7 @@ interface FlashcardsProgress {
 }
 
 const Flashcards = () => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const setId = query.id?.toString();
   const [cards, setCards] = useState<Flashcard[]>();
   const [cardIndex, setCardIndex] = useState<number>(0);
@@ -20,6 +25,7 @@ const Flashcards = () => {
     data: studySet,
     isLoading,
     refetch,
+    error,
   } = api.studySet.getById.useQuery(
     {
       id: setId!,
@@ -38,27 +44,6 @@ const Flashcards = () => {
     know: [],
   });
 
-  const reviewToughTerms = () => {
-    setCards(learning);
-
-    setProgress((prev) => ({
-      ...prev,
-      learning: [],
-    }));
-
-    setCardIndex(0);
-  };
-
-  const resetFlashcards = () => {
-    if (!studySet) return;
-    setCards(studySet.cards);
-    setProgress({
-      know: [],
-      learning: [],
-    });
-    setCardIndex(0);
-  };
-
   const addToKnow = () => {
     if (!currentCard) return;
     setProgress((prev) => ({ ...prev, know: [...prev.know, currentCard] }));
@@ -76,7 +61,33 @@ const Flashcards = () => {
     setCardIndex((prev) => prev + value);
   };
 
-  if (isLoading) return <div>Loading flashcards...</div>;
+  if (isLoading || !setId) return <div>Loading flashcards...</div>;
+
+  if (error) return <div>{error.message}</div>;
+
+  const reviewToughTerms = () => {
+    setCards(learning);
+
+    setProgress((prev) => ({
+      ...prev,
+      learning: [],
+    }));
+
+    setCardIndex(0);
+  };
+
+  const resetFlashcards = () => {
+    setCards(studySet.cards);
+    setProgress({
+      know: [],
+      learning: [],
+    });
+    setCardIndex(0);
+  };
+
+  const backToStudySet = async () => {
+    await push(`/study-set/${setId}`);
+  };
 
   return (
     <div className="bg-slate-100">
@@ -89,7 +100,24 @@ const Flashcards = () => {
             <Result
               know={know.length}
               learning={learning.length}
-              studySetId={setId}
+              firstButton={
+                learning.length > 0
+                  ? {
+                      text: "Review tough terms",
+                      Icon: AcademicCapIcon,
+                      callback: reviewToughTerms,
+                    }
+                  : {
+                      text: "Reset flashcards",
+                      Icon: ArrowPathIcon,
+                      callback: resetFlashcards,
+                    }
+              }
+              secondButton={{
+                text: "Back to study set",
+                Icon: ArrowUturnLeftIcon,
+                callback: backToStudySet,
+              }}
             />
           </div>
         )}

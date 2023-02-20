@@ -1,3 +1,4 @@
+import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -14,13 +15,13 @@ import Result from "../../../components/Result";
 import { api } from "../../../utils/api";
 
 const Test = () => {
-  const { query } = useRouter();
+  const { query, push } = useRouter();
   const setId = query.id?.toString();
-
   const {
     data: studySetTest,
     isLoading,
     error,
+    refetch,
   } = api.studySet.getTest.useQuery(
     { id: setId! },
     {
@@ -42,6 +43,7 @@ const Test = () => {
     const incorrect =
       Object.values(data).reduce((acc, el) => acc + el.length, 0) - correct;
     setCorrectness({ correct, incorrect });
+    window && window.scrollTo(0, 0);
   };
 
   const calculateCorrectness = (answers: TestInputs) => {
@@ -69,9 +71,19 @@ const Test = () => {
     return correctiness;
   };
 
+  const takeNewTest = async () => {
+    await refetch();
+    setResult(undefined);
+    setCorrectness(undefined);
+  };
+
   if (isLoading || !setId) return <div>Loading...</div>;
 
   if (error) return <div>{error.message}</div>;
+
+  const backToStudySet = async () => {
+    await push(`/study-set/${setId}`);
+  };
 
   return (
     <div className="bg-slate-100">
@@ -79,9 +91,18 @@ const Test = () => {
         {result && correctness ? (
           <div>
             <Result
-              know={correctness?.correct}
-              learning={correctness?.incorrect}
-              studySetId={setId}
+              know={correctness.correct}
+              learning={correctness.incorrect}
+              firstButton={{
+                text: "Take a new test",
+                Icon: ArrowPathIcon,
+                callback: takeNewTest,
+              }}
+              secondButton={{
+                text: "Back to study set",
+                Icon: ArrowUturnLeftIcon,
+                callback: backToStudySet,
+              }}
             />
             <UserAnswers result={result} />
           </div>
