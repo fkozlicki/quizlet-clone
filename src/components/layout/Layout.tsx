@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState, type PropsWithChildren } from "react";
 import { Toaster } from "react-hot-toast";
 import AuthDropdown from "./AuthDropdown";
+import CreateFolder from "./CreateFolder";
 import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
 
@@ -11,6 +12,8 @@ const Layout = ({ children }: PropsWithChildren) => {
     "signup" | "login" | false
   >(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [createFolderModalOpen, setCreateFolderModalOpen] =
+    useState<boolean>(false);
   const { pathname } = useRouter();
   const { data: session } = useSession();
 
@@ -41,6 +44,12 @@ const Layout = ({ children }: PropsWithChildren) => {
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
+  const openCreateFolder = () => {
+    setCreateFolderModalOpen(true);
+  };
+  const closeCreateFolder = () => {
+    setCreateFolderModalOpen(false);
+  };
 
   return (
     <div
@@ -53,6 +62,7 @@ const Layout = ({ children }: PropsWithChildren) => {
         openSignup={openSignup}
         openLogin={openLogin}
         openMobileMenu={openMobileMenu}
+        openCreateFolder={openCreateFolder}
       />
       {children}
       {!session && (
@@ -64,6 +74,10 @@ const Layout = ({ children }: PropsWithChildren) => {
         />
       )}
       <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
+      <CreateFolder
+        closeCreateFolder={closeCreateFolder}
+        isOpen={createFolderModalOpen}
+      />
     </div>
   );
 };
