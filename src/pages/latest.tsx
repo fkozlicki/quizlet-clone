@@ -1,5 +1,5 @@
 import type { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 import StudySetPreview from "../components/StudySetPreview";
@@ -25,18 +25,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Latest = () => {
+  const { data: session, status } = useSession({ required: true });
+
+  if (status === "loading") return <div>Loading...</div>;
+
+  const userId = session.user.id;
+
   const {
     data: studySets,
     isLoading,
     error,
-  } = api.studySet.getUserSets.useQuery();
+  } = api.studySet.getUserSets.useQuery({
+    id: userId,
+  });
 
   if (isLoading) return <div>Loading...</div>;
 
   if (error) return <div>{error.message}</div>;
 
   return (
-    <div className="bg-slate-100 py-5 sm:py-10">
+    <div className="min-h-screen bg-slate-100 py-5 sm:py-10">
       <div className="mx-4 max-w-[75rem] sm:mx-6 xl:m-auto">
         {studySets.length > 0 ? (
           <div>
