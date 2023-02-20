@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import Link from "next/link";
 import React from "react";
 import StudySetPreview from "../components/StudySetPreview";
 import { api } from "../utils/api";
@@ -24,14 +25,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Latest = () => {
-  const { data: studySets } = api.studySet.getUserSets.useQuery();
+  const {
+    data: studySets,
+    isLoading,
+    error,
+  } = api.studySet.getUserSets.useQuery();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (error) return <div>{error.message}</div>;
 
   return (
     <div className="bg-slate-100 py-5 sm:py-10">
       <div className="mx-4 max-w-[75rem] sm:mx-6 xl:m-auto">
-        {studySets ? (
+        {studySets.length > 0 ? (
           <div>
-            <p>Recent</p>
+            <h1 className="mb-8 text-lg font-medium">Your study sets</h1>
             <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
               {studySets.map((set) => (
                 <StudySetPreview
@@ -46,7 +55,15 @@ const Latest = () => {
             </div>
           </div>
         ) : (
-          <div>You have no study sets</div>
+          <div className="flex flex-col items-center">
+            <h1 className="mb-4 text-lg font-medium">You have no study sets</h1>
+            <Link
+              href="/create-set"
+              className="rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
+            >
+              Create one
+            </Link>
+          </div>
         )}
       </div>
     </div>
