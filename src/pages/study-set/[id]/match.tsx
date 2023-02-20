@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useReducer } from "react";
-import MemoryCard from "../../../components/MemoryCard";
+import EndScreen from "../../../components/pages/match/EndScreen";
+import GameScreen from "../../../components/pages/match/GameScreen";
+import StartScreen from "../../../components/pages/match/StartScreen";
 import { api } from "../../../utils/api";
 
-interface GameCard {
+export interface GameCard {
   flashcardId: string;
   content: string;
 }
@@ -172,55 +174,19 @@ const Match = () => {
           Back to set
         </Link>
       </div>
-      {stage === "initial" && (
-        <div>
-          <h1 className="mb-2 text-center text-2xl font-semibold">
-            Are you ready?
-          </h1>
-          <p className="mb-5 text-center text-lg">
-            Match all terms with definitions
-          </p>
-          <button
-            onClick={startGame}
-            className="m-auto block rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-          >
-            Start game
-          </button>
-        </div>
-      )}
+      {stage === "initial" && <StartScreen startGame={startGame} />}
       {stage === "start" && (
-        <div>
-          <div className="mb-4 text-xl">{ellapsedTime.toFixed(1)} sec.</div>
-          <div className="grid h-full grid-cols-3 gap-4">
-            {cards &&
-              cards.map((card, index) => (
-                <MemoryCard
-                  key={index}
-                  content={card.content}
-                  selectCallback={() => selectCard(index)}
-                  isSelected={checkIsSelected(index)}
-                  isMatched={checkIsMatched(index)}
-                  isMismatch={checkIsMisatch(index)}
-                />
-              ))}
-          </div>
-        </div>
+        <GameScreen
+          cards={cards}
+          time={ellapsedTime}
+          selectCard={selectCard}
+          checkIsMatched={checkIsMatched}
+          checkIsMisatch={checkIsMisatch}
+          checkIsSelected={checkIsSelected}
+        />
       )}
       {stage === "finished" && (
-        <div className="flex flex-col items-center">
-          <div className="text-lg">You finished in</div>
-          <div className="mb-4 text-2xl font-bold">
-            {ellapsedTime.toFixed(1)} sec.
-          </div>
-          {/* IF RECORD => RECORD */}
-          {/* <div className="text-lg">Your best score is {}</div> */}
-          <button
-            onClick={playAgain}
-            className="rounded-md bg-blue-600 px-4 py-2 font-medium text-white hover:bg-blue-700"
-          >
-            Play again
-          </button>
-        </div>
+        <EndScreen time={ellapsedTime} playAgain={playAgain} />
       )}
     </div>
   );

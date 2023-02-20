@@ -2,6 +2,7 @@ import type { StudySet, User } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import ProfileImage from "./ProfileImage";
 
 interface StudySetPreviewProps {
   id: StudySet["id"];
@@ -31,19 +32,12 @@ const StudySetPreview = ({
             <p>{termsCount} terms</p>
           </div>
           <div className="flex items-center gap-2">
-            {authorImage ? (
-              <Image
-                src={authorImage}
-                alt="author icon"
-                width={24}
-                height={24}
-                className="rounded-full"
-              />
-            ) : (
-              <div className="h-6 w-6 rounded-full bg-slate-600 uppercase text-white">
-                {authorName?.charAt(0)}
-              </div>
-            )}
+            <ProfileImage
+              image={authorImage}
+              userName={authorName}
+              size={24}
+              fontSize={14}
+            />
             <span>{authorName}</span>
           </div>
         </div>
