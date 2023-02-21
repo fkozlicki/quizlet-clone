@@ -33,6 +33,7 @@
     "react-hook-form": "^7.42.1",
     "react-hot-toast": "^2.4.0",
     "react-minimal-pie-chart": "^8.4.0",
+    "slugify": "^1.6.5",
     "superjson": "1.9.1",
     "zod": "^3.20.2"
   },
