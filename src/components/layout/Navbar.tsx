@@ -79,14 +79,14 @@ const Navbar = ({
             </div>
             <div className="hidden items-center px-2 md:flex">
               <div className="relative">
-                <div
+                <button
                   onClick={toggleCreateDropdown}
                   className="flex items-center gap-2 rounded bg-blue-600 px-3 py-[6px] font-medium text-white hover:bg-blue-700"
                 >
                   <span className="hidden lg:block">Create</span>
                   <ChevronDownIcon width={20} className="hidden lg:block" />
                   <PlusIcon width={20} className="lg:hidden" />
-                </div>
+                </button>
                 {createDropdownOpen && (
                   <div className="absolute top-[110%] left-0 min-w-[10rem] rounded-2xl border bg-white py-2 shadow-lg">
                     <button
