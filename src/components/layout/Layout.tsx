@@ -1,21 +1,43 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import React, { useEffect, useState, type PropsWithChildren } from "react";
-import { Toaster } from "react-hot-toast";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from "react";
+import { toast, Toaster } from "react-hot-toast";
+import { api } from "../../utils/api";
 import AuthDropdown from "./AuthDropdown";
-import CreateFolder from "./CreateFolder";
+import FolderModal from "./FolderModal";
 import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
 
 const Layout = ({ children }: PropsWithChildren) => {
+  const resetForm = useRef<(() => void) | null>(null);
   const [authDropdownOpen, setAuthDropdownOpen] = useState<
     "signup" | "login" | false
   >(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [createFolderModalOpen, setCreateFolderModalOpen] =
     useState<boolean>(false);
-  const { pathname } = useRouter();
+  const { pathname, push } = useRouter();
   const { data: session } = useSession();
+  const {
+    mutate,
+    error,
+    reset: resetFolderMutation,
+  } = api.folder.create.useMutation({
+    onSuccess: async ({ slug }) => {
+      const { current } = resetForm;
+      current && current();
+      session && (await push(`/${session.user.id}/folders/${slug}`));
+      closeCreateFolder();
+    },
+    onError: () => {
+      toast("Couldn't create folder");
+    },
+  });
 
   useEffect(() => {
     closeMobileMenu();
@@ -74,10 +96,16 @@ const Layout = ({ children }: PropsWithChildren) => {
         />
       )}
       <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
-      <CreateFolder
-        closeCreateFolder={closeCreateFolder}
-        isOpen={createFolderModalOpen}
-      />
+      {session && createFolderModalOpen && (
+        <FolderModal
+          closeCreateFolder={closeCreateFolder}
+          variant="create"
+          mutate={mutate}
+          errorMessage={error?.message}
+          resetForm={resetForm}
+          resetFolderMutation={resetFolderMutation}
+        />
+      )}
     </div>
   );
 };
