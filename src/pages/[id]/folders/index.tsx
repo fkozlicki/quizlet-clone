@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import React from "react";
 import FolderPreview from "../../../components/FolderPreview";
@@ -56,18 +57,21 @@ const Folders = ({ achivements }: FoldersProps) => {
   if (isError) return <div>{error.message}</div>;
 
   return (
-    <ProfileLayout achivements={achivements}>
-      <div className="grid gap-y-4">
-        {folders.map(({ title, slug, studySets }, index) => (
-          <FolderPreview
-            key={index}
-            title={title}
-            setsCount={studySets.length}
-            href={`/${userId}/folders/${slug}`}
-          />
-        ))}
-      </div>
-    </ProfileLayout>
+    <>
+      <NextSeo title="Quizlet 2.0 - Folders" />
+      <ProfileLayout achivements={achivements}>
+        <div className="grid gap-y-4">
+          {folders.map(({ title, slug, studySets }, index) => (
+            <FolderPreview
+              key={index}
+              title={title}
+              setsCount={studySets.length}
+              href={`/${userId}/folders/${slug}`}
+            />
+          ))}
+        </div>
+      </ProfileLayout>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import React from "react";
 import ProfileLayout from "../../components/layout/ProfileLayout";
@@ -53,28 +54,31 @@ const StudySets = ({ achivements }: StudySetsProps) => {
   if (error) return <div>{error.message}</div>;
 
   return (
-    <ProfileLayout achivements={achivements}>
-      <div>
-        {studySets.length > 0 ? (
-          <div>
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-              {studySets.map((set) => (
-                <StudySetPreview
-                  key={set.id}
-                  authorImage={set.user.image}
-                  authorName={set.user.name}
-                  title={set.title}
-                  termsCount={set.cards.length}
-                  id={set.id}
-                />
-              ))}
+    <>
+      <NextSeo title="Quizlet 2.0 - Study sets" />
+      <ProfileLayout achivements={achivements}>
+        <div>
+          {studySets.length > 0 ? (
+            <div>
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                {studySets.map((set) => (
+                  <StudySetPreview
+                    key={set.id}
+                    authorImage={set.user.image}
+                    authorName={set.user.name}
+                    title={set.title}
+                    termsCount={set.cards.length}
+                    id={set.id}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="">This user doesn&apos;t have any sets</div>
-        )}
-      </div>
-    </ProfileLayout>
+          ) : (
+            <div className="">This user doesn&apos;t have any sets</div>
+          )}
+        </div>
+      </ProfileLayout>
+    </>
   );
 };
 

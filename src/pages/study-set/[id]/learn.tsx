@@ -1,4 +1,5 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import React, { useState, type MouseEvent } from "react";
 import CardPreview from "../../../components/CardPreview";
@@ -66,53 +67,56 @@ const Learn = () => {
   };
 
   return (
-    <div className="bg-slate-100">
-      <div className="m-auto max-w-[65rem] p-4 md:py-12">
-        {cards && <ProgressBar value={cardIndex} max={cards.length} />}
-        {currentCard && (
-          <MultipleChoice
-            term={currentCard.term}
-            answers={currentCard.answers}
-            index={cardIndex}
-            callback={chooseAnswer}
-            type="button"
-          />
-        )}
-        {cards && cardIndex === cards.length && (
-          <div>
-            <div className="mb-8 text-2xl font-bold">U finished learning</div>
-            <Result
-              know={correct}
-              learning={cards.length - correct}
-              firstButton={{
-                text: "Lear with new set",
-                Icon: ArrowPathIcon,
-                callback: resetLearning,
-              }}
-              secondButton={{
-                text: "Back to study set",
-                Icon: ArrowUturnLeftIcon,
-                callback: backToStudySet,
-              }}
+    <>
+      <NextSeo title="Quizlet 2.0 - Learn" />
+      <div className="bg-slate-100">
+        <div className="m-auto max-w-[65rem] p-4 md:py-12">
+          {cards && <ProgressBar value={cardIndex} max={cards.length} />}
+          {currentCard && (
+            <MultipleChoice
+              term={currentCard.term}
+              answers={currentCard.answers}
+              index={cardIndex}
+              callback={chooseAnswer}
+              type="button"
             />
+          )}
+          {cards && cardIndex === cards.length && (
             <div>
-              <div className="mb-4 text-xl font-bold text-gray-600">
-                Terms studied in this round
-              </div>
-              <div className="flex max-w-3xl flex-col gap-4">
-                {cards.map(({ term, definition }, index) => (
-                  <CardPreview
-                    key={index}
-                    term={term}
-                    definition={definition}
-                  />
-                ))}
+              <div className="mb-8 text-2xl font-bold">U finished learning</div>
+              <Result
+                know={correct}
+                learning={cards.length - correct}
+                firstButton={{
+                  text: "Lear with new set",
+                  Icon: ArrowPathIcon,
+                  callback: resetLearning,
+                }}
+                secondButton={{
+                  text: "Back to study set",
+                  Icon: ArrowUturnLeftIcon,
+                  callback: backToStudySet,
+                }}
+              />
+              <div>
+                <div className="mb-4 text-xl font-bold text-gray-600">
+                  Terms studied in this round
+                </div>
+                <div className="flex max-w-3xl flex-col gap-4">
+                  {cards.map(({ term, definition }, index) => (
+                    <CardPreview
+                      key={index}
+                      term={term}
+                      definition={definition}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

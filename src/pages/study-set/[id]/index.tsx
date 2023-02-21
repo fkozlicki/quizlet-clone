@@ -1,4 +1,5 @@
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import FlippingCard from "../../../components/FlippingCard";
@@ -53,63 +54,67 @@ const StudySet = () => {
   const currentCard = studySet.cards?.[cardIndex];
   const otherSets = studySet.user.studySets;
   const {
+    title,
     cards,
     userId,
     user: { image, name },
   } = studySet;
 
   return (
-    <div className="overflow-hidden bg-slate-100">
-      <div className="m-auto max-w-[55rem] p-4 sm:p-10">
-        <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
-          {studySet.title}
-        </h1>
-        {studySet.description && (
-          <p className="mb-8 text-lg">{studySet.description}</p>
-        )}
-        <ProgressBar value={cardIndex} max={cards.length} />
-        <div className="mb-12">
-          {currentCard && (
-            <FlippingCard
-              variant="normal"
-              buttonVariant="chevron"
-              refetchSet={refetch}
-              id={currentCard.id}
+    <>
+      <NextSeo title={`Quizlet 2.0 - Study set ${title}`} />
+      <div className="overflow-hidden bg-slate-100">
+        <div className="m-auto max-w-[55rem] p-4 sm:p-10">
+          <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
+            {studySet.title}
+          </h1>
+          {studySet.description && (
+            <p className="mb-8 text-lg">{studySet.description}</p>
+          )}
+          <ProgressBar value={cardIndex} max={cards.length} />
+          <div className="mb-12">
+            {currentCard && (
+              <FlippingCard
+                variant="normal"
+                buttonVariant="chevron"
+                refetchSet={refetch}
+                id={currentCard.id}
+                userId={userId}
+                term={currentCard.term}
+                definition={currentCard.definition}
+                index={cardIndex}
+                length={cards.length}
+                changeCardCallback={changeCard}
+              />
+            )}
+            {cardIndex === cards.length && (
+              <Result
+                know={cards.length}
+                learning={0}
+                firstButton={{
+                  text: "Reset Flashcards",
+                  callback: resetFlashcards,
+                  Icon: ArrowPathIcon,
+                }}
+              />
+            )}
+          </div>
+          <StudyModes setId={setId} />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <CreatedBy userImage={image} userName={name} />
+            <StudySetCTA
               userId={userId}
-              term={currentCard.term}
-              definition={currentCard.definition}
-              index={cardIndex}
-              length={cards.length}
-              changeCardCallback={changeCard}
+              setId={setId}
+              closeMenu={closeMenu}
+              menuOpen={menuOpen}
+              toggleMenu={toggleMenu}
             />
-          )}
-          {cardIndex === cards.length && (
-            <Result
-              know={cards.length}
-              learning={0}
-              firstButton={{
-                text: "Reset Flashcards",
-                callback: resetFlashcards,
-                Icon: ArrowPathIcon,
-              }}
-            />
-          )}
+          </div>
+          <CardsList cards={cards} setId={setId} />
+          {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
         </div>
-        <StudyModes setId={setId} />
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-          <CreatedBy userImage={image} userName={name} />
-          <StudySetCTA
-            userId={userId}
-            setId={setId}
-            closeMenu={closeMenu}
-            menuOpen={menuOpen}
-            toggleMenu={toggleMenu}
-          />
-        </div>
-        <CardsList cards={cards} setId={setId} />
-        {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
       </div>
-    </div>
+    </>
   );
 };
 

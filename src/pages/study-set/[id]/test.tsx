@@ -1,13 +1,7 @@
 import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { PieChart } from "react-minimal-pie-chart";
-import { z } from "zod";
-import MultipleChoice from "../../../components/cards/MultipleChoice";
-import TrueOrFalse from "../../../components/cards/TrueOrFalse";
-import Written from "../../../components/cards/Written";
 import type { TestInputs } from "../../../components/pages/test/TestForm";
 import TestForm from "../../../components/pages/test/TestForm";
 import UserAnswers from "../../../components/pages/test/UserAnswers";
@@ -86,38 +80,41 @@ const Test = () => {
   };
 
   return (
-    <div className="bg-slate-100">
-      <div className="m-auto max-w-[55rem] p-4 sm:p-10">
-        {result && correctness ? (
-          <div>
-            <Result
-              know={correctness.correct}
-              learning={correctness.incorrect}
-              firstButton={{
-                text: "Take a new test",
-                Icon: ArrowPathIcon,
-                callback: takeNewTest,
-              }}
-              secondButton={{
-                text: "Back to study set",
-                Icon: ArrowUturnLeftIcon,
-                callback: backToStudySet,
-              }}
-            />
-            <UserAnswers result={result} />
-          </div>
-        ) : (
-          <>
-            {studySetTest && (
-              <TestForm
-                studySetTest={studySetTest}
-                formCallack={submitAnswers}
+    <>
+      <NextSeo title="Quizlet 2.0 - Test" />
+      <div className="bg-slate-100">
+        <div className="m-auto max-w-[55rem] p-4 sm:p-10">
+          {result && correctness ? (
+            <div>
+              <Result
+                know={correctness.correct}
+                learning={correctness.incorrect}
+                firstButton={{
+                  text: "Take a new test",
+                  Icon: ArrowPathIcon,
+                  callback: takeNewTest,
+                }}
+                secondButton={{
+                  text: "Back to study set",
+                  Icon: ArrowUturnLeftIcon,
+                  callback: backToStudySet,
+                }}
               />
-            )}
-          </>
-        )}
+              <UserAnswers result={result} />
+            </div>
+          ) : (
+            <>
+              {studySetTest && (
+                <TestForm
+                  studySetTest={studySetTest}
+                  formCallack={submitAnswers}
+                />
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

@@ -5,6 +5,7 @@ import { api } from "../utils/api";
 import { toast } from "react-hot-toast";
 import type { CreateSetInputs } from "../components/StudySetForm";
 import StudySetForm from "../components/StudySetForm";
+import { NextSeo } from "next-seo";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -65,15 +66,18 @@ const CreateSet = () => {
   };
 
   return (
-    <div className="bg-slate-100">
-      <div className="mx-4 max-w-[75rem] pb-4 sm:mx-10 xl:mx-auto">
-        <StudySetForm
-          formCallback={createStudySet}
-          initialData={initialData}
-          resetRef={resetRef}
-        />
+    <>
+      <NextSeo title="Quizlet 2.0 - Create study set" />
+      <div className="bg-slate-100">
+        <div className="mx-4 max-w-[75rem] pb-4 sm:mx-10 xl:mx-auto">
+          <StudySetForm
+            formCallback={createStudySet}
+            initialData={initialData}
+            resetRef={resetRef}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

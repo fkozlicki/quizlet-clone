@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { api } from "../utils/api";
 import "../styles/globals.css";
 import Layout from "../components/layout/Layout";
+import { DefaultSeo } from "next-seo";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -12,6 +13,15 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <SessionProvider session={session}>
       <Layout>
+        <DefaultSeo
+          title="Quizlet 2.0"
+          description="Quizlet Clone app built with T3Stack"
+          openGraph={{
+            type: "website",
+            locale: "en_IE",
+            url: process.env.NEXT_PUBLIC_APP_DOMAIN,
+          }}
+        />
         <Component {...pageProps} />
       </Layout>
     </SessionProvider>

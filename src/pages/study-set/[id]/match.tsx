@@ -1,3 +1,4 @@
+import { NextSeo } from "next-seo";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useReducer } from "react";
@@ -165,30 +166,33 @@ const Match = () => {
   };
 
   return (
-    <div className="m-auto max-w-[55rem] p-4 sm:p-10">
-      <div className="mb-5 flex justify-end">
-        <Link
-          href={`/study-set/${id!}`}
-          className="rounded-md py-2 px-4 font-medium hover:bg-slate-100"
-        >
-          Back to set
-        </Link>
+    <>
+      <NextSeo title="Quizlet 2.0 - Match" />
+      <div className="m-auto max-w-[55rem] p-4 sm:p-10">
+        <div className="mb-5 flex justify-end">
+          <Link
+            href={`/study-set/${id!}`}
+            className="rounded-md py-2 px-4 font-medium hover:bg-slate-100"
+          >
+            Back to set
+          </Link>
+        </div>
+        {stage === "initial" && <StartScreen startGame={startGame} />}
+        {stage === "start" && (
+          <GameScreen
+            cards={cards}
+            time={ellapsedTime}
+            selectCard={selectCard}
+            checkIsMatched={checkIsMatched}
+            checkIsMisatch={checkIsMisatch}
+            checkIsSelected={checkIsSelected}
+          />
+        )}
+        {stage === "finished" && (
+          <EndScreen time={ellapsedTime} playAgain={playAgain} />
+        )}
       </div>
-      {stage === "initial" && <StartScreen startGame={startGame} />}
-      {stage === "start" && (
-        <GameScreen
-          cards={cards}
-          time={ellapsedTime}
-          selectCard={selectCard}
-          checkIsMatched={checkIsMatched}
-          checkIsMisatch={checkIsMisatch}
-          checkIsSelected={checkIsSelected}
-        />
-      )}
-      {stage === "finished" && (
-        <EndScreen time={ellapsedTime} playAgain={playAgain} />
-      )}
-    </div>
+    </>
   );
 };
 

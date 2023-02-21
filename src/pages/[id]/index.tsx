@@ -5,6 +5,7 @@ import ProfileLayout from "../../components/layout/ProfileLayout";
 import ReactCalendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import { api } from "../../utils/api";
+import { NextSeo } from "next-seo";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -46,17 +47,20 @@ const Profile = ({ achivements }: ProfileProps) => {
   console.log(data?.sessions);
 
   return (
-    <ProfileLayout achivements={achivements}>
-      <div>
-        <h2 className="mb-4 text-xl font-bold">Recent activity</h2>
-        <div className="grid h-[400px] w-full place-items-center rounded-2xl bg-white p-4 shadow-lg">
-          <ReactCalendar
-            defaultView="month"
-            // formatDay={(locale, date) => console.log(locale, date)}
-          />
+    <>
+      <NextSeo title="Quizlet 2.0 - Profile" />
+      <ProfileLayout achivements={achivements}>
+        <div>
+          <h2 className="mb-4 text-xl font-bold">Recent activity</h2>
+          <div className="grid h-[400px] w-full place-items-center rounded-2xl bg-white p-4 shadow-lg">
+            <ReactCalendar
+              defaultView="month"
+              // formatDay={(locale, date) => console.log(locale, date)}
+            />
+          </div>
         </div>
-      </div>
-    </ProfileLayout>
+      </ProfileLayout>
+    </>
   );
 };
 
