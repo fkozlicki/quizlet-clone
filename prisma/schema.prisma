@@ -58,6 +58,7 @@ model User {
     accounts      Account[]
     sessions      Session[]
     studySets     StudySet[]
+    folders       Folder[]
 }
 
 model VerificationToken {
@@ -83,4 +84,16 @@ model StudySet {
     userId      String
     cards       Flashcard[]
     user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    folderId    String?
+    folder      Folder?     @relation(fields: [folderId], references: [id])
+}
+
+model Folder {
+    id          String     @id @default(cuid())
+    title       String
+    slug        String
+    description String?
+    studySets   StudySet[]
+    userId      String
+    user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
