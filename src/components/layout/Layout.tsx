@@ -38,6 +38,18 @@ const Layout = ({ children }: PropsWithChildren) => {
       toast("Couldn't create folder");
     },
   });
+  const { mutateAsync } = api.activity.create.useMutation();
+
+  useEffect(() => {
+    const createActivity = async () => {
+      if (session) {
+        await mutateAsync({
+          userId: session.user.id,
+        });
+      }
+    };
+    createActivity().catch(console.error);
+  }, [session]);
 
   useEffect(() => {
     closeMobileMenu();
