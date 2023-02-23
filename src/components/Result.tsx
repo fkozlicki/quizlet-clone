@@ -43,7 +43,7 @@ const Result = ({ know, learning, firstButton, secondButton }: ResultProps) => {
                 textAnchor="middle"
                 className="font-medium"
               >
-                {dataEntry.percentage}%
+                {dataEntry.percentage.toFixed(1)}%
               </text>
             )}
             labelStyle={{
