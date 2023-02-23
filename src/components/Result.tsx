@@ -3,7 +3,9 @@ import React from "react";
 import { PieChart } from "react-minimal-pie-chart";
 
 type ResultButton = {
-  Icon: any;
+  Icon: (
+    props: ComponentProps<"svg"> & { title?: string; titleId?: string }
+  ) => JSX.Element;
   text: string;
   callback: () => Promise<void> | void;
 };
