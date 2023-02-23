@@ -4,11 +4,31 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-  body {
-    font-family: "Jost", sans-serif;
-  }
+html {
+  scroll-behavior: smooth;
+}
+* {
+  font-family: "Jost", sans-serif;
+}
+.react-calendar {
+  border: none !important;
+}
+.react-calendar__month-view__weekdays {
+  color: gray;
+  font-weight: 600 !important;
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none;
+}
+.react-calendar__tile:hover {
+  background: transparent !important;
+}
+.react-calendar__tile--now:enabled {
+  background: white;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: initial !important;
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: #757575 !important;
 }
