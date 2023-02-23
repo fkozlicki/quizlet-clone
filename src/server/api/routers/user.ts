@@ -45,8 +45,7 @@ export const userRouter = createTRPCRouter({
           name,
           email,
           password: hashedPassword,
-          // NextJS doesnt serialize Date
-          birthday: birthday.toISOString(),
+          birthday: birthday,
         },
       });
 
