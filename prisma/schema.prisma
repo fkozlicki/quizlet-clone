@@ -41,9 +41,9 @@ model Account {
 
 model Session {
     id           String   @id @default(cuid())
-    sessionToken String   @unique
     userId       String
     expires      DateTime
+    sessionToken String   @unique
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -59,6 +59,7 @@ model User {
     sessions      Session[]
     studySets     StudySet[]
     folders       Folder[]
+    activity      Activity[]
 }
 
 model VerificationToken {
@@ -96,4 +97,11 @@ model Folder {
     studySets   StudySet[]
     userId      String
     user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Activity {
+    id     String   @id @default(cuid())
+    date   DateTime @default(now())
+    user   User     @relation(fields: [userId], references: [id])
+    userId String
 }
