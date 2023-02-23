@@ -13,10 +13,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (id !== session?.user?.id) {
     return {
-      redirect: {
-        destination: `/${id}/study-sets`,
-        permanent: false,
-      },
       props: {
         achivements: false,
       },
@@ -74,7 +70,13 @@ const StudySets = ({ achivements }: StudySetsProps) => {
               </div>
             </div>
           ) : (
-            <div className="">This user doesn&apos;t have any sets</div>
+            <>
+              {achivements ? (
+                <div>You have not sets</div>
+              ) : (
+                <div className="">This user doesn&apos;t have any sets</div>
+              )}
+            </>
           )}
         </div>
       </ProfileLayout>
