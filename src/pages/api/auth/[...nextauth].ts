@@ -35,11 +35,12 @@ export function requestWrapper(
   const opts: NextAuthOptions = {
     adapter: adapter,
     callbacks: {
-      // Include user.id on session
       session({ session, user }) {
+        // Include user.id on session
         if (session.user) {
           session.user.id = user.id;
         }
+
         return session;
       },
       async signIn({ user, account, profile, email, credentials }) {
