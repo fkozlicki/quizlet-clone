@@ -13,10 +13,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (id !== session?.user?.id) {
     return {
-      redirect: {
-        destination: `/${id}/study-sets`,
-        permanent: false,
-      },
       props: {
         achivements: false,
       },
@@ -60,16 +56,26 @@ const Folders = ({ achivements }: FoldersProps) => {
     <>
       <NextSeo title="Quizlet 2.0 - Folders" />
       <ProfileLayout achivements={achivements}>
-        <div className="grid gap-y-4">
-          {folders.map(({ title, slug, studySets }, index) => (
-            <FolderPreview
-              key={index}
-              title={title}
-              setsCount={studySets.length}
-              href={`/${userId}/folders/${slug}`}
-            />
-          ))}
-        </div>
+        {folders.length > 0 ? (
+          <div className="grid gap-y-4">
+            {folders.map(({ title, slug, studySets }, index) => (
+              <FolderPreview
+                key={index}
+                title={title}
+                setsCount={studySets.length}
+                href={`/${userId}/folders/${slug}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div>
+            {achivements ? (
+              <div>You have no folders</div>
+            ) : (
+              <div>User have no folders</div>
+            )}
+          </div>
+        )}
       </ProfileLayout>
     </>
   );
