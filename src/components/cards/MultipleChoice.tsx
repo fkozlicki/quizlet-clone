@@ -1,5 +1,5 @@
 import type { MouseEvent } from "react";
-import React, { useRef } from "react";
+import React from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 interface MultipleChoiceProps {
