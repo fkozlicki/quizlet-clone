@@ -23,8 +23,8 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   FACEBOOK_CLIENT_SECRET: z.string(),
-  APPLE_ID: z.string(),
-  APPLE_SECRET: z.string(),
+  // APPLE_ID: z.string(),
+  // APPLE_SECRET: z.string(),
 });
 
 /**
@@ -33,7 +33,7 @@ export const serverSchema = z.object({
  * To expose them to the client, prefix them with `NEXT_PUBLIC_`.
  */
 export const clientSchema = z.object({
-  // NEXT_PUBLIC_CLIENTVAR: z.string(),
+  NEXT_PUBLIC_APP_DOMAIN: z.string(),
 });
 
 /**
@@ -44,4 +44,6 @@ export const clientSchema = z.object({
  */
 export const clientEnv = {
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
+  NEXT_PUBLIC_APP_DOMAIN:
+    process.env.NEXT_PUBLIC_APP_DOMAIN ?? "https://quizletv2.com/",
 };
