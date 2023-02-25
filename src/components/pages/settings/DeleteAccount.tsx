@@ -1,7 +1,6 @@
 import { XMarkIcon } from "@heroicons/react/24/solid";
 import type { User } from "@prisma/client";
 import { signOut } from "next-auth/react";
-import Image from "next/image";
 import React, { useState } from "react";
 import { api } from "../../../utils/api";
 import ProfileImage from "../../ProfileImage";
