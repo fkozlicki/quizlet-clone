@@ -2,33 +2,24 @@ import { XMarkIcon } from "@heroicons/react/24/solid";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
 import React from "react";
+import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import LoginForm from "./LoginForm";
 import SignupForm from "./SignupForm";
 
-interface AuthDropdownProps {
-  status: "signup" | "login" | false;
-  openSignup: () => void;
-  openLogin: () => void;
-  close: () => void;
-}
+const AuthDropdown = () => {
+  const [state, dispatch] = useAuthDropdownContext();
 
-const AuthDropdown = ({
-  status,
-  openSignup,
-  openLogin,
-  close,
-}: AuthDropdownProps) => {
   return (
     <div
       className={`fixed left-0 top-0 flex h-full w-full bg-white transition-transform duration-300 ${
-        status === false
+        state === "closed"
           ? "-translate-y-full opacity-0"
           : "z-50 translate-y-0 opacity-100"
       }`}
     >
       <div className="relative hidden flex-[50%] md:block">
         <Image
-          src="/login.png"
+          src="/login.avif"
           alt="login image"
           fill
           className="object-cover"
@@ -39,26 +30,26 @@ const AuthDropdown = ({
           <div className="mb-12 flex gap-8">
             <h3
               className={`${
-                status === "signup"
+                state === "signup"
                   ? "border-b-4 border-yellow-500 text-black"
                   : "text-gray-400"
               } cursor-pointer text-2xl font-bold`}
-              onClick={openSignup}
+              onClick={() => dispatch("openSignup")}
             >
               Sign up
             </h3>
             <h3
               className={`${
-                status === "login"
+                state === "login"
                   ? "border-b-4 border-yellow-500 text-black"
                   : "text-gray-400"
               } cursor-pointer text-2xl font-bold`}
-              onClick={openLogin}
+              onClick={() => dispatch("openLogin")}
             >
               Log in
             </h3>
           </div>
-          {status === "login" && (
+          {state === "login" && (
             <div className="mb-8 flex flex-col gap-4">
               <button
                 onClick={() =>
@@ -102,7 +93,7 @@ const AuthDropdown = ({
               </button> */}
             </div>
           )}
-          {status === "signup" && (
+          {state === "signup" && (
             <>
               <div className="mb-8 flex flex-col gap-4">
                 <button
@@ -130,11 +121,14 @@ const AuthDropdown = ({
             </>
           )}
 
-          {status === "login" && <LoginForm />}
-          {status === "signup" && <SignupForm />}
+          {state === "login" && <LoginForm />}
+          {state === "signup" && <SignupForm />}
         </div>
       </div>
-      <button onClick={close} className="absolute right-4 top-4 h-6 w-6">
+      <button
+        onClick={() => dispatch("close")}
+        className="absolute right-4 top-4 h-6 w-6"
+      >
         <XMarkIcon width={24} />
       </button>
     </div>

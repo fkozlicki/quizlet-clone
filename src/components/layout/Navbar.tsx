@@ -9,24 +9,20 @@ import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import ProfileImage from "../ProfileImage";
+import Image from "next/image";
+import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 
 interface NavbarProps {
-  openSignup: () => void;
-  openLogin: () => void;
   openMobileMenu: () => void;
   openCreateFolder: () => void;
 }
 
-const Navbar = ({
-  openSignup,
-  openLogin,
-  openMobileMenu,
-  openCreateFolder,
-}: NavbarProps) => {
+const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
   const { data: session } = useSession();
   const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
   const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
   const { push, pathname } = useRouter();
+  const [state, dispatch] = useAuthDropdownContext();
 
   useEffect(() => {
     setMenuDropdownOpen(false);
@@ -46,7 +42,7 @@ const Navbar = ({
       setCreateDropdownOpen(false);
       openCreateFolder();
     } else {
-      openLogin();
+      dispatch("openLogin");
     }
   };
 
@@ -54,7 +50,7 @@ const Navbar = ({
     if (session) {
       await push(link);
     } else {
-      openLogin();
+      dispatch("openLogin");
     }
   };
 
@@ -65,14 +61,14 @@ const Navbar = ({
           <div className="flex">
             <Link
               href="/"
-              className="hidden h-full px-2 leading-[4rem] md:block"
+              className="hidden h-full px-2 leading-[4rem] md:flex md:items-center"
             >
-              Flash.it
+              <Image src="/logo.svg" alt="logo" width={110} height={24} />
             </Link>
             <div className="hidden h-full md:flex">
               <Link
                 href="/"
-                className="mx-3 hidden h-full leading-[4rem] lg:block"
+                className="mx-3 hidden h-full text-lg font-medium leading-[4rem] lg:block"
               >
                 Home
               </Link>
@@ -127,14 +123,14 @@ const Navbar = ({
               <>
                 <div className="px-6">
                   <button
-                    onClick={openLogin}
+                    onClick={() => dispatch("openLogin")}
                     className="rounded px-2 py-1 hover:bg-indigo-50"
                   >
                     Log in
                   </button>
                 </div>
                 <button
-                  onClick={openSignup}
+                  onClick={() => dispatch("openSignup")}
                   className="rounded bg-amber-400 py-1 px-2 hover:bg-amber-300"
                 >
                   <span>Sign up</span>

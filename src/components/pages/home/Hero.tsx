@@ -1,16 +1,20 @@
 import Image from "next/image";
 import React from "react";
+import { useAuthDropdownContext } from "../../../contexts/AuthDropdownContext";
 
 const Hero = () => {
+  const [, dispatch] = useAuthDropdownContext();
+
   return (
     <div className="relative">
-      <div className="relative h-[720px] w-full">
+      <div className="relative h-[834px] w-full">
         <Image
-          src="/hero.avif"
+          src="/hero.jpg"
           alt="Hero image"
           fill
-          className="object-cover "
+          className="object-cover object-[20%]"
         />
+        <div className="absolute h-full w-full bg-black/50"></div>
       </div>
       <div className="absolute top-0 left-0 h-full w-full p-7 md:py-16 md:px-7 lg:px-20 2xl:px-[10rem] 2xl:py-20">
         <div className="flex h-full w-full flex-col items-start justify-start md:justify-center">
@@ -24,7 +28,10 @@ const Hero = () => {
               grades and reach their goals.
             </p>
           </div>
-          <button className="ml-4 mb-12 rounded-lg bg-blue-600 px-6 py-3 text-white sm:ml-8  md:ml-12">
+          <button
+            onClick={() => dispatch("openSignup")}
+            className="ml-4 mb-12 rounded-lg bg-blue-600 px-6 py-3 text-white hover:bg-blue-700  sm:ml-8 md:ml-12"
+          >
             Sign up for free
           </button>
         </div>

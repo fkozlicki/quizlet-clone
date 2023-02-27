@@ -7,6 +7,7 @@ import React, {
   type PropsWithChildren,
 } from "react";
 import { toast, Toaster } from "react-hot-toast";
+import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { api } from "../../utils/api";
 import AuthDropdown from "./AuthDropdown";
 import FolderModal from "./FolderModal";
@@ -15,10 +16,8 @@ import Navbar from "./Navbar";
 
 const Layout = ({ children }: PropsWithChildren) => {
   const resetForm = useRef<(() => void) | null>(null);
-  const [authDropdownOpen, setAuthDropdownOpen] = useState<
-    "signup" | "login" | false
-  >(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [state] = useAuthDropdownContext();
   const [createFolderModalOpen, setCreateFolderModalOpen] =
     useState<boolean>(false);
   const { pathname, push } = useRouter();
@@ -63,15 +62,6 @@ const Layout = ({ children }: PropsWithChildren) => {
     }
   }, [mobileMenuOpen]);
 
-  const openSignup = () => {
-    setAuthDropdownOpen("signup");
-  };
-  const openLogin = () => {
-    setAuthDropdownOpen("login");
-  };
-  const closeAuthDropdown = () => {
-    setAuthDropdownOpen(false);
-  };
   const openMobileMenu = () => {
     setMobileMenuOpen(true);
   };
@@ -88,25 +78,16 @@ const Layout = ({ children }: PropsWithChildren) => {
   return (
     <div
       className={`relative ${
-        authDropdownOpen === false ? "" : "h-screen overflow-hidden"
+        state === "closed" ? "" : "h-screen overflow-hidden"
       }`}
     >
       <Toaster position="top-center" />
       <Navbar
-        openSignup={openSignup}
-        openLogin={openLogin}
         openMobileMenu={openMobileMenu}
         openCreateFolder={openCreateFolder}
       />
       {children}
-      {!session && (
-        <AuthDropdown
-          status={authDropdownOpen}
-          openSignup={openSignup}
-          openLogin={openLogin}
-          close={closeAuthDropdown}
-        />
-      )}
+      {!session && <AuthDropdown />}
       <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
       {session && createFolderModalOpen && (
         <FolderModal
