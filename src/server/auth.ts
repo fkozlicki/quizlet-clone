@@ -1,8 +1,4 @@
-import type {
-  NextApiRequest,
-  NextApiResponse,
-  GetServerSidePropsContext,
-} from "next";
+import type { NextApiRequest, NextApiResponse } from "next";
 import { unstable_getServerSession } from "next-auth";
 import { requestWrapper } from "../pages/api/auth/[...nextauth]";
 
