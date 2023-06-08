@@ -24,7 +24,7 @@ const SignupForm = () => {
     register,
     handleSubmit,
     watch,
-    formState: { errors },
+    formState: { errors, isValid },
     reset,
   } = useForm<CredentialsInputs>({
     mode: "onChange",
@@ -73,7 +73,7 @@ const SignupForm = () => {
 
   const notFilledAllFields = () => {
     const { birthday, email, name, password, accepted } = watch();
-    if (Object.keys(watch()).length === 0) return true;
+    if (Object.values(watch()).length === 0) return true;
     return (
       Object.values(birthday).some((value) => value === 0) ||
       [email, name, password].some((value) => value.length === 0) ||
@@ -233,7 +233,7 @@ const SignupForm = () => {
         )}
       </div>
       <button
-        disabled={notFilledAllFields()}
+        disabled={notFilledAllFields() || !isValid}
         type="submit"
         className="mt-6 w-full rounded bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300"
       >
