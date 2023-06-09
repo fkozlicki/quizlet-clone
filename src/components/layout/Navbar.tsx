@@ -22,7 +22,7 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
   const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
   const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
   const { push, pathname } = useRouter();
-  const [state, dispatch] = useAuthDropdownContext();
+  const [, dispatch] = useAuthDropdownContext();
 
   useEffect(() => {
     setMenuDropdownOpen(false);

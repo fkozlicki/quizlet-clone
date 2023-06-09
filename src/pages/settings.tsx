@@ -21,7 +21,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const user = await prisma?.user.findUnique({
     where: {
-      id: session.user?.id,
+      id: session.user.id,
     },
   });
 
