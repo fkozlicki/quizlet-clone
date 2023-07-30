@@ -6,6 +6,7 @@ import DeleteAccount from "../components/pages/settings/DeleteAccount";
 import NightMode from "../components/pages/settings/NightMode";
 import EditProfilePicture from "../components/pages/settings/EditProfilePicture";
 import { NextSeo } from "next-seo";
+import { prisma } from "../server/db";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
@@ -19,7 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const user = await prisma?.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
       id: session.user.id,
     },
