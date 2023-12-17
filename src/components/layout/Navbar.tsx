@@ -1,16 +1,13 @@
-import React, { useEffect, useState } from "react";
-import {
-  MagnifyingGlassIcon,
-  ChevronDownIcon,
-  PlusIcon,
-  Bars3Icon,
-} from "@heroicons/react/24/solid";
+import { DownOutlined } from "@ant-design/icons";
+import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { Button, Dropdown } from "antd";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import ProfileImage from "../ProfileImage";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
+import ProfileImage from "../ProfileImage";
 
 interface NavbarProps {
   openMobileMenu: () => void;
@@ -20,35 +17,28 @@ interface NavbarProps {
 const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
   const { data: session } = useSession();
   const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
-  const [createDropdownOpen, setCreateDropdownOpen] = useState<boolean>(false);
   const { push, pathname } = useRouter();
   const [, dispatch] = useAuthDropdownContext();
 
   useEffect(() => {
     setMenuDropdownOpen(false);
-    setCreateDropdownOpen(false);
   }, [pathname]);
 
   const toggleMenuDropdown = () => {
     setMenuDropdownOpen((prev) => !prev);
   };
 
-  const toggleCreateDropdown = () => {
-    setCreateDropdownOpen((prev) => !prev);
-  };
-
   const handleCreateFolder = () => {
     if (session) {
-      setCreateDropdownOpen(false);
       openCreateFolder();
     } else {
       dispatch("openLogin");
     }
   };
 
-  const handleCreateStudySet = async (link: string) => {
+  const handleCreateStudySet = async () => {
     if (session) {
-      await push(link);
+      await push("/create-set");
     } else {
       dispatch("openLogin");
     }
@@ -58,7 +48,7 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
     <div className="sticky top-0 z-30 border-b bg-white">
       <div className="h-16 px-4 md:h-16">
         <div className="flex h-full justify-between">
-          <div className="flex">
+          <div className="flex items-center">
             <Link
               href="/"
               className="hidden h-full px-2 leading-[4rem] md:flex md:items-center"
@@ -73,34 +63,23 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
                 Home
               </Link>
             </div>
-            <div className="hidden items-center px-2 md:flex">
-              <div className="relative">
-                <button
-                  onClick={toggleCreateDropdown}
-                  className="flex items-center gap-2 rounded bg-blue-600 px-3 py-[6px] font-medium text-white hover:bg-blue-700"
-                >
-                  <span className="hidden lg:block">Create</span>
-                  <ChevronDownIcon width={20} className="hidden lg:block" />
-                  <PlusIcon width={20} className="lg:hidden" />
-                </button>
-                {createDropdownOpen && (
-                  <div className="absolute top-[110%] left-0 min-w-[10rem] rounded-2xl border bg-white py-2 shadow-lg">
-                    <button
-                      onClick={() => handleCreateStudySet("/create-set")}
-                      className="w-full px-6 py-2 text-start hover:bg-slate-100"
-                    >
-                      Study set
-                    </button>
-                    <button
-                      onClick={handleCreateFolder}
-                      className="w-full px-6 py-2 text-start hover:bg-slate-100"
-                    >
-                      Folder
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
+            <Dropdown
+              menu={{
+                items: [
+                  {
+                    label: <div onClick={handleCreateStudySet}>Study Set</div>,
+                    key: 0,
+                  },
+                  {
+                    label: <div onClick={handleCreateFolder}>Folder</div>,
+                    key: 1,
+                  },
+                ],
+              }}
+              trigger={["click"]}
+            >
+              <Button icon={<DownOutlined />}>Create</Button>
+            </Dropdown>
             <button onClick={openMobileMenu} className="md:hidden">
               <Bars3Icon width={32} height={32} />
             </button>
@@ -120,22 +99,12 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
               </button>
             </div>
             {!session && (
-              <>
-                <div className="px-6">
-                  <button
-                    onClick={() => dispatch("openLogin")}
-                    className="rounded px-2 py-1 hover:bg-indigo-50"
-                  >
-                    Log in
-                  </button>
-                </div>
-                <button
-                  onClick={() => dispatch("openSignup")}
-                  className="rounded bg-amber-400 py-1 px-2 hover:bg-amber-300"
-                >
-                  <span>Sign up</span>
-                </button>
-              </>
+              <div className="flex gap-4">
+                <Button onClick={() => dispatch("openLogin")}>Log in</Button>
+                <Button onClick={() => dispatch("openSignup")} type="primary">
+                  Sign up
+                </Button>
+              </div>
             )}
             {session && session.user && (
               <div className="relative">
