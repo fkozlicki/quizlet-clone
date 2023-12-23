@@ -1,32 +1,24 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-  // Further reading:
-  // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-  // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
   url      = env("DATABASE_URL")
 }
 
-// Necessary for Next auth
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? // @db.Text
-  access_token      String? // @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? // @db.Text
+  id_token          String?
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -35,9 +27,9 @@ model Account {
 
 model Session {
   id           String   @id @default(cuid())
+  sessionToken String   @unique
   userId       String
   expires      DateTime
-  sessionToken String   @unique
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
@@ -50,10 +42,10 @@ model User {
   image         String?
   birthday      DateTime?
   accounts      Account[]
+  activity      Activity[]
+  folders       Folder[]
   sessions      Session[]
   studySets     StudySet[]
-  folders       Folder[]
-  activity      Activity[]
 }
 
 model VerificationToken {
@@ -69,33 +61,40 @@ model Flashcard {
   term       String
   definition String
   studySetId String
+  position   Int
   studySet   StudySet @relation(fields: [studySetId], references: [id], onDelete: Cascade)
 }
 
 model StudySet {
   id          String      @id @default(cuid())
   title       String
-  description String
+  description String?
   userId      String
-  cards       Flashcard[]
-  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   folderId    String?
+  cards       Flashcard[]
   folder      Folder?     @relation(fields: [folderId], references: [id])
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Folder {
   id          String     @id @default(cuid())
   title       String
-  slug        String
   description String?
-  studySets   StudySet[]
   userId      String
+  slug        String
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studySets   StudySet[]
 }
 
 model Activity {
   id     String   @id @default(cuid())
   date   DateTime @default(now())
-  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
+  user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Example {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime
 }
