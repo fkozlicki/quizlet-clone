@@ -1,125 +1,110 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import type { MutableRefObject } from "react";
-import { useEffect } from "react";
-import React, { useCallback } from "react";
+import { Button, Form, Input } from "antd";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { useForm, useFieldArray } from "react-hook-form";
-import { z } from "zod";
+import { api } from "../utils/api";
 import CreateCard from "./CreateCard";
-
-const studySetSchema = z.object({
-  title: z.string().min(1),
-  description: z.string(),
-  cards: z
-    .array(
-      z.object({
-        term: z.string(),
-        definition: z.string(),
-      })
-    )
-    .refine((data) => {
-      let count = 0;
-      data.forEach((el) => {
-        if (el.term.length > 0 && el.definition.length > 0) ++count;
-      });
-      return count >= 2;
-    }, "You need two cards to create a set."),
-});
-
-export type CreateSetInputs = z.infer<typeof studySetSchema>;
+import { useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import type {
+  CreateStudySetValues,
+  EditStudySetValues,
+} from "../schemas/study-set";
+import { createStudySetSchema } from "../schemas/study-set";
+import { FormItem } from "react-hook-form-antd";
 
 interface StudySetFormProps {
-  formCallback: (data: CreateSetInputs) => void;
-  initialData: CreateSetInputs;
-  resetRef?: MutableRefObject<(() => void) | null>;
+  initialData?: EditStudySetValues;
 }
 
-const StudySetForm = ({
-  formCallback,
-  initialData,
-  resetRef,
-}: StudySetFormProps) => {
-  const {
-    control,
-    register,
-    handleSubmit,
-    formState: { errors },
-    reset,
-  } = useForm<CreateSetInputs>({
-    resolver: zodResolver(studySetSchema),
-    defaultValues: initialData,
-    mode: "onSubmit",
+const initialCards = Array.from({ length: 4 }, (_, index) => ({
+  term: "",
+  definition: "",
+  position: index,
+}));
+
+const StudySetForm = ({ initialData }: StudySetFormProps) => {
+  const { mutate: createSet } = api.studySet.create.useMutation();
+  const { mutate: editSet } = api.studySet.editById.useMutation();
+  const { handleSubmit, control, setValue } = useForm<
+    CreateStudySetValues | EditStudySetValues
+  >({
+    resolver: zodResolver(createStudySetSchema),
+    defaultValues: initialData ?? {
+      cards: initialCards,
+    },
   });
-  const { fields, remove, swap, append } = useFieldArray({
+  const { fields, append, remove, swap } = useFieldArray({
     control,
     name: "cards",
   });
 
-  useEffect(() => {
-    if (resetRef) {
-      resetRef.current = reset;
+  const onFinish = (values: CreateStudySetValues | EditStudySetValues) => {
+    const convertedData = {
+      ...values,
+      cards: values.cards
+        .filter((card) => card.term && card.definition)
+        .map((card) => {
+          const { term, definition, position } = card;
+          if (!card.definition) return { term, definition: "...", position };
+          if (!card.term) return { term: "...", definition, position };
+          return card;
+        }),
+    };
+
+    if ("id" in convertedData) {
+      editSet(convertedData);
+    } else {
+      createSet(convertedData);
     }
-  }, []);
+  };
 
-  const moveCard = useCallback((dragIndex: number, hoverIndex: number) => {
-    swap(dragIndex, hoverIndex);
-  }, []);
-
-  const appendCard = () => {
-    append({
-      definition: "",
-      term: "",
-    });
+  const swapCards = (from: number, to: number) => {
+    setValue(`cards.${from}.position`, to);
+    setValue(`cards.${to}.position`, from);
+    swap(from, to);
   };
 
   return (
-    <form onSubmit={handleSubmit(formCallback)}>
-      <div className="mb-8">
-        <h1 className="py-4 text-lg font-semibold">Create new study set</h1>
-        <button className="hidden">Create</button>
-      </div>
-      <input
-        className="mb-6 w-full rounded-lg bg-white px-4 py-2 text-lg outline-none placeholder:text-lg placeholder:font-semibold placeholder:text-gray-500"
-        type="text"
-        placeholder="Enter title"
-        {...register("title")}
-      />
-      <textarea
-        className="mb-6 h-[120px] w-full resize-none rounded-lg bg-white px-4 py-2 text-lg outline-none placeholder:text-base placeholder:font-semibold placeholder:text-gray-500"
-        placeholder="Add a description..."
-        {...register("description")}
-      />
-      {errors.cards && <p>{errors.cards.message}</p>}
+    <Form onFinish={handleSubmit(onFinish)} layout="vertical">
+      <FormItem control={control} name="title" label="Title">
+        <Input size="large" />
+      </FormItem>
+      <FormItem control={control} label="Description" name="description">
+        <Input.TextArea size="large" />
+      </FormItem>
+      <div className="pb-2">Flashcards</div>
       <DndProvider backend={HTML5Backend}>
-        {fields.map((field, index) => (
-          <CreateCard
-            key={field.id}
-            index={index}
-            id={field.id}
-            moveCard={moveCard}
-            term={register(`cards.${index}.term`)}
-            definition={register(`cards.${index}.definition`)}
-            removeCallback={() => remove(index)}
-          />
-        ))}
+        <div className="mb-6 flex flex-col gap-6">
+          {fields.map((field, index) => (
+            <CreateCard
+              key={field.id}
+              id={field.id}
+              control={control}
+              index={index}
+              remove={remove}
+              swap={swapCards}
+              cardsCount={fields.length}
+            />
+          ))}
+        </div>
       </DndProvider>
-      <button
-        type="button"
-        onClick={appendCard}
-        className="group mb-8 flex w-full justify-center rounded-md bg-white p-4 shadow md:py-8"
+      <Button
+        onClick={() =>
+          append({ term: "", definition: "", position: fields.length })
+        }
+        className="mb-6 h-16 w-full"
       >
-        <p className="border-b-4 border-cyan-400 pb-2 font-semibold uppercase group-hover:border-yellow-500 group-hover:text-yellow-500">
-          + add card
-        </p>
-      </button>
-      <button
-        type="submit"
-        className="ml-auto block rounded-lg bg-blue-600 px-8 py-5 text-white hover:bg-blue-700"
+        Add Card
+      </Button>
+      <Button
+        htmlType="submit"
+        size="large"
+        type="primary"
+        className="ml-auto block h-14 w-28"
       >
-        Create
-      </button>
-    </form>
+        {initialData ? "Edit" : "Create"}
+      </Button>
+    </Form>
   );
 };
 

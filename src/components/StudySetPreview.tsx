@@ -1,7 +1,7 @@
+import { UserOutlined } from "@ant-design/icons";
 import type { StudySet, User } from "@prisma/client";
+import { Avatar, Card, Tag } from "antd";
 import Link from "next/link";
-import React from "react";
-import ProfileImage from "./ProfileImage";
 
 interface StudySetPreviewProps {
   id: StudySet["id"];
@@ -9,6 +9,7 @@ interface StudySetPreviewProps {
   termsCount: number;
   authorImage: User["image"];
   authorName: User["name"];
+  authorId: User["id"];
 }
 
 const StudySetPreview = ({
@@ -17,31 +18,31 @@ const StudySetPreview = ({
   termsCount,
   authorImage,
   authorName,
+  authorId,
 }: StudySetPreviewProps) => {
   return (
-    <div className="relative overflow-hidden rounded bg-white drop-shadow">
+    <Card hoverable className="relative">
       <Link
-        className="absolute top-0 left-0 h-full w-full border-b-[5px] border-white hover:border-gray-300"
         href={`/study-set/${id}`}
+        className="absolute top-0 left-0 h-full w-full"
       ></Link>
-      <div className="py-3 px-4">
-        <div className="flex h-32 flex-col justify-between">
-          <div>
-            <p>{title}</p>
-            <p>{termsCount} terms</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <ProfileImage
-              image={authorImage}
-              userName={authorName}
-              size={24}
-              fontSize={14}
-            />
-            <span>{authorName}</span>
-          </div>
-        </div>
+      <Card.Meta title={title} />
+      <Tag className="mt-2">{termsCount} terms</Tag>
+      <div className="mt-8">
+        <Link
+          href={`/${authorId}`}
+          className="group relative z-10 flex items-center gap-2 text-black"
+        >
+          <Avatar
+            size="small"
+            icon={<UserOutlined />}
+            src={authorImage}
+            alt="set author avatar"
+          />
+          <span className="group-hover:underline">{authorName}</span>
+        </Link>
       </div>
-    </div>
+    </Card>
   );
 };
 

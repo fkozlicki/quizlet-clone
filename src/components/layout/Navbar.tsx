@@ -1,38 +1,28 @@
-import { DownOutlined } from "@ant-design/icons";
+import { DownOutlined, UserOutlined } from "@ant-design/icons";
 import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
-import { Button, Dropdown } from "antd";
+import { Avatar, Button, Dropdown, Tag } from "antd";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import ProfileImage from "../ProfileImage";
+import { useFolderModalContext } from "../../contexts/FolderModalContext";
 
 interface NavbarProps {
   openMobileMenu: () => void;
-  openCreateFolder: () => void;
 }
 
-const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
+const Navbar = ({ openMobileMenu }: NavbarProps) => {
   const { data: session } = useSession();
-  const [menuDropdownOpen, setMenuDropdownOpen] = useState<boolean>(false);
-  const { push, pathname } = useRouter();
-  const [, dispatch] = useAuthDropdownContext();
-
-  useEffect(() => {
-    setMenuDropdownOpen(false);
-  }, [pathname]);
-
-  const toggleMenuDropdown = () => {
-    setMenuDropdownOpen((prev) => !prev);
-  };
+  const { push } = useRouter();
+  const [, dispatchAuthDropdown] = useAuthDropdownContext();
+  const [, dispatchFolderModal] = useFolderModalContext();
 
   const handleCreateFolder = () => {
     if (session) {
-      openCreateFolder();
+      dispatchFolderModal({ type: "open" });
     } else {
-      dispatch("openLogin");
+      dispatchAuthDropdown("openLogin");
     }
   };
 
@@ -40,7 +30,7 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
     if (session) {
       await push("/create-set");
     } else {
-      dispatch("openLogin");
+      dispatchAuthDropdown("openLogin");
     }
   };
 
@@ -55,14 +45,12 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
             >
               <Image src="/logo.svg" alt="logo" width={110} height={24} />
             </Link>
-            <div className="hidden h-full md:flex">
-              <Link
-                href="/"
-                className="mx-3 hidden h-full text-lg font-medium leading-[4rem] lg:block"
-              >
-                Home
-              </Link>
-            </div>
+            <Link
+              href="/"
+              className="mx-3 hidden h-full text-lg font-medium leading-[4rem] lg:block"
+            >
+              Home
+            </Link>
             <Dropdown
               menu={{
                 items: [
@@ -100,76 +88,88 @@ const Navbar = ({ openMobileMenu, openCreateFolder }: NavbarProps) => {
             </div>
             {!session && (
               <div className="flex gap-4">
-                <Button onClick={() => dispatch("openLogin")}>Log in</Button>
-                <Button onClick={() => dispatch("openSignup")} type="primary">
+                <Button onClick={() => dispatchAuthDropdown("openLogin")}>
+                  Log in
+                </Button>
+                <Button
+                  onClick={() => dispatchAuthDropdown("openSignup")}
+                  type="primary"
+                >
                   Sign up
                 </Button>
               </div>
             )}
             {session && session.user && (
-              <div className="relative">
-                <button
-                  onClick={toggleMenuDropdown}
-                  className="flex items-center"
-                >
-                  <ProfileImage
-                    image={session.user.image}
-                    userName={session.user.name}
-                    size={32}
-                    fontSize={16}
-                  />
-                </button>
-                <div
-                  className={`absolute top-[120%] right-0 z-20 min-w-[14rem] rounded-2xl border bg-white shadow-lg ${
-                    menuDropdownOpen ? "block" : "hidden"
-                  }`}
-                >
-                  <div className="border-b">
-                    <div className="flex items-center gap-4 py-4 px-6">
-                      <ProfileImage
-                        image={session.user.image}
-                        userName={session.user.name}
-                        size={32}
-                        fontSize={16}
+              <Dropdown
+                trigger={["click"]}
+                menu={{
+                  items: [
+                    {
+                      key: 0,
+                      label: (
+                        <div className="flex items-center gap-2">
+                          <Avatar
+                            className="relative cursor-pointer"
+                            icon={<UserOutlined />}
+                            src={
+                              session.user.image && (
+                                <Image
+                                  src={session.user.image}
+                                  alt="profile image"
+                                  fill={true}
+                                />
+                              )
+                            }
+                          />
+                          <div className="text-start">
+                            <div className="text-sm">{session.user.name}</div>
+                            <div className="max-w-[8rem] overflow-hidden text-ellipsis text-sm">
+                              {session.user.email}
+                            </div>
+                          </div>
+                        </div>
+                      ),
+                    },
+                    {
+                      label: <Link href={`/${session.user.id}`}>Profile</Link>,
+                      key: 1,
+                    },
+                    {
+                      label: <Link href={`settings`}>Settings</Link>,
+                      key: 2,
+                    },
+                    {
+                      label: (
+                        <div>
+                          Dark mode
+                          <Tag color="processing" className="ml-2 leading-4">
+                            soon
+                          </Tag>
+                        </div>
+                      ),
+                      key: 3,
+                    },
+                    {
+                      label: <span onClick={() => signOut()}>Log out</span>,
+                      key: 4,
+                    },
+                  ],
+                }}
+              >
+                <Avatar
+                  className="relative cursor-pointer"
+                  icon={<UserOutlined />}
+                  src={
+                    session.user.image && (
+                      <Image
+                        src={session.user.image}
+                        alt="profile image"
+                        fill={true}
                       />
-                      <div className="text-start">
-                        <p className="text-sm">{session.user.name}</p>
-                        <p className="max-w-[7rem] overflow-hidden text-ellipsis text-sm">
-                          {session.user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex flex-col border-b py-2">
-                    <Link
-                      href={`/${session.user.id}`}
-                      className="py-2 px-6 text-start hover:bg-slate-100"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      href={`settings`}
-                      className="py-2 px-6 text-start hover:bg-slate-100"
-                    >
-                      Settings
-                    </Link>
-                    <button className="py-2 px-6 text-start hover:bg-slate-100">
-                      Dark mode
-                      <span className="ml-2 rounded-md bg-blue-700 px-2 text-sm text-white">
-                        soon
-                      </span>
-                    </button>
-                  </div>
-                  <div className="py-2">
-                    <button
-                      onClick={() => signOut()}
-                      className="w-full whitespace-nowrap py-2 px-6 text-start hover:bg-slate-100"
-                    >
-                      Log out
-                    </button>
-                  </div>
-                </div>
-              </div>
+                    )
+                  }
+                />
+              </Dropdown>
             )}
           </div>
         </div>

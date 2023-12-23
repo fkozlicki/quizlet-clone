@@ -1,22 +1,27 @@
+import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button, Input, message } from "antd";
 import { signIn } from "next-auth/react";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const loginSchema = z.object({
-  email: z.string().min(1).email(),
-  password: z.string().min(1),
+  email: z.string().min(1, "Enter email").email("Enter valid email"),
+  password: z.string().min(1, "Enter password"),
 });
 
 type LoginInputs = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
-  const { register, handleSubmit } = useForm<LoginInputs>({
+  const {
+    handleSubmit,
+    formState: { errors, isValid },
+    control,
+  } = useForm<LoginInputs>({
     resolver: zodResolver(loginSchema),
+    mode: "onChange",
   });
-  const [error, setError] = useState<string>();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const handleLogin = async (data: LoginInputs) => {
     const res = await signIn("credentials", {
@@ -26,56 +31,76 @@ const LoginForm = () => {
     if (!res) return;
 
     if (res?.status === 200) {
-      toast("Successfuly logged in");
+      await messageApi.success("Successfuly logged in");
     } else {
-      toast("Couldn't log in");
-      setError(res?.error);
+      await messageApi.success("Couldn't log in");
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(handleLogin)}>
-      <div className="flex flex-col">
-        <input
-          {...register("email")}
-          type="email"
-          id="email"
-          placeholder="Type your email address or username"
-          className="peer pb-1 text-lg outline-none placeholder:text-lg placeholder:text-gray-300"
-        />
-        <span className="before relative h-1 w-full before:absolute before:top-0 before:left-0 before:block before:h-[2px] before:w-full before:bg-black before:transition-height before:duration-[120ms] before:ease-borderHeight before:content-[''] peer-focus:before:h-1 peer-focus:before:bg-yellow-500" />
-        <label
-          htmlFor="email"
-          className="mt-[10px] text-xs font-semibold uppercase tracking-wider text-gray-500"
+    <div>
+      {contextHolder}
+      <div className="flex flex-col gap-4">
+        <Button
+          onClick={() => signIn("google", { redirect: false })}
+          icon={<GoogleOutlined />}
+          className="h-14"
         >
-          Email
-        </label>
+          Sign in with Google
+        </Button>
+        <Button icon={<GithubOutlined />} className="h-14">
+          Sign in with Github
+        </Button>
       </div>
-      <div className="mt-6 flex flex-col">
-        <input
-          {...register("password")}
-          type="password"
-          id="password"
-          placeholder="Type your password"
-          className="peer pb-1 text-lg outline-none placeholder:text-lg placeholder:text-gray-300"
-        />
-        <span className="before relative h-1 w-full before:absolute before:top-0 before:left-0 before:block before:h-[2px] before:w-full before:bg-black before:transition-height before:duration-[120ms] before:ease-borderHeight before:content-[''] peer-focus:before:h-1 peer-focus:before:bg-yellow-500" />
-        <label
-          htmlFor=""
-          className="mt-[10px] text-xs font-semibold uppercase tracking-wider text-gray-500"
+      <div className="my-6 flex items-center">
+        <div className="h-px flex-1 bg-slate-200"></div>
+        <div className="px-4">OR</div>
+        <div className="h-px flex-1 bg-slate-200"></div>
+      </div>
+      <form onSubmit={handleSubmit(handleLogin)}>
+        <div className="flex flex-col gap-4">
+          <Controller
+            name="email"
+            control={control}
+            render={({ field: { value, onChange } }) => (
+              <Input
+                status={errors.email && "error"}
+                placeholder="Type your email address or username"
+                type="email"
+                size="large"
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { value, onChange } }) => (
+              <Input.Password
+                status={errors.password && "error"}
+                placeholder="Type your password"
+                size="large"
+                value={value}
+                onChange={onChange}
+              />
+            )}
+          />
+        </div>
+        <p className="mt-6 mb-6 text-center text-sm">
+          By clicking Log in, you accept Flashit&apos;s Terms of Service and
+          Privacy Policy
+        </p>
+        <Button
+          disabled={!isValid}
+          type="primary"
+          className="h-16 w-full"
+          htmlType="submit"
         >
-          Password
-        </label>
-      </div>
-      <p className="mt-6 mb-6 text-center text-sm">
-        By clicking Log in, you accept Flashit&apos;s Terms of Service and
-        Privacy Policy
-      </p>
-      <button className="w-full rounded bg-cyan-400 p-6 font-bold text-white transition-height hover:bg-cyan-500">
-        Log in
-      </button>
-      <div></div>
-    </form>
+          Log in
+        </Button>
+      </form>
+    </div>
   );
 };
 

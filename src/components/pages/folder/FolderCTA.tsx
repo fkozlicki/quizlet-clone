@@ -4,64 +4,19 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import { toast } from "react-hot-toast";
-import { api } from "../../../utils/api";
+import { useState } from "react";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 import IconButton from "../../IconButton";
 import type { FolderInputs } from "../../layout/FolderModal";
-import FolderModal from "../../layout/FolderModal";
 
 interface FolderCTAProps {
-  refetch: () => void;
-  defaultData: {
-    title: string;
-    description: string | null;
-  };
-  slug: string;
-  userId: string;
-  folderId: string;
+  defaultData: FolderInputs;
   openAddSetModal: () => void;
 }
 
-const FolderCTA = ({
-  refetch,
-  defaultData,
-  slug,
-  userId,
-  folderId,
-  openAddSetModal,
-}: FolderCTAProps) => {
-  const { push } = useRouter();
+const FolderCTA = ({ defaultData, openAddSetModal }: FolderCTAProps) => {
   const [optionsModalOpen, setOptionsModalOpen] = useState<boolean>(false);
-  const [createFolderModalOpen, setCreateFolderModalOpen] =
-    useState<boolean>(false);
-  const {
-    mutate,
-    error: editError,
-    reset: resetFolderMutation,
-  } = api.folder.edit.useMutation({
-    onSuccess: async (data) => {
-      toast("Successfully edited folder");
-      if (slug === data.slug) {
-        refetch();
-      } else {
-        await push(`/${userId}/folders/${data.slug}`);
-      }
-      closeCreateFolder();
-    },
-    onError: () => {
-      toast("Couldn't edit folder");
-    },
-  });
-
-  const submitEdit = (data: FolderInputs) => {
-    mutate({
-      id: folderId,
-      title: data.title,
-      description: data.description,
-    });
-  };
+  const [, dispatch] = useFolderModalContext();
 
   const toggleOptionsModal = () => {
     setOptionsModalOpen((prev) => !prev);
@@ -69,11 +24,8 @@ const FolderCTA = ({
 
   const openEditFolderModal = () => {
     setOptionsModalOpen(false);
-    setCreateFolderModalOpen(true);
-  };
-
-  const closeCreateFolder = () => {
-    setCreateFolderModalOpen(false);
+    dispatch({ type: "setDefaultData", payload: defaultData });
+    dispatch({ type: "open" });
   };
 
   return (
@@ -103,16 +55,6 @@ const FolderCTA = ({
           )}
         </div>
       </div>
-      {createFolderModalOpen && (
-        <FolderModal
-          variant="edit"
-          defaultData={defaultData}
-          closeCreateFolder={closeCreateFolder}
-          mutate={submitEdit}
-          resetFolderMutation={resetFolderMutation}
-          errorMessage={editError?.message}
-        />
-      )}
     </div>
   );
 };

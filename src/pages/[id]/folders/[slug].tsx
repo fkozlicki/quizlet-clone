@@ -68,11 +68,7 @@ const Folder = () => {
               {session && (
                 <FolderCTA
                   openAddSetModal={openAddSetModal}
-                  folderId={id}
-                  defaultData={{ title, description }}
-                  refetch={refetch}
-                  slug={slug}
-                  userId={userId}
+                  defaultData={{ id, title, description }}
                 />
               )}
             </div>

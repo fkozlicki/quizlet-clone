@@ -8,6 +8,7 @@ import { DefaultSeo } from "next-seo";
 import AuthDropdownProvider from "../contexts/AuthDropdownContext";
 import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
+import FolderModalProvider from "../contexts/FolderModalContext";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -17,18 +18,20 @@ const MyApp: AppType<{ session: Session | null }> = ({
     <SessionProvider session={session}>
       <ConfigProvider>
         <AuthDropdownProvider>
-          <Layout>
-            <DefaultSeo
-              title="Quizlet 2.0"
-              description="Quizlet Clone app built with T3Stack"
-              openGraph={{
-                type: "website",
-                locale: "en_IE",
-                url: process.env.NEXT_PUBLIC_APP_DOMAIN,
-              }}
-            />
-            <Component {...pageProps} />
-          </Layout>
+          <FolderModalProvider>
+            <Layout>
+              <DefaultSeo
+                title="Quizlet 2.0"
+                description="Quizlet Clone app built with T3Stack"
+                openGraph={{
+                  type: "website",
+                  locale: "en_IE",
+                  url: process.env.NEXT_PUBLIC_APP_DOMAIN,
+                }}
+              />
+              <Component {...pageProps} />
+            </Layout>
+          </FolderModalProvider>
         </AuthDropdownProvider>
       </ConfigProvider>
     </SessionProvider>

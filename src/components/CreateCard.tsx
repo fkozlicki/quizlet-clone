@@ -1,18 +1,23 @@
-import { Bars2Icon } from "@heroicons/react/24/solid";
-import { TrashIcon } from "@heroicons/react/24/outline";
-import React, { useRef, useState } from "react";
+import { BarsOutlined, DeleteOutlined } from "@ant-design/icons";
+import { Button, Card, Flex, Input } from "antd";
+import type { Identifier, XYCoord } from "dnd-core";
+import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { DragSourceMonitor } from "react-dnd/dist/types";
-import type { Identifier, XYCoord } from "dnd-core";
-import type { UseFormRegisterReturn } from "react-hook-form";
+import type { Control } from "react-hook-form";
+import { FormItem } from "react-hook-form-antd";
+import type {
+  CreateStudySetValues,
+  EditStudySetValues,
+} from "../schemas/study-set";
 
 export interface CreateCardProps {
+  remove: (index: number) => void;
+  swap: (from: number, to: number) => void;
   id: string;
   index: number;
-  moveCard: (dragIndex: number, hoverIndex: number) => void;
-  term: UseFormRegisterReturn;
-  definition: UseFormRegisterReturn;
-  removeCallback: () => void;
+  control: Control<CreateStudySetValues | EditStudySetValues>;
+  cardsCount: number;
 }
 
 interface DragItem {
@@ -22,15 +27,14 @@ interface DragItem {
 }
 
 const CreateCard = ({
+  remove,
+  swap,
   id,
   index,
-  moveCard,
-  term,
-  definition,
-  removeCallback,
+  control,
+  cardsCount,
 }: CreateCardProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [isInputHovered, setIsInputHovered] = useState<boolean>(false);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
     void,
@@ -82,7 +86,7 @@ const CreateCard = ({
       }
 
       // Time to actually perform the action
-      moveCard(dragIndex, hoverIndex);
+      swap(dragIndex, hoverIndex);
 
       // Note: we're mutating the monitor item here!
       // Generally it's better to avoid mutations,
@@ -100,78 +104,51 @@ const CreateCard = ({
     collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
-    canDrag: !isInputHovered,
   });
 
   drag(drop(ref));
 
   return (
-    <div
-      className={`relative mb-2 cursor-move overflow-hidden rounded-lg sm:mb-5 opacity-${
-        isDragging ? 0 : "100"
-      }`}
+    <Card
       ref={ref}
       data-handler-id={handlerId}
+      className={`border-[#d9d9d9] opacity-${isDragging ? 0 : "100"}`}
+      extra={
+        <div className="flex items-center">
+          <Button
+            icon={<BarsOutlined />}
+            type="link"
+            className="cursor-default text-black"
+          />
+          <Button
+            onClick={() => remove(index)}
+            icon={<DeleteOutlined />}
+            type="text"
+            disabled={cardsCount < 3}
+          />
+        </div>
+      }
+      title={index + 1}
     >
-      <div className="">
-        <div className="mb-[2px] flex items-center justify-between bg-white p-3">
-          <div className="p-2">{index + 1}</div>
-          <div className="flex items-center">
-            <div>
-              <Bars2Icon width={20} className="stroke-2" />
-            </div>
-            <button
-              onClick={removeCallback}
-              className="ml-4 p-2 hover:text-yellow-300"
-            >
-              <TrashIcon width={18} />
-            </button>
-          </div>
-        </div>
-        <div className="flex flex-col bg-white p-4 pt-0 sm:flex-row sm:gap-10 md:p-6 md:pt-0">
-          <div className="relative z-20 flex-1 pt-5">
-            <div
-              className="mb-4 flex cursor-auto flex-col "
-              onMouseEnter={() => setIsInputHovered(true)}
-              onMouseLeave={() => setIsInputHovered(false)}
-            >
-              <input
-                type="text"
-                className="border-b-2 border-black outline-none placeholder:font-light"
-                placeholder="Enter term"
-                {...term}
-              />
-              <label
-                htmlFor=""
-                className="mt-[10px] text-xs font-medium uppercase text-gray-400"
-              >
-                Term
-              </label>
-            </div>
-          </div>
-          <div className="relative z-20 flex-1 pt-5">
-            <div
-              className="flex cursor-auto flex-col"
-              onMouseEnter={() => setIsInputHovered(true)}
-              onMouseLeave={() => setIsInputHovered(false)}
-            >
-              <input
-                type="text"
-                className="border-b-2 border-black outline-none placeholder:font-light"
-                placeholder="Enter definition"
-                {...definition}
-              />
-              <label
-                htmlFor=""
-                className="mt-[10px] text-xs font-medium uppercase text-gray-400"
-              >
-                Definition
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+      <Flex className="gap-8">
+        <FormItem
+          control={control}
+          name={`cards.${index}.term`}
+          label="term"
+          className="flex-1"
+        >
+          <Input placeholder="Enter term" />
+        </FormItem>
+        <FormItem
+          control={control}
+          name={`cards.${index}.definition`}
+          label="definition"
+          className="flex-1"
+        >
+          <Input placeholder="Enter definition" />
+        </FormItem>
+      </Flex>
+    </Card>
   );
 };
 
