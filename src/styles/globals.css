@@ -29,6 +29,10 @@ a {
   text-decoration: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
 .react-calendar {
   border: none !important;
 }
