@@ -3,6 +3,10 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import {
+  createStudySetSchema,
+  editStudySetSchema,
+} from "../../../schemas/study-set";
 
 type TrueOrFalse = Flashcard & {
   answer: string;
@@ -38,18 +42,7 @@ export const studySetRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(
-      z.object({
-        title: z.string(),
-        description: z.string(),
-        cards: z.array(
-          z.object({
-            term: z.string(),
-            definition: z.string(),
-          })
-        ),
-      })
-    )
+    .input(createStudySetSchema)
     .mutation(async ({ ctx, input }) => {
       return await ctx.prisma.studySet.create({
         data: {
@@ -211,21 +204,7 @@ export const studySetRouter = createTRPCRouter({
     }),
 
   editById: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        body: z.object({
-          title: z.string(),
-          description: z.string(),
-          cards: z.array(
-            z.object({
-              term: z.string(),
-              definition: z.string(),
-            })
-          ),
-        }),
-      })
-    )
+    .input(editStudySetSchema)
     .mutation(async ({ ctx, input }) => {
       const updated = await ctx.prisma.studySet.update({
         include: {
@@ -235,11 +214,11 @@ export const studySetRouter = createTRPCRouter({
           id: input.id,
         },
         data: {
-          title: input.body.title,
-          description: input.body.description,
+          title: input.title,
+          description: input.description,
           cards: {
             deleteMany: {},
-            createMany: { data: input.body.cards },
+            createMany: { data: input.cards },
           },
         },
       });

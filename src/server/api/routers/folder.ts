@@ -3,15 +3,11 @@ import slugify from "slugify";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
+import { createFolderSchema, editFolderSchema } from "../../../schemas/folder";
 
 export const folderRouter = createTRPCRouter({
   create: protectedProcedure
-    .input(
-      z.object({
-        title: z.string(),
-        description: z.string().nullable(),
-      })
-    )
+    .input(createFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { title, description } = input;
 
@@ -167,13 +163,7 @@ export const folderRouter = createTRPCRouter({
     }),
 
   edit: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        title: z.string(),
-        description: z.string().nullable(),
-      })
-    )
+    .input(editFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, title, description } = input;
 
