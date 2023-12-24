@@ -1,6 +1,6 @@
+import { UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import React from "react";
-import ProfileImage from "../../ProfileImage";
+import { Avatar } from "antd";
 
 interface CreatedByProps {
   userImage: User["image"];
@@ -9,16 +9,11 @@ interface CreatedByProps {
 
 const CreatedBy = ({ userImage, userName }: CreatedByProps) => {
   return (
-    <div className="mb-10 flex items-center gap-4">
-      <ProfileImage
-        image={userImage}
-        userName={userName}
-        size={32}
-        fontSize={16}
-      />
-      <div>
-        <p className="text-xs text-gray-400">Created by</p>
-        <p className="text-sm font-medium">{userName}</p>
+    <div className="flex items-center gap-4">
+      <Avatar icon={<UserOutlined />} src={userImage} />
+      <div className="flex flex-col">
+        <span className="text-xs text-gray-400">Created by</span>
+        <span className="text-sm font-medium">{userName}</span>
       </div>
     </div>
   );

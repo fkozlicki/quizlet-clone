@@ -7,55 +7,74 @@ import {
 import { useSession } from "next-auth/react";
 import React from "react";
 import IconButton from "../../IconButton";
+import { Button, Dropdown, Tooltip } from "antd";
+import {
+  ApiOutlined,
+  DeleteOutlined,
+  DownloadOutlined,
+  EditOutlined,
+  EllipsisOutlined,
+  PlusOutlined,
+  PrinterOutlined,
+  ShareAltOutlined,
+} from "@ant-design/icons";
+import Link from "next/link";
 
 interface StudySetCTAProps {
   userId: string;
   setId: string;
-  toggleMenu: () => void;
-  closeMenu: () => void;
-  menuOpen: boolean;
 }
 
-const StudySetCTA = ({
-  userId,
-  setId,
-  toggleMenu,
-  closeMenu,
-  menuOpen,
-}: StudySetCTAProps) => {
+const StudySetCTA = ({ userId, setId }: StudySetCTAProps) => {
   const { data: session } = useSession();
 
   return (
-    <div className="mb-10 flex gap-2">
-      <IconButton Icon={PlusIcon} size={20} />
-      {session?.user?.id === userId && (
-        <IconButton
-          Icon={PencilIcon}
-          size={18}
-          as="link"
-          href={`${setId}/edit`}
-        />
+    <div className="flex gap-2">
+      <Tooltip title="Add to folder">
+        <Button shape="circle" icon={<PlusOutlined />} size="large" />
+      </Tooltip>
+      {session?.user.id === userId && (
+        <Tooltip title="Edit">
+          <Link href={`${setId}/edit`}>
+            <Button shape="circle" icon={<EditOutlined />} size="large" />
+          </Link>
+        </Tooltip>
       )}
-      <IconButton Icon={ArrowUpTrayIcon} size={20} />
-      <div className="relative">
-        <IconButton
-          size={20}
-          onClick={toggleMenu}
-          onBlur={closeMenu}
-          Icon={EllipsisHorizontalIcon}
-        />
-        <div
-          className={`absolute top-[110%] right-0 z-10 block min-w-[10rem] rounded-xl bg-white py-3 shadow-md ${
-            menuOpen ? "block" : "hidden"
-          }`}
-        >
-          <div className="py-1 px-4 hover:bg-slate-100">Save and edit</div>
-          <div className="py-1 px-4 hover:bg-slate-100">Export</div>
-          <div className="py-1 px-4 hover:bg-slate-100">Combine</div>
-          <div className="py-1 px-4 hover:bg-slate-100">Print</div>
-          <div className="py-1 px-4 hover:bg-slate-100">Delete</div>
-        </div>
-      </div>
+      <Tooltip title="Share">
+        <Button shape="circle" icon={<ShareAltOutlined />} size="large" />
+      </Tooltip>
+      <Dropdown
+        placement="bottomRight"
+        menu={{
+          items: [
+            {
+              key: 0,
+              label: "Combine",
+              icon: <ApiOutlined className="mr-4 text-lg" />,
+            },
+            {
+              key: 1,
+              label: "Print",
+              icon: <PrinterOutlined className="mr-4 text-lg" />,
+            },
+            {
+              key: 2,
+              label: "Export",
+              icon: <DownloadOutlined className="mr-4 text-lg" />,
+            },
+            {
+              key: 3,
+              label: "Delete",
+              icon: <DeleteOutlined className="mr-4 text-lg" />,
+            },
+          ],
+        }}
+        trigger={["click"]}
+      >
+        <Tooltip title="More">
+          <Button shape="circle" icon={<EllipsisOutlined />} size="large" />
+        </Tooltip>
+      </Dropdown>
     </div>
   );
 };

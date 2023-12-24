@@ -7,7 +7,7 @@ interface StudyModesProps {
 
 const StudyModes = ({ setId }: StudyModesProps) => {
   return (
-    <div className="mb-12 grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
       <IconCard
         icon="/cards.png"
         text="Flashcards"

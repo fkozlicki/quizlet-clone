@@ -18,7 +18,7 @@ const OtherSets = ({ otherSets }: OtherSetsProps) => {
           ({
             id,
             title,
-            user: { image: userImage, name: userName },
+            user: { image: userImage, name: userName, id: authorId },
             cards,
           }) => (
             <StudySetPreview
@@ -28,6 +28,7 @@ const OtherSets = ({ otherSets }: OtherSetsProps) => {
               authorName={userName}
               id={id}
               termsCount={cards.length}
+              authorId={authorId}
             />
           )
         )}

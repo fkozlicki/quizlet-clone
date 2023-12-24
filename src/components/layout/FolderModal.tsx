@@ -68,12 +68,7 @@ const FolderModal = ({ session }: FolderModalProps) => {
         disabled: !isValid,
       }}
     >
-      <Form
-        initialValues={defaultData}
-        onFinish={onFinish}
-        layout="vertical"
-        requiredMark="optional"
-      >
+      <Form layout="vertical" requiredMark="optional">
         <FormItem control={control} name="title" label="Title">
           <Input placeholder="Title" />
         </FormItem>
