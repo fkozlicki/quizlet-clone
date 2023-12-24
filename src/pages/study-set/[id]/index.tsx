@@ -1,15 +1,14 @@
-import { ArrowPathIcon } from "@heroicons/react/24/solid";
+import type { Flashcard } from "@prisma/client";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
-import FlippingCard from "../../../components/FlippingCard";
+import { useState } from "react";
+import FlashcardsGame from "../../../components/FlashcardsGame";
 import CardsList from "../../../components/pages/study-set/CardsList";
 import CreatedBy from "../../../components/pages/study-set/CreatedBy";
+import FlashcardModal from "../../../components/pages/study-set/FlashcardModal";
 import OtherSets from "../../../components/pages/study-set/OtherSets";
 import StudyModes from "../../../components/pages/study-set/StudyModes";
 import StudySetCTA from "../../../components/pages/study-set/StudySetCTA";
-import ProgressBar from "../../../components/ProgressBar";
-import Result from "../../../components/Result";
 import { api } from "../../../utils/api";
 
 const StudySet = () => {
@@ -18,7 +17,6 @@ const StudySet = () => {
   const {
     data: studySet,
     isLoading,
-    refetch,
     error,
   } = api.studySet.getById.useQuery(
     {
@@ -28,30 +26,12 @@ const StudySet = () => {
       enabled: !!query.id,
     }
   );
-  const [cardIndex, setCardIndex] = useState<number>(0);
-  const [menuOpen, setMenuOpen] = useState<boolean>(false);
-
-  const closeMenu = () => {
-    setMenuOpen(false);
-  };
-
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
-  };
-
-  const changeCard = (value: number) => {
-    setCardIndex((prev) => prev + value);
-  };
-
-  const resetFlashcards = () => {
-    setCardIndex(0);
-  };
+  const [editFlashcard, setEditFlashcard] = useState<Flashcard>();
 
   if (isLoading || !setId) return <div>Loading...</div>;
 
   if (error) return <div>{error.message}</div>;
 
-  const currentCard = studySet.cards?.[cardIndex];
   const otherSets = studySet.user.studySets;
   const {
     title,
@@ -59,6 +39,14 @@ const StudySet = () => {
     userId,
     user: { image, name },
   } = studySet;
+
+  const closeEditModal = () => {
+    setEditFlashcard(undefined);
+  };
+
+  const openEditModal = (flashcard: Flashcard) => {
+    setEditFlashcard(flashcard);
+  };
 
   return (
     <>
@@ -69,48 +57,27 @@ const StudySet = () => {
             {studySet.title}
           </h1>
           {studySet.description && (
-            <p className="mb-8 text-lg">{studySet.description}</p>
+            <p className="mb-4 text-lg">{studySet.description}</p>
           )}
-          <ProgressBar value={cardIndex} max={cards.length} />
-          <div className="mb-12">
-            {currentCard && (
-              <FlippingCard
-                variant="normal"
-                buttonVariant="chevron"
-                refetchSet={refetch}
-                id={currentCard.id}
-                userId={userId}
-                term={currentCard.term}
-                definition={currentCard.definition}
-                index={cardIndex}
-                length={cards.length}
-                changeCardCallback={changeCard}
-              />
-            )}
-            {cardIndex === cards.length && (
-              <Result
-                know={cards.length}
-                learning={0}
-                firstButton={{
-                  text: "Reset Flashcards",
-                  callback: resetFlashcards,
-                  Icon: ArrowPathIcon,
-                }}
-              />
-            )}
-          </div>
           <StudyModes setId={setId} />
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <FlashcardsGame
+            cards={studySet.cards}
+            ownerId={studySet.userId}
+            openEditModal={openEditModal}
+          />
+          <FlashcardModal
+            flashcard={editFlashcard}
+            closeModal={closeEditModal}
+          />
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <CreatedBy userImage={image} userName={name} />
-            <StudySetCTA
-              userId={userId}
-              setId={setId}
-              closeMenu={closeMenu}
-              menuOpen={menuOpen}
-              toggleMenu={toggleMenu}
-            />
+            <StudySetCTA userId={userId} setId={setId} />
           </div>
-          <CardsList cards={cards} setId={setId} />
+          <CardsList
+            cards={cards}
+            setId={setId}
+            openEditModal={openEditModal}
+          />
           {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
         </div>
       </div>
