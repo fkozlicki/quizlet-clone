@@ -97,5 +97,5 @@ module.exports = {
   corePlugins: {
     preflight: false,
   },
-  important: true,
+  important: "#app",
 };
