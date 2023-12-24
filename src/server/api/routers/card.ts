@@ -1,17 +1,11 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 
+import { editFlashcardSchema } from "../../../schemas/flashcard";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const cardRouter = createTRPCRouter({
   edit: protectedProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        term: z.string(),
-        definition: z.string(),
-      })
-    )
+    .input(editFlashcardSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, term, definition } = input;
       const edited = await ctx.prisma.flashcard.update({
