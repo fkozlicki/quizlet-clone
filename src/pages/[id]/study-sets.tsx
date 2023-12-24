@@ -65,6 +65,7 @@ const StudySets = ({ achivements }: StudySetsProps) => {
                     title={set.title}
                     termsCount={set.cards.length}
                     id={set.id}
+                    authorId={set.userId}
                   />
                 ))}
               </div>
