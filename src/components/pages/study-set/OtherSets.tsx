@@ -12,7 +12,7 @@ interface OtherSetsProps {
 const OtherSets = ({ otherSets }: OtherSetsProps) => {
   return (
     <div>
-      <p className="mb-6 font-bold">Other sets by this creator</p>
+      <div className="mb-6 font-bold">Other sets by this creator</div>
       <div className="grid gap-4 md:grid-cols-2">
         {otherSets.map(
           ({

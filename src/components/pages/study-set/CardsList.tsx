@@ -13,9 +13,9 @@ interface CardsListProps {
 const CardsList = ({ cards, setId, openEditModal }: CardsListProps) => {
   return (
     <div className="mb-12">
-      <p className="mb-5 text-lg font-bold">
+      <div className="mb-5 text-lg font-bold">
         Terms in this set ({cards.length})
-      </p>
+      </div>
       <div className="mb-8 flex flex-col gap-3">
         {cards.map((flashcard, index) => (
           <CardPreview

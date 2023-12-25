@@ -24,24 +24,22 @@ const StudySetPreview = ({
     <Card hoverable className="relative">
       <Link
         href={`/study-set/${id}`}
-        className="absolute top-0 left-0 h-full w-full"
+        className="absolute left-0 top-0 h-full w-full"
       ></Link>
       <Card.Meta title={title} />
       <Tag className="mt-2">{termsCount} terms</Tag>
-      <div className="mt-8">
-        <Link
-          href={`/${authorId}`}
-          className="group relative z-10 flex items-center gap-2 text-black"
-        >
-          <Avatar
-            size="small"
-            icon={<UserOutlined />}
-            src={authorImage}
-            alt="set author avatar"
-          />
-          <span className="group-hover:underline">{authorName}</span>
-        </Link>
-      </div>
+      <Link
+        href={`/${authorId}`}
+        className="group relative z-10 mt-8 flex w-fit items-center gap-2 text-black"
+      >
+        <Avatar
+          size="small"
+          icon={<UserOutlined />}
+          src={authorImage}
+          alt="set author avatar"
+        />
+        <span className="group-hover:underline">{authorName}</span>
+      </Link>
     </Card>
   );
 };

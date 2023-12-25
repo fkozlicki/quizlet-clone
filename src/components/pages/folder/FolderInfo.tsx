@@ -1,6 +1,5 @@
-import { FolderIcon } from "@heroicons/react/24/outline";
+import { FolderOutlined } from "@ant-design/icons";
 import type { Folder } from "@prisma/client";
-import React from "react";
 
 interface FolderInfoProps {
   title: Folder["title"];
@@ -10,9 +9,9 @@ interface FolderInfoProps {
 const FolderInfo = ({ title, description }: FolderInfoProps) => {
   return (
     <div>
-      <div className="flex items-end gap-4">
-        <FolderIcon width={52} />
-        <h1 className="text-4xl font-bold">{title}</h1>
+      <div className="flex items-center gap-4">
+        <FolderOutlined className="text-5xl" />
+        <div className="text-4xl font-bold">{title}</div>
       </div>
       {description && <div>{description}</div>}
     </div>

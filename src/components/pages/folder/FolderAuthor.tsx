@@ -1,6 +1,6 @@
+import { UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import React from "react";
-import ProfileImage from "../../ProfileImage";
+import { Avatar } from "antd";
 
 interface FolderInfoProps {
   setsCount: number;
@@ -10,17 +10,12 @@ interface FolderInfoProps {
 
 const FolderAuthor = ({ setsCount, userImage, userName }: FolderInfoProps) => {
   return (
-    <div className="flex gap-4">
+    <div className="flex items-center gap-6">
       <div>{setsCount} sets</div>
-      <div className="flex gap-2">
-        <span>created by</span>
-        <ProfileImage
-          image={userImage}
-          userName={userName}
-          size={20}
-          fontSize={16}
-        />
-        <span>{userName}</span>
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-600">created by</span>
+        <Avatar icon={<UserOutlined />} src={userImage} size="small" alt="" />
+        <span className="text-sm font-medium">{userName}</span>
       </div>
     </div>
   );
