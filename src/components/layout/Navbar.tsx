@@ -55,12 +55,13 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               menu={{
                 items: [
                   {
-                    label: <div onClick={handleCreateStudySet}>Study Set</div>,
+                    label: <div onClick={handleCreateStudySet}>Study set</div>,
                     key: 0,
                   },
                   {
-                    label: <div onClick={handleCreateFolder}>Folder</div>,
+                    label: "Folder",
                     key: 1,
+                    onClick: handleCreateFolder,
                   },
                 ],
               }}
@@ -105,7 +106,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
                 menu={{
                   items: [
                     {
-                      key: 0,
+                      key: "0",
                       label: (
                         <div className="flex items-center gap-2">
                           <Avatar
@@ -132,11 +133,11 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
                     },
                     {
                       label: <Link href={`/${session.user.id}`}>Profile</Link>,
-                      key: 1,
+                      key: "1",
                     },
                     {
-                      label: <Link href={`settings`}>Settings</Link>,
-                      key: 2,
+                      label: <Link href={`/settings`}>Settings</Link>,
+                      key: "2",
                     },
                     {
                       label: (
@@ -147,11 +148,11 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
                           </Tag>
                         </div>
                       ),
-                      key: 3,
+                      key: "3",
                     },
                     {
+                      key: "4",
                       label: <span onClick={() => signOut()}>Log out</span>,
-                      key: 4,
                     },
                   ],
                 }}
