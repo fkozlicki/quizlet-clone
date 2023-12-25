@@ -1,5 +1,4 @@
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
-import { Bars3Icon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { DownOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
 import { Avatar, Button, Dropdown, Tag } from "antd";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -39,6 +38,11 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
       <div className="h-16 px-4 md:h-16">
         <div className="flex h-full justify-between">
           <div className="flex items-center">
+            <Button
+              onClick={openMobileMenu}
+              icon={<MenuOutlined />}
+              className="md:hidden"
+            />
             <Link
               href="/"
               className="hidden h-full px-2 leading-[4rem] md:flex md:items-center"
@@ -52,6 +56,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               Home
             </Link>
             <Dropdown
+              className="hidden md:block"
               menu={{
                 items: [
                   {
@@ -69,24 +74,8 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
             >
               <Button icon={<DownOutlined />}>Create</Button>
             </Dropdown>
-            <button onClick={openMobileMenu} className="md:hidden">
-              <Bars3Icon width={32} height={32} />
-            </button>
           </div>
           <div className="flex items-center">
-            <div className="flex h-full items-center px-2">
-              <div className="hidden max-w-[15rem] items-center gap-2 rounded-md border border-gray-200 bg-slate-100 px-2 py-1 lg:flex">
-                <MagnifyingGlassIcon className="h-5 w-5" />
-                <input
-                  type="text"
-                  placeholder="Study sets, textbooks, questions"
-                  className="hidden flex-1 text-ellipsis bg-transparent pr-9 outline-none placeholder:text-base placeholder:font-medium placeholder:tracking-wider placeholder:text-black md:block"
-                />
-              </div>
-              <button className="flex h-8 w-8 items-center justify-center rounded-full border border-slate-300 text-slate-400 hover:border-slate-500 hover:text-slate-500 lg:hidden">
-                <MagnifyingGlassIcon className="h-4 w-4" />
-              </button>
-            </div>
             {!session && (
               <div className="flex gap-4">
                 <Button onClick={() => dispatchAuthDropdown("openLogin")}>

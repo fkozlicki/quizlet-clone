@@ -1,121 +1,128 @@
-import {
-  BellIcon,
-  Cog6ToothIcon,
-  FolderIcon,
-  MoonIcon,
-  Square2StackIcon,
-  UserCircleIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { UserOutlined } from "@ant-design/icons";
+import { Avatar, Drawer, Menu } from "antd";
+import type { MenuProps } from "antd/es/menu";
 import { signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-import ProfileImage from "../ProfileImage";
+import type { Key, ReactNode } from "react";
+import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
+import { useFolderModalContext } from "../../contexts/FolderModalContext";
+import { useRouter } from "next/router";
+
+type MenuItem = Required<MenuProps>["items"][number];
 
 interface MobileMenuProps {
-  status: boolean;
-  close: () => void;
+  open: boolean;
+  onClose: () => void;
 }
 
-const MobileMenu = ({ status, close }: MobileMenuProps) => {
-  const [createOpen, setCreateOpen] = useState<boolean>(false);
+const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
   const { data: session } = useSession();
+  const { push } = useRouter();
+  const [, dispatchAuthDropdown] = useAuthDropdownContext();
+  const [, dispatchFolderModal] = useFolderModalContext();
 
-  const toggleCreate = () => {
-    setCreateOpen((prev) => !prev);
+  const handleCreateFolder = () => {
+    if (session) {
+      dispatchFolderModal({ type: "open" });
+    } else {
+      dispatchAuthDropdown("openLogin");
+    }
+    onClose();
   };
 
+  const handleCreateStudySet = async () => {
+    if (session) {
+      await push("/create-set");
+    } else {
+      dispatchAuthDropdown("openLogin");
+    }
+    onClose();
+  };
+
+  function getItem(
+    label: ReactNode,
+    key?: Key | null,
+    icon?: ReactNode,
+    children?: MenuItem[]
+  ): MenuItem {
+    return {
+      key,
+      icon,
+      children,
+      label,
+    } as MenuItem;
+  }
+
   return (
-    <div
-      className={`fixed top-0 left-0 z-50 h-screen w-screen bg-white transition-transform md:hidden ${
-        status ? "translate-x-0" : "-translate-x-full"
-      }`}
+    <Drawer
+      placement="left"
+      width="100vw"
+      open={open}
+      onClose={onClose}
+      className="md:hidden"
+      classNames={{
+        mask: "md:hidden",
+      }}
     >
-      <div className="flex justify-end px-4 py-2">
-        <button
-          onClick={close}
-          className="rounded-full border p-2 hover:bg-slate-200"
-        >
-          <XMarkIcon className="w-6" />
-        </button>
-      </div>
-      <div>
-        <div>
-          <div className="p-4 text-xl font-medium">Home</div>
-          <div className="">
-            <div onClick={toggleCreate} className="p-4 text-xl font-medium">
-              Create
-            </div>
-            {createOpen && (
-              <div className="mx-4 mb-4 overflow-hidden border-l transition-transform">
-                <Link
-                  href="/create-set"
-                  className="group flex items-center gap-4 px-6 py-3 text-xl font-medium"
-                >
-                  <Square2StackIcon width={24} className="text-slate-500" />
-                  <span className="group-hover:text-slate-500">Study set</span>
-                </Link>
-                <div className="group flex items-center gap-4 px-6 py-3 text-xl font-medium">
-                  <FolderIcon width={24} className="text-slate-500" />
-                  <span className="group-hover:text-slate-500">Folder</span>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        <div className="m-auto h-0.5 w-[95%] bg-slate-100"></div>
-        {session && session.user && (
-          <div className="px-6 py-8">
-            <div className="mb-4 flex items-center gap-4">
-              <ProfileImage
-                image={session.user.image}
-                userName={session.user.name}
-                size={40}
-                fontSize={20}
-              />
-              <div>
-                <p className="text-xl font-bold">{session.user.name}</p>
-                <p>{session.user.email}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 py-4 text-xl font-medium">
-              <BellIcon width={24} />
-              Notifications
-              <span className="rounded bg-blue-700 px-2 text-sm font-normal text-white">
-                soon
-              </span>
-            </div>
-            <Link
-              href={`/${session.user.id}`}
-              className="flex gap-4 py-4 text-xl font-medium"
-            >
-              <UserCircleIcon width={24} />
-              Profile
-            </Link>
-            <Link
-              href="/settings"
-              className="flex gap-4 py-4 text-xl font-medium"
-            >
-              <Cog6ToothIcon width={24} />
-              Settings
-            </Link>
-            <button className="flex items-center gap-4 py-4 text-xl font-medium">
-              <MoonIcon width={24} />
-              Dark mode
-              <span className="rounded bg-blue-700 px-2 text-sm font-normal text-white">
-                soon
-              </span>
-            </button>
-            <button
-              onClick={() => signOut()}
-              className="mt-4 w-full rounded-lg border py-2 text-center font-semibold text-gray-500 hover:bg-slate-100"
-            >
-              Log out
-            </button>
-          </div>
+      <Menu
+        mode="inline"
+        className="border-0"
+        items={[
+          getItem(<Link href="/latest">Home</Link>, "1"),
+          getItem("Create", "2", undefined, [
+            {
+              key: "1",
+              label: "Study set",
+              onClick: () => void handleCreateStudySet(),
+            },
+            {
+              key: "2",
+              label: "Folder",
+              onClick: handleCreateFolder,
+            },
+          ]),
+        ].concat(
+          session
+            ? [
+                { key: "3", type: "divider" },
+                getItem(
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      className="relative cursor-pointer"
+                      icon={<UserOutlined />}
+                      src={
+                        session.user.image && (
+                          <Image
+                            src={session.user.image}
+                            alt="profile image"
+                            fill={true}
+                          />
+                        )
+                      }
+                    />
+                    <div className="text-start">
+                      <div className="text-sm">{session.user.name}</div>
+                      <div className="overflow-hidden text-ellipsis text-sm">
+                        {session.user.email}
+                      </div>
+                    </div>
+                  </div>,
+                  "4"
+                ),
+                getItem(<Link href={`/${session.user.id}`}>Profile</Link>, "5"),
+                getItem(<Link href="/settings">Settings</Link>, "6"),
+                getItem("Dark mode", "7"),
+                {
+                  label: "Logout",
+                  key: "8",
+                  onClick: () => void signOut(),
+                },
+              ]
+            : []
         )}
-      </div>
-    </div>
+      />
+    </Drawer>
   );
 };
 

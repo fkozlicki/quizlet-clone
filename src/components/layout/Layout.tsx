@@ -44,10 +44,14 @@ const Layout = ({ children }: PropsWithChildren) => {
     <>
       <Navbar openMobileMenu={openMobileMenu} />
       <main className="min-h-[calc(100vh-65px)] bg-slate-100">
-        <div className="m-auto max-w-6xl py-12">{children}</div>
+        <div
+          className={`${pathname === "/" ? "" : "m-auto max-w-6xl px-4 py-12"}`}
+        >
+          {children}
+        </div>
       </main>
       {!session && <AuthDropdown />}
-      <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
+      <MobileMenu open={mobileMenuOpen} onClose={closeMobileMenu} />
       {session && <FolderModal session={session} />}
     </>
   );
