@@ -96,7 +96,7 @@ export const userRouter = createTRPCRouter({
       return exclude(user, ["password"]);
     }),
 
-  editPicture: protectedProcedure
+  update: protectedProcedure
     .input(
       z.object({
         image: z.string(),
