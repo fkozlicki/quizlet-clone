@@ -25,10 +25,10 @@ const AuthDropdown = () => {
       <Button
         type="text"
         onClick={closeDrawer}
-        className="absolute top-4 right-4"
+        className="absolute right-4 top-4 z-10"
         icon={<CloseOutlined />}
       ></Button>
-      <div className="relative flex-1">
+      <div className="relative hidden flex-1 md:block">
         <Image
           src="/login.avif"
           alt="login image"
@@ -36,27 +36,29 @@ const AuthDropdown = () => {
           className="object-cover"
         />
       </div>
-      <div className="flex-1 p-4 xl:px-20 xl:py-12">
-        <Tabs
-          defaultActiveKey="login"
-          activeKey={state}
-          onChange={(key) =>
-            dispatch(key === "login" ? "openLogin" : "openSignup")
-          }
-          size="large"
-          items={[
-            {
-              key: "login",
-              label: "Login",
-              children: <LoginForm />,
-            },
-            {
-              key: "signup",
-              label: "Signup",
-              children: <SignupForm />,
-            },
-          ]}
-        />
+      <div className="flex-1 ">
+        <div className="p-4 xl:px-20 xl:py-12">
+          <Tabs
+            defaultActiveKey="login"
+            activeKey={state}
+            onChange={(key) =>
+              dispatch(key === "login" ? "openLogin" : "openSignup")
+            }
+            size="large"
+            items={[
+              {
+                key: "login",
+                label: "Login",
+                children: <LoginForm />,
+              },
+              {
+                key: "signup",
+                label: "Signup",
+                children: <SignupForm />,
+              },
+            ]}
+          />
+        </div>
       </div>
     </Drawer>
   );
