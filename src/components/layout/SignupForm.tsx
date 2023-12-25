@@ -4,18 +4,24 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../utils/api";
 import { toast } from "react-hot-toast";
-import { Button, Checkbox, DatePicker, Input } from "antd";
+import { Button, Checkbox, DatePicker, Divider, Form, Input } from "antd";
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { signIn } from "next-auth/react";
 import dayjs from "dayjs";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
+import { FormItem } from "react-hook-form-antd";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+
+dayjs.extend(customParseFormat);
 
 const credentialsSchema = z.object({
-  birthday: z.string().min(1, "Enter your birthday"),
-  email: z.string().min(1, "Enter your email").email("Enter a valid email"),
-  name: z.string().min(1, "Enter your name"),
-  password: z.string().min(1, "Enter your password"),
-  accepted: z.literal(true),
+  birthday: z.string().min(1, "Birthday is required"),
+  email: z.string().min(1, "Email is required").email("Enter a valid email"),
+  name: z.string().min(1, "Name is required"),
+  password: z.string().min(1, "Password is required"),
+  accepted: z.literal(true, {
+    errorMap: () => ({ message: "You must accept Terms and Conditions" }),
+  }),
 });
 
 type CredentialsInputs = z.infer<typeof credentialsSchema>;
@@ -27,9 +33,10 @@ const SignupForm = () => {
     control,
     reset,
     formState: { isValid, errors },
+    watch,
   } = useForm<CredentialsInputs>({
-    mode: "onChange",
     resolver: zodResolver(credentialsSchema),
+    mode: "onChange",
   });
   const createUser = api.user.create.useMutation({
     onSuccess: () => {
@@ -49,6 +56,8 @@ const SignupForm = () => {
     createUser.mutate(data);
   };
 
+  console.log(watch());
+
   return (
     <>
       <div className="flex flex-col gap-4">
@@ -57,99 +66,80 @@ const SignupForm = () => {
           icon={<GoogleOutlined />}
           className="h-14"
         >
-          Sign in with Google
+          Sign up with Google
         </Button>
         <Button icon={<GithubOutlined />} className="h-14">
-          Sign in with Github
+          Sign up with Github
         </Button>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-        <div className="flex flex-col gap-4">
+      <Divider className="text-sm text-gray-400">OR</Divider>
+      <Form
+        onFinish={handleSubmit(onSubmit)}
+        layout="vertical"
+        fields={[
+          {
+            name: "birthday",
+            errors: errors.birthday?.message
+              ? [errors.birthday.message]
+              : undefined,
+          },
+        ]}
+      >
+        <Form.Item label="Birthday">
           <Controller
             name="birthday"
             control={control}
-            render={({ field: { value, onChange } }) => (
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
               <DatePicker
-                status={errors.birthday && "error"}
                 size="large"
                 className="w-full"
                 placeholder="Select your birthday"
-                value={value ? dayjs(value) : null}
-                onChange={(date) => onChange(date ? date.format() : null)}
+                value={value ? dayjs(value) : undefined}
+                onChange={(date) => onChange(date ? date.format() : "")}
+                status={error ? "error" : undefined}
               />
             )}
           />
-          <Controller
-            name="email"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Input
-                status={errors.email && "error"}
-                size="large"
-                type="email"
-                placeholder="example@email.com"
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-          <Controller
-            name="name"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Input
-                status={errors.name && "error"}
-                size="large"
-                type="text"
-                placeholder="John Doe"
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-          <Controller
-            name="password"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Input.Password
-                status={errors.password && "error"}
-                size="large"
-                placeholder="•••••"
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-
+        </Form.Item>
+        <FormItem control={control} name="email" label="Email">
+          <Input size="large" type="email" placeholder="example@email.com" />
+        </FormItem>
+        <FormItem control={control} name="name" label="Name">
+          <Input size="large" type="text" placeholder="John Doe" />
+        </FormItem>
+        <FormItem control={control} name="password" label="Password">
+          <Input.Password size="large" placeholder="•••••" />
+        </FormItem>
+        <FormItem control={control} name="accepted">
           <div className="flex items-center gap-3">
-            <Controller
-              name="accepted"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <Checkbox value={value} onChange={onChange} />
-              )}
-            />
+            <Checkbox />
             <div>
               I accept Quizlet&apos;s <span>Terms of Service</span> and{" "}
               <span>Privacy Policy</span>
             </div>
           </div>
-          <Button disabled={!isValid} type="primary" className="h-10">
-            Sign up
-          </Button>
+        </FormItem>
+        <Button
+          disabled={!isValid}
+          type="primary"
+          className="mt-2 h-10 w-full"
+          htmlType="submit"
+        >
+          Sign up
+        </Button>
+      </Form>
+
+      <div className="mt-4 rounded border-2 border-slate-200 p-2">
+        <div className="text-center font-medium text-slate-500">
+          Already have an account?{" "}
+          <span
+            className="cursor-pointer text-cyan-400 hover:text-cyan-500"
+            onClick={() => dispatch("openLogin")}
+          >
+            Log in
+          </span>
         </div>
-        <div className="mt-4 rounded border-2 border-slate-200 p-2">
-          <div className="text-center font-medium text-slate-500">
-            Already have an account?{" "}
-            <span
-              className="cursor-pointer text-cyan-400 hover:text-cyan-500"
-              onClick={() => dispatch("openLogin")}
-            >
-              Log in
-            </span>
-          </div>
-        </div>
-      </form>
+      </div>
     </>
   );
 };

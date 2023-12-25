@@ -1,8 +1,9 @@
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Input, message } from "antd";
+import { Button, Divider, Form, Input, message } from "antd";
 import { signIn } from "next-auth/react";
 import { Controller, useForm } from "react-hook-form";
+import { FormItem } from "react-hook-form-antd";
 import { z } from "zod";
 
 const loginSchema = z.object({
@@ -52,42 +53,19 @@ const LoginForm = () => {
           Sign in with Github
         </Button>
       </div>
-      <div className="my-6 flex items-center">
-        <div className="h-px flex-1 bg-slate-200"></div>
-        <div className="px-4">OR</div>
-        <div className="h-px flex-1 bg-slate-200"></div>
-      </div>
-      <form onSubmit={handleSubmit(handleLogin)}>
-        <div className="flex flex-col gap-4">
-          <Controller
-            name="email"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <Input
-                status={errors.email && "error"}
-                placeholder="Type your email address or username"
-                type="email"
-                size="large"
-                value={value}
-                onChange={onChange}
-              />
-            )}
+      <Divider className="text-sm text-gray-400">OR</Divider>
+      <Form onFinish={handleSubmit(handleLogin)} layout="vertical">
+        <FormItem control={control} name="email" label="Password">
+          <Input
+            placeholder="Type your email address or username"
+            size="large"
+            type="email"
           />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { value, onChange } }) => (
-              <Input.Password
-                status={errors.password && "error"}
-                placeholder="Type your password"
-                size="large"
-                value={value}
-                onChange={onChange}
-              />
-            )}
-          />
-        </div>
-        <p className="mt-6 mb-6 text-center text-sm">
+        </FormItem>
+        <FormItem control={control} name="password" label="Password">
+          <Input.Password placeholder="Type your password" size="large" />
+        </FormItem>
+        <p className="mb-6 mt-6 text-center text-sm">
           By clicking Log in, you accept Flashit&apos;s Terms of Service and
           Privacy Policy
         </p>
@@ -99,7 +77,7 @@ const LoginForm = () => {
         >
           Log in
         </Button>
-      </form>
+      </Form>
     </div>
   );
 };
