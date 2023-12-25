@@ -22,7 +22,6 @@ const Folder = () => {
     isLoading,
     isError,
     error,
-    refetch,
   } = api.folder.getByTitle.useQuery(
     {
       userId,
@@ -56,41 +55,38 @@ const Folder = () => {
   return (
     <>
       <NextSeo title={`Quizlet 2.0 | ${title} Folder`} />
-      <div className="relative bg-slate-100 py-5 sm:py-10">
-        <div className="mx-4 max-w-[75rem] sm:mx-6 xl:m-auto">
-          <div className="pb-8">
-            <div className="mb-4 flex items-center justify-between">
-              <FolderAuthor
-                setsCount={studySets.length}
-                userImage={image}
-                userName={name}
-              />
-              {session && (
-                <FolderCTA
-                  openAddSetModal={openAddSetModal}
-                  defaultData={{ id, title, description }}
-                />
-              )}
-            </div>
-            <FolderInfo title={title} description={description} />
-          </div>
-          <div>
-            {studySets.length > 0 ? (
-              <FolderContent studySets={studySets} />
-            ) : (
-              <EmptyFolder openAddSetModal={openAddSetModal} />
-            )}
-          </div>
-          {addSetModalOpen && (
-            <AddSetModal
-              closeModal={closeAddSetModal}
-              folderId={id}
-              refetch={refetch}
-              setsInFolder={studySets}
+      <div className="pb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <FolderAuthor
+            setsCount={studySets.length}
+            userImage={image}
+            userName={name}
+          />
+          {session && (
+            <FolderCTA
+              openAddSetModal={openAddSetModal}
+              defaultData={{ id, title, description }}
             />
           )}
         </div>
+        <FolderInfo title={title} description={description} />
       </div>
+      <div>
+        {studySets.length > 0 ? (
+          <FolderContent studySets={studySets} />
+        ) : (
+          <EmptyFolder
+            openAddSetModal={openAddSetModal}
+            ownerId={folder.userId}
+          />
+        )}
+      </div>
+      <AddSetModal
+        open={addSetModalOpen}
+        closeModal={closeAddSetModal}
+        folderId={id}
+        setsInFolder={studySets}
+      />
     </>
   );
 };

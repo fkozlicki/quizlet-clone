@@ -124,12 +124,13 @@ const Match = () => {
   }, [selected]);
 
   useEffect(() => {
-    let interval: NodeJS.Timer | undefined;
-    if (stage === "start") {
-      interval = setInterval(() => {
-        dispatch({ type: "startTimer" });
-      }, 100);
-    }
+    const interval =
+      stage === "start"
+        ? setInterval(() => {
+            dispatch({ type: "startTimer" });
+          }, 100)
+        : undefined;
+
     if (stage === "finished" && interval) {
       clearInterval(interval);
     }
@@ -168,30 +169,28 @@ const Match = () => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Match" />
-      <div className="m-auto max-w-[55rem] p-4 sm:p-10">
-        <div className="mb-5 flex justify-end">
-          <Link
-            href={`/study-set/${id!}`}
-            className="rounded-md py-2 px-4 font-medium hover:bg-slate-100"
-          >
-            Back to set
-          </Link>
-        </div>
-        {stage === "initial" && <StartScreen startGame={startGame} />}
-        {stage === "start" && (
-          <GameScreen
-            cards={cards}
-            time={ellapsedTime}
-            selectCard={selectCard}
-            checkIsMatched={checkIsMatched}
-            checkIsMisatch={checkIsMisatch}
-            checkIsSelected={checkIsSelected}
-          />
-        )}
-        {stage === "finished" && (
-          <EndScreen time={ellapsedTime} playAgain={playAgain} />
-        )}
+      <div className="mb-5 flex justify-end">
+        <Link
+          href={`/study-set/${id!}`}
+          className="rounded-md px-4 py-2 font-medium hover:bg-slate-100"
+        >
+          Back to set
+        </Link>
       </div>
+      {stage === "initial" && <StartScreen startGame={startGame} />}
+      {stage === "start" && (
+        <GameScreen
+          cards={cards}
+          time={ellapsedTime}
+          selectCard={selectCard}
+          checkIsMatched={checkIsMatched}
+          checkIsMisatch={checkIsMisatch}
+          checkIsSelected={checkIsSelected}
+        />
+      )}
+      {stage === "finished" && (
+        <EndScreen time={ellapsedTime} playAgain={playAgain} />
+      )}
     </>
   );
 };

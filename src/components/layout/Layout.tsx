@@ -1,24 +1,22 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect, useState, type PropsWithChildren } from "react";
-import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { api } from "../../utils/api";
 import AuthDropdown from "./AuthDropdown";
+import FolderModal from "./FolderModal";
 import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
-import FolderModal from "./FolderModal";
 
 const Layout = ({ children }: PropsWithChildren) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const [state] = useAuthDropdownContext();
   const { pathname } = useRouter();
   const { data: session } = useSession();
 
-  const createActivity = api.activity.create.useMutation();
+  const { mutate: createActivity } = api.activity.create.useMutation();
 
   useEffect(() => {
     if (session) {
-      createActivity.mutate();
+      createActivity();
     }
   }, [session]);
 
@@ -37,22 +35,21 @@ const Layout = ({ children }: PropsWithChildren) => {
   const openMobileMenu = () => {
     setMobileMenuOpen(true);
   };
+
   const closeMobileMenu = () => {
     setMobileMenuOpen(false);
   };
 
   return (
-    <div
-      className={`relative ${
-        state === "closed" ? "" : "h-screen overflow-hidden"
-      }`}
-    >
+    <>
       <Navbar openMobileMenu={openMobileMenu} />
-      {children}
+      <main className="min-h-[calc(100vh-65px)] bg-slate-100">
+        <div className="m-auto max-w-6xl py-12">{children}</div>
+      </main>
       {!session && <AuthDropdown />}
       <MobileMenu status={mobileMenuOpen} close={closeMobileMenu} />
       {session && <FolderModal session={session} />}
-    </div>
+    </>
   );
 };
 

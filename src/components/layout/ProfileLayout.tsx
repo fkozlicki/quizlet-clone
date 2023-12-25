@@ -1,19 +1,24 @@
+import { UserOutlined } from "@ant-design/icons";
+import { Avatar, Tabs } from "antd";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
-import React from "react";
 import { api } from "../../utils/api";
-import ProfileImage from "../ProfileImage";
 
 interface ProfileLayoutProps {
   children: ReactElement;
-  achivements: boolean;
 }
 
-const ProfileLayout = ({ children, achivements }: ProfileLayoutProps) => {
+const ProfileLayout = ({ children }: ProfileLayoutProps) => {
+  const { data: session } = useSession();
   const { query, pathname } = useRouter();
-  const id = query.id?.toString();
-  const { data: user } = api.user.getById.useQuery(
+  const id = query.id as string;
+  const {
+    data: user,
+    isLoading,
+    isError,
+  } = api.user.getById.useQuery(
     {
       id: query.id as string,
     },
@@ -22,57 +27,52 @@ const ProfileLayout = ({ children, achivements }: ProfileLayoutProps) => {
     }
   );
 
+  if (isError || isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="bg-slate-100">
       <div className="m-auto max-w-[75rem] p-4 sm:px-8">
-        <div className="mb-8 flex items-center gap-5">
-          <ProfileImage
-            image={user?.image}
-            userName={user?.name}
-            size={64}
-            fontSize={32}
+        <div className="mb-8 flex items-start gap-5">
+          <Avatar
+            icon={<UserOutlined />}
+            src={user.image}
+            alt=""
+            className="h-16 w-16"
           />
           <div>
             <h1 className="text-2xl font-bold">{user?.name}</h1>
-            <p className="font-semibold text-gray-400">{user?.name}</p>
+            <div className="font-semibold text-gray-400">{user?.name}</div>
           </div>
         </div>
-        <div className="mb-8 border-b-2">
-          {id && (
-            <div className="flex items-center gap-5">
-              {achivements && (
-                <Link
-                  href={`/${id}`}
-                  className={`relative pb-1 before:absolute before:top-full before:left-0 ${
-                    pathname === "/[id]" ? "before:block" : "before:hidden"
-                  } font-semibold before:h-0.5 before:w-full before:bg-blue-700 hover:text-black hover:before:block`}
-                >
-                  Achivements
-                </Link>
-              )}
-              <Link
-                href={`/${id}/study-sets`}
-                className={`relative pb-1 before:absolute before:top-full before:left-0 ${
-                  pathname === "/[id]/study-sets"
-                    ? "before:block"
-                    : "text-gray-500 before:hidden"
-                } font-semibold before:h-0.5 before:w-full before:bg-blue-700 hover:text-black hover:before:block`}
-              >
-                Study sets
-              </Link>
-              <Link
-                href={`/${id}/folders`}
-                className={`relative pb-1 before:absolute before:top-full before:left-0 ${
-                  pathname === "/[id]/folders"
-                    ? "before:block"
-                    : "text-gray-500 before:hidden"
-                } font-semibold before:h-0.5 before:w-full before:bg-blue-700 hover:text-black hover:before:block`}
-              >
-                Folders
-              </Link>
-            </div>
-          )}
-        </div>
+        <Tabs
+          activeKey={
+            pathname === "/[id]"
+              ? "1"
+              : pathname === "/[id]/study-sets"
+              ? "2"
+              : "3"
+          }
+          items={(session?.user.id === id
+            ? [
+                {
+                  key: "1",
+                  label: <Link href={`/${id}`}>Achivements</Link>,
+                },
+              ]
+            : []
+          ).concat([
+            {
+              key: "2",
+              label: <Link href={`/${id}/study-sets`}>Study sets</Link>,
+            },
+            {
+              key: "3",
+              label: <Link href={`/${id}/folders`}>Folders</Link>,
+            },
+          ])}
+        />
         {children}
       </div>
     </div>

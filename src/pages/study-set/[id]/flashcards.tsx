@@ -27,15 +27,11 @@ const Flashcards = () => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Flashcards" />
-      <div className="bg-slate-100">
-        <div className="m-auto max-w-[65rem] p-4 md:py-12">
-          <FlashcardsGame
-            cards={studySet.cards}
-            ownerId={studySet.userId}
-            variant="large"
-          />
-        </div>
-      </div>
+      <FlashcardsGame
+        cards={studySet.cards}
+        ownerId={studySet.userId}
+        variant="large"
+      />
     </>
   );
 };

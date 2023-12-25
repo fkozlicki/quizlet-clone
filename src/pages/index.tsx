@@ -1,5 +1,4 @@
 import type { GetServerSideProps } from "next";
-import { type NextPage } from "next";
 import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Hero from "../components/pages/home/Hero";
@@ -21,13 +20,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-const Home: NextPage = () => {
+const Home = () => {
   return (
     <>
       <NextSeo title="Quizlet 2.0" />
-      <div>
-        <Hero />
-      </div>
+      <Hero />
     </>
   );
 };

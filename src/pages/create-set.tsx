@@ -26,11 +26,7 @@ const CreateSet = () => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Create study set" />
-      <div className="bg-slate-100 py-10">
-        <div className="mx-4 max-w-6xl pb-4 sm:mx-10 xl:mx-auto">
-          <StudySetForm />
-        </div>
-      </div>
+      <StudySetForm />
     </>
   );
 };

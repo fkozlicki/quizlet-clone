@@ -51,35 +51,26 @@ const StudySet = () => {
   return (
     <>
       <NextSeo title={`Quizlet 2.0 - Study set ${title}`} />
-      <div className="overflow-hidden bg-slate-100">
-        <div className="m-auto max-w-[55rem] p-4 sm:p-10">
-          <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
-            {studySet.title}
-          </h1>
-          {studySet.description && (
-            <p className="mb-4 text-lg">{studySet.description}</p>
-          )}
-          <StudyModes setId={setId} />
-          <FlashcardsGame
-            cards={studySet.cards}
-            ownerId={studySet.userId}
-            openEditModal={openEditModal}
-          />
-          <FlashcardModal
-            flashcard={editFlashcard}
-            closeModal={closeEditModal}
-          />
-          <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-            <CreatedBy userImage={image} userName={name} />
-            <StudySetCTA userId={userId} setId={setId} />
-          </div>
-          <CardsList
-            cards={cards}
-            setId={setId}
-            openEditModal={openEditModal}
-          />
-          {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
+      <div className="m-auto max-w-3xl">
+        <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
+          {studySet.title}
+        </h1>
+        {studySet.description && (
+          <p className="mb-4 text-lg">{studySet.description}</p>
+        )}
+        <StudyModes setId={setId} />
+        <FlashcardsGame
+          cards={studySet.cards}
+          ownerId={studySet.userId}
+          openEditModal={openEditModal}
+        />
+        <FlashcardModal flashcard={editFlashcard} closeModal={closeEditModal} />
+        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <CreatedBy userImage={image} userName={name} />
+          <StudySetCTA userId={userId} setId={setId} />
         </div>
+        <CardsList cards={cards} setId={setId} openEditModal={openEditModal} />
+        {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
       </div>
     </>
   );

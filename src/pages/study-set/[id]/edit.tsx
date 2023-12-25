@@ -27,7 +27,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Edit: NextPage = () => {
   const { query } = useRouter();
-  const { data: studySet, isLoading } = api.studySet.getById.useQuery(
+  const {
+    data: studySet,
+    isLoading,
+    isError,
+  } = api.studySet.getById.useQuery(
     { id: query.id as string },
     {
       enabled: !!query.id,
@@ -35,16 +39,12 @@ const Edit: NextPage = () => {
     }
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading || isError) return <div>Loading...</div>;
 
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Edit study set" />
-      <div className="bg-slate-100">
-        <div className="mx-4 max-w-[75rem] pb-4 sm:mx-10 xl:mx-auto">
-          {studySet && <StudySetForm initialData={studySet} />}
-        </div>
-      </div>
+      {studySet && <StudySetForm initialData={studySet} />}
     </>
   );
 };

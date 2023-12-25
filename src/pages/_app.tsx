@@ -1,19 +1,31 @@
-import { type AppType } from "next/app";
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
-import { api } from "../utils/api";
-import "../styles/globals.css";
-import Layout from "../components/layout/Layout";
-import { DefaultSeo } from "next-seo";
-import AuthDropdownProvider from "../contexts/AuthDropdownContext";
 import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
+import type { NextPage } from "next";
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
+import { DefaultSeo } from "next-seo";
+import type { AppProps } from "next/app";
+import type { ReactElement, ReactNode } from "react";
+import Layout from "../components/layout/Layout";
+import AuthDropdownProvider from "../contexts/AuthDropdownContext";
 import FolderModalProvider from "../contexts/FolderModalContext";
+import "../styles/globals.css";
+import { api } from "../utils/api";
 
-const MyApp: AppType<{ session: Session | null }> = ({
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps<{ session: Session | null }> & {
+  Component: NextPageWithLayout;
+};
+
+const MyApp = ({
   Component,
   pageProps: { session, ...pageProps },
-}) => {
+}: AppPropsWithLayout) => {
+  const getLayout = Component.getLayout ?? ((page) => page);
+
   return (
     <SessionProvider session={session}>
       <ConfigProvider>
@@ -29,7 +41,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
                   url: process.env.NEXT_PUBLIC_APP_DOMAIN,
                 }}
               />
-              <Component {...pageProps} />
+              {getLayout(<Component {...pageProps} />)}
             </Layout>
           </FolderModalProvider>
         </AuthDropdownProvider>

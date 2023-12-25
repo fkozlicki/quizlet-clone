@@ -1,36 +1,13 @@
-import type { GetServerSideProps } from "next";
-import { getSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import React from "react";
 import FolderPreview from "../../../components/FolderPreview";
 import ProfileLayout from "../../../components/layout/ProfileLayout";
 import { api } from "../../../utils/api";
+import type { NextPageWithLayout } from "../../_app";
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const session = await getSession(context);
-  const id = context.query.id as string;
-
-  if (id !== session?.user?.id) {
-    return {
-      props: {
-        achivements: false,
-      },
-    };
-  }
-
-  return {
-    props: {
-      achivements: true,
-    },
-  };
-};
-
-interface FoldersProps {
-  achivements: boolean;
-}
-
-const Folders = ({ achivements }: FoldersProps) => {
+const Folders: NextPageWithLayout = () => {
+  const { data: session } = useSession();
   const { query } = useRouter();
   const userId = query.id as string;
 
@@ -55,30 +32,32 @@ const Folders = ({ achivements }: FoldersProps) => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Folders" />
-      <ProfileLayout achivements={achivements}>
-        {folders.length > 0 ? (
-          <div className="grid gap-y-4">
-            {folders.map(({ title, slug, studySets }, index) => (
-              <FolderPreview
-                key={index}
-                title={title}
-                setsCount={studySets.length}
-                href={`/${userId}/folders/${slug}`}
-              />
-            ))}
-          </div>
-        ) : (
-          <div>
-            {achivements ? (
-              <div>You have no folders</div>
-            ) : (
-              <div>User have no folders</div>
-            )}
-          </div>
-        )}
-      </ProfileLayout>
+      {folders.length > 0 ? (
+        <div className="grid gap-y-4">
+          {folders.map(({ title, slug, studySets }, index) => (
+            <FolderPreview
+              key={index}
+              title={title}
+              setsCount={studySets.length}
+              href={`/${userId}/folders/${slug}`}
+            />
+          ))}
+        </div>
+      ) : (
+        <>
+          {session ? (
+            <div>You have no folders</div>
+          ) : (
+            <div>User have no folders</div>
+          )}
+        </>
+      )}
     </>
   );
+};
+
+Folders.getLayout = (page) => {
+  return <ProfileLayout>{page}</ProfileLayout>;
 };
 
 export default Folders;
