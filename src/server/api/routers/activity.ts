@@ -1,18 +1,17 @@
 import { TRPCError } from "@trpc/server";
 
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+import dayjs from "dayjs";
 
 export const activityRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
+    const today = dayjs().startOf("day").toDate();
 
     const existingActivity = await ctx.prisma.activity.findFirst({
       where: {
         userId: ctx.session.user.id,
         date: {
-          gte: new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-          lt: new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
+          gte: today,
         },
       },
     });
@@ -21,7 +20,6 @@ export const activityRouter = createTRPCRouter({
       const activity = await ctx.prisma.activity.create({
         data: {
           userId: ctx.session.user.id,
-          date: now,
         },
       });
 
