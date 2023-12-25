@@ -41,7 +41,8 @@ button {
   font-weight: 600 !important;
 }
 .react-calendar__month-view__weekdays__weekday abbr {
-  text-decoration: none;
+  text-decoration: none !important;
+  cursor: default !important;
 }
 .react-calendar__tile:hover {
   background: transparent !important;
