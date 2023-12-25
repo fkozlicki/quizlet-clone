@@ -1,14 +1,4 @@
 import {
-  ArrowUpTrayIcon,
-  EllipsisHorizontalIcon,
-  PencilIcon,
-  PlusIcon,
-} from "@heroicons/react/24/solid";
-import { useSession } from "next-auth/react";
-import React from "react";
-import IconButton from "../../IconButton";
-import { Button, Dropdown, Tooltip } from "antd";
-import {
   ApiOutlined,
   DeleteOutlined,
   DownloadOutlined,
@@ -18,6 +8,8 @@ import {
   PrinterOutlined,
   ShareAltOutlined,
 } from "@ant-design/icons";
+import { Button, Dropdown, Tooltip } from "antd";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 interface StudySetCTAProps {
