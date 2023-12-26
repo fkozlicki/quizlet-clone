@@ -1,4 +1,4 @@
-import { FolderIcon } from "@heroicons/react/24/outline";
+import { FolderOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import React from "react";
 
@@ -13,7 +13,7 @@ const FolderPreview = ({ title, setsCount, href }: FolderPreviewProps) => {
     <Link href={href} className="w-full rounded bg-white px-6 py-2 shadow-md">
       <div className="mb-1 font-medium">{setsCount} sets</div>
       <div className="flex items-center gap-6">
-        <FolderIcon width={24} />
+        <FolderOutlined className="text-2xl" />
         <div className="text-xl font-bold">{title}</div>
       </div>
     </Link>

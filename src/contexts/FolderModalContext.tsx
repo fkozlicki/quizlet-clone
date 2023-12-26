@@ -11,6 +11,7 @@ type FolderModalState = {
   open: boolean;
   defaultData?: EditFolderValues;
 };
+
 type FolderModalAction =
   | { type: "setDefaultData"; payload: FolderModalState["defaultData"] }
   | { type: "open" }

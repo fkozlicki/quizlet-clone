@@ -14,12 +14,7 @@ const ProfileLayout = ({ children }: ProfileLayoutProps) => {
   const { data: session } = useSession();
   const { query, pathname } = useRouter();
   const id = query.id as string;
-  const {
-    data: user,
-    isLoading,
-    isError,
-    error,
-  } = api.user.getById.useQuery(
+  const { data: user, isLoading } = api.user.getById.useQuery(
     {
       id: query.id as string,
     },
@@ -50,8 +45,8 @@ const ProfileLayout = ({ children }: ProfileLayoutProps) => {
     );
   }
 
-  if (isError) {
-    return <div>{error.message}</div>;
+  if (!user) {
+    return <div>404</div>;
   }
 
   return (

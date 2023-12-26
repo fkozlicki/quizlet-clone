@@ -1,16 +1,22 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import React from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import { api } from "../../utils/api";
-import { toast } from "react-hot-toast";
-import { Button, Checkbox, DatePicker, Divider, Form, Input } from "antd";
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
-import { signIn } from "next-auth/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Button,
+  Checkbox,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  message,
+} from "antd";
 import dayjs from "dayjs";
-import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import { FormItem } from "react-hook-form-antd";
 import customParseFormat from "dayjs/plugin/customParseFormat";
+import { signIn } from "next-auth/react";
+import { Controller, useForm } from "react-hook-form";
+import { FormItem } from "react-hook-form-antd";
+import { z } from "zod";
+import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
+import { api } from "../../utils/api";
 
 dayjs.extend(customParseFormat);
 
@@ -40,14 +46,10 @@ const SignupForm = () => {
   const createUser = api.user.create.useMutation({
     onSuccess: () => {
       reset();
-      toast("Created successfuly", {
-        icon: "✅",
-      });
+      void message.success("Created successfully");
     },
     onError: () => {
-      toast("Couldn't create user", {
-        icon: "❌",
-      });
+      void message.error("Couldn't create user");
     },
   });
 
@@ -125,7 +127,6 @@ const SignupForm = () => {
           Sign up
         </Button>
       </Form>
-
       <div className="mt-4 rounded border-2 border-slate-200 p-2">
         <div className="text-center font-medium text-slate-500">
           Already have an account?{" "}
