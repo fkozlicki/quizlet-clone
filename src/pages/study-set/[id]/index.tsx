@@ -11,8 +11,11 @@ import StudyModes from "../../../components/pages/study-set/StudyModes";
 import StudySetCTA from "../../../components/pages/study-set/StudySetCTA";
 import { api } from "../../../utils/api";
 import { Button, Skeleton } from "antd";
+import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const StudySet = () => {
+  const { data: session } = useSession();
   const { query } = useRouter();
   const { id: setId } = query as { id?: string };
   const {
@@ -65,13 +68,8 @@ const StudySet = () => {
     );
   }
 
-  const {
-    title,
-    cards,
-    userId,
-    user: { image, name, studySets: otherSets },
-    description,
-  } = studySet;
+  const { title, cards, userId, user, description } = studySet;
+  const { studySets: otherSets } = user;
 
   return (
     <>
@@ -91,10 +89,23 @@ const StudySet = () => {
           closeModal={closeEditModal}
         />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CreatedBy userImage={image} userName={name} />
+          <CreatedBy user={user} />
           <StudySetCTA userId={userId} setId={setId} />
         </div>
-        <CardsList cards={cards} setId={setId} openEditModal={openEditModal} />
+        <CardsList
+          userId={userId}
+          cards={cards}
+          openEditModal={openEditModal}
+        />
+        {userId === session?.user.id && (
+          <div className="flex justify-center">
+            <Link href={`${setId}/edit`}>
+              <Button type="primary" className="h-14 font-medium" size="large">
+                Add or Remove Terms
+              </Button>
+            </Link>
+          </div>
+        )}
         {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
       </div>
     </>

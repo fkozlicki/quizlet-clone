@@ -65,7 +65,11 @@ const AddSetModal = ({
             <Empty
               image={Empty.PRESENTED_IMAGE_SIMPLE}
               description="You have not sets yet"
-            ></Empty>
+            >
+              <Link href="/create-set">
+                <Button type="primary">Create set</Button>
+              </Link>
+            </Empty>
           )}
         </div>
       )}

@@ -22,9 +22,11 @@ const StudySetCTA = ({ userId, setId }: StudySetCTAProps) => {
 
   return (
     <div className="flex gap-2">
-      <Tooltip title="Add to folder">
-        <Button shape="circle" icon={<PlusOutlined />} size="large" />
-      </Tooltip>
+      {session?.user.id === userId && (
+        <Tooltip title="Add to folder">
+          <Button shape="circle" icon={<PlusOutlined />} size="large" />
+        </Tooltip>
+      )}
       {session?.user.id === userId && (
         <Tooltip title="Edit">
           <Link href={`${setId}/edit`}>
@@ -38,28 +40,39 @@ const StudySetCTA = ({ userId, setId }: StudySetCTAProps) => {
       <Dropdown
         placement="bottomRight"
         menu={{
-          items: [
-            {
-              key: 0,
-              label: "Combine",
-              icon: <ApiOutlined className="mr-4 text-lg" />,
-            },
-            {
-              key: 1,
-              label: "Print",
-              icon: <PrinterOutlined className="mr-4 text-lg" />,
-            },
-            {
-              key: 2,
-              label: "Export",
-              icon: <DownloadOutlined className="mr-4 text-lg" />,
-            },
-            {
-              key: 3,
-              label: "Delete",
-              icon: <DeleteOutlined className="mr-4 text-lg" />,
-            },
-          ],
+          items: (session?.user.id === userId
+            ? [
+                {
+                  key: 0,
+                  label: "Combine",
+                  icon: <ApiOutlined className="mr-4 text-lg" />,
+                },
+              ]
+            : []
+          ).concat(
+            [
+              {
+                key: 1,
+                label: "Print",
+                icon: <PrinterOutlined className="mr-4 text-lg" />,
+              },
+              {
+                key: 2,
+                label: "Export",
+                icon: <DownloadOutlined className="mr-4 text-lg" />,
+              },
+            ].concat(
+              session?.user.id === userId
+                ? [
+                    {
+                      key: 3,
+                      label: "Delete",
+                      icon: <DeleteOutlined className="mr-4 text-lg" />,
+                    },
+                  ]
+                : []
+            )
+          ),
         }}
         trigger={["click"]}
       >

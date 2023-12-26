@@ -1,4 +1,4 @@
-import { Button, Skeleton } from "antd";
+import { Button, Empty, Skeleton } from "antd";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -6,7 +6,6 @@ import { useState } from "react";
 import StudySetPreview from "../../../components/StudySetPreview";
 import StudySetSkeleton from "../../../components/StudySetSkeleton";
 import AddSetModal from "../../../components/pages/folder/AddSetModal";
-import EmptyFolder from "../../../components/pages/folder/EmptyFolder";
 import FolderAuthor from "../../../components/pages/folder/FolderAuthor";
 import FolderCTA from "../../../components/pages/folder/FolderCTA";
 import FolderInfo from "../../../components/pages/folder/FolderInfo";
@@ -42,7 +41,7 @@ const Folder = () => {
 
   if (isLoading || !userId) {
     return (
-      <div>
+      <>
         <div className="flex items-center justify-between">
           <Skeleton.Input className="h-4 w-full max-w-xs" active />
           <div className="flex gap-2">
@@ -57,7 +56,7 @@ const Folder = () => {
           <StudySetSkeleton />
           <StudySetSkeleton />
         </div>
-      </div>
+      </>
     );
   }
 
@@ -71,23 +70,13 @@ const Folder = () => {
       </div>
     );
 
-  const {
-    studySets,
-    user: { image, name },
-    title,
-    description,
-    id,
-  } = folder;
+  const { studySets, user, title, description, id } = folder;
 
   return (
     <>
       <NextSeo title={`Quizlet 2.0 | ${title} Folder`} />
       <div className="mb-4 flex items-center justify-between">
-        <FolderAuthor
-          setsCount={studySets.length}
-          userImage={image}
-          userName={name}
-        />
+        <FolderAuthor setsCount={studySets.length} user={user} />
         {session && userId === session.user.id && (
           <>
             <FolderCTA
@@ -123,7 +112,16 @@ const Folder = () => {
           )}
         </div>
       ) : (
-        <EmptyFolder openAddSetModal={openAddSetModal} ownerId={userId} />
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="This folder has no sets yet"
+        >
+          {session?.user.id === userId && (
+            <Button type="primary" onClick={openAddSetModal}>
+              Create now
+            </Button>
+          )}
+        </Empty>
       )}
     </>
   );

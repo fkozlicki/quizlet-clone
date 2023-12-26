@@ -7,9 +7,10 @@ import StudySetForm from "../../../components/StudySetForm";
 import { api } from "../../../utils/api";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const userId = context.query.id;
   const session = await getSession(context);
 
-  if (!session) {
+  if (!session || session.user.id !== userId) {
     return {
       redirect: {
         destination: "/",

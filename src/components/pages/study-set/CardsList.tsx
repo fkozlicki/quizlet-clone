@@ -1,36 +1,27 @@
 import type { Flashcard } from "@prisma/client";
-import Link from "next/link";
-import React from "react";
 import CardPreview from "../../CardPreview";
-import { Button } from "antd";
 
 interface CardsListProps {
   cards: Flashcard[];
-  setId: string;
   openEditModal: (flashcard: Flashcard) => void;
+  userId: string;
 }
 
-const CardsList = ({ cards, setId, openEditModal }: CardsListProps) => {
+const CardsList = ({ cards, openEditModal, userId }: CardsListProps) => {
   return (
-    <div className="mb-12">
+    <div className="mb-8">
       <div className="mb-5 text-lg font-bold">
         Terms in this set ({cards.length})
       </div>
-      <div className="mb-8 flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         {cards.map((flashcard, index) => (
           <CardPreview
+            userId={userId}
             key={index}
             flashcard={flashcard}
             openEditModal={() => openEditModal(flashcard)}
           />
         ))}
-      </div>
-      <div className="flex justify-center">
-        <Link href={`${setId}/edit`}>
-          <Button type="primary" className="h-14 font-medium" size="large">
-            Add or Remove Terms
-          </Button>
-        </Link>
       </div>
     </div>
   );
