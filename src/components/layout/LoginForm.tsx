@@ -1,8 +1,8 @@
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Divider, Form, Input, message } from "antd";
+import { Button, Divider, Form, Input } from "antd";
 import { signIn } from "next-auth/react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
 import { z } from "zod";
 
@@ -16,31 +16,21 @@ type LoginInputs = z.infer<typeof loginSchema>;
 const LoginForm = () => {
   const {
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { isValid },
     control,
   } = useForm<LoginInputs>({
     resolver: zodResolver(loginSchema),
     mode: "onChange",
   });
-  const [messageApi, contextHolder] = message.useMessage();
 
-  const handleLogin = async (data: LoginInputs) => {
-    const res = await signIn("credentials", {
+  const handleLogin = (data: LoginInputs) => {
+    void signIn("credentials", {
       ...data,
     });
-
-    if (!res) return;
-
-    if (res?.status === 200) {
-      await messageApi.success("Successfuly logged in");
-    } else {
-      await messageApi.success("Couldn't log in");
-    }
   };
 
   return (
-    <div>
-      {contextHolder}
+    <>
       <div className="flex flex-col gap-4">
         <Button
           onClick={() => signIn("google", { redirect: false })}
@@ -78,7 +68,7 @@ const LoginForm = () => {
           Log in
         </Button>
       </Form>
-    </div>
+    </>
   );
 };
 

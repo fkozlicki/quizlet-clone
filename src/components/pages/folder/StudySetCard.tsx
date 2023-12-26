@@ -1,6 +1,6 @@
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
-import { Button, Card } from "antd";
+import { Button, Card, message } from "antd";
 import { api } from "../../../utils/api";
 
 interface StudySetCardProps {
@@ -8,18 +8,42 @@ interface StudySetCardProps {
   setsInFolder: StudySet[];
   title: string;
   setId: string;
+  userId: string;
 }
 
 const StudySetCard = ({
+  setId,
   title,
   folderId,
-  setId,
   setsInFolder,
+  userId,
 }: StudySetCardProps) => {
-  const { mutate: addSet } = api.folder.addSet.useMutation();
-  const { mutate: removeSet } = api.folder.removeSet.useMutation();
-  const setsIds = setsInFolder.map((set) => set.id);
-  const present = setsIds.includes(setId);
+  const {
+    folder: {
+      getByTitle: { setData },
+    },
+  } = api.useUtils();
+  const { mutate: addSet, isLoading: addLoading } =
+    api.folder.addSet.useMutation({
+      onSuccess: (data) => {
+        setData({ slug: folderId, userId }, data);
+        void message.success("Added successfully");
+      },
+      onError: () => {
+        void message.error("Couldn't add set");
+      },
+    });
+  const { mutate: removeSet, isLoading: removeLoading } =
+    api.folder.removeSet.useMutation({
+      onSuccess: (data) => {
+        setData({ slug: folderId, userId }, data);
+        void message.success("Removed successfully");
+      },
+      onError: () => {
+        void message.error("Couldn't remove set");
+      },
+    });
+  const present = setsInFolder.map((set) => set.id).includes(setId);
 
   const handleAddSet = () => {
     addSet({
@@ -40,6 +64,8 @@ const StudySetCard = ({
       <div className="flex items-center justify-between">
         <div className="text-xl font-bold">{title}</div>
         <Button
+          disabled={addLoading || removeLoading}
+          loading={addLoading || removeLoading}
           onClick={present ? handleRemoveSet : handleAddSet}
           type={present ? "primary" : "default"}
           icon={present ? <MinusOutlined /> : <PlusOutlined />}

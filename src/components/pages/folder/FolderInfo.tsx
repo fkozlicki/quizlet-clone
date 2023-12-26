@@ -8,7 +8,7 @@ interface FolderInfoProps {
 
 const FolderInfo = ({ title, description }: FolderInfoProps) => {
   return (
-    <div>
+    <div className="mb-8">
       <div className="flex items-center gap-4">
         <FolderOutlined className="text-5xl" />
         <div className="text-4xl font-bold">{title}</div>

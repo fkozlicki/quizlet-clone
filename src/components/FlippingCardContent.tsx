@@ -5,7 +5,7 @@ import type { MouseEventHandler } from "react";
 interface FlippingCardContentProps {
   content: string;
   title: string;
-  openEditModal?: () => void;
+  openEditModal: () => void;
   editable: boolean;
   back?: boolean;
 }
@@ -36,17 +36,19 @@ const FlippingCardContent = ({
         <div className="flex items-center justify-between">
           <div className="font-medium text-slate-400">{title}</div>
           <div className="flex justify-end gap-2">
-            {editable && openEditModal && (
+            {editable && (
               <Button
                 icon={<EditOutlined />}
                 type="text"
                 onClick={handleOpenEdit}
+                shape="circle"
               />
             )}
             <Button
               onClick={handleAddToFavourites}
               icon={<StarFilled />}
               type="text"
+              shape="circle"
             />
           </div>
         </div>

@@ -141,7 +141,8 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
                     },
                     {
                       key: "4",
-                      label: <span onClick={() => signOut()}>Log out</span>,
+                      label: "Sign out",
+                      onClick: () => void signOut(),
                     },
                   ],
                 }}

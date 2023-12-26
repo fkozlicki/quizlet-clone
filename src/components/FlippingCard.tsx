@@ -7,8 +7,8 @@ import FlippingCardContent from "./FlippingCardContent";
 interface FlippingCardProps {
   flashcard: Flashcard;
   editable: boolean;
-  openEditModal?: (flashcard: Flashcard) => void;
-  size?: "normal" | "large";
+  openEditModal: (flashcard: Flashcard) => void;
+  size?: "small" | "large";
   moveAnimation: FlashcardAnimation;
   cardWrapper: RefObject<HTMLDivElement>;
   animationCardWrapper: RefObject<HTMLDivElement>;
@@ -18,7 +18,7 @@ const FlippingCard = ({
   flashcard,
   editable,
   openEditModal,
-  size = "normal",
+  size = "small",
   moveAnimation,
   cardWrapper,
   animationCardWrapper,
@@ -49,7 +49,7 @@ const FlippingCard = ({
       </div>
       <div
         className={`w-full ${
-          size === "normal" ? "min-h-[21rem] sm:min-h-[25rem]" : "min-h-[40rem]"
+          size === "small" ? "min-h-[21rem] sm:min-h-[25rem]" : "min-h-[40rem]"
         }`}
       >
         <div
@@ -67,17 +67,13 @@ const FlippingCard = ({
             } `}
           >
             <FlippingCardContent
-              openEditModal={
-                openEditModal ? () => openEditModal(flashcard) : undefined
-              }
+              openEditModal={() => openEditModal(flashcard)}
               title="Term"
               content={flashcard.term}
               editable={editable}
             />
             <FlippingCardContent
-              openEditModal={
-                openEditModal ? () => openEditModal(flashcard) : undefined
-              }
+              openEditModal={() => openEditModal(flashcard)}
               title="Definition"
               content={flashcard.definition}
               editable={editable}

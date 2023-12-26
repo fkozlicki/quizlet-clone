@@ -33,7 +33,6 @@ const SignupForm = () => {
     control,
     reset,
     formState: { isValid, errors },
-    watch,
   } = useForm<CredentialsInputs>({
     resolver: zodResolver(credentialsSchema),
     mode: "onChange",
@@ -55,8 +54,6 @@ const SignupForm = () => {
   const onSubmit = (data: CredentialsInputs) => {
     createUser.mutate(data);
   };
-
-  console.log(watch());
 
   return (
     <>

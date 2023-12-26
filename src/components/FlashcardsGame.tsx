@@ -4,7 +4,7 @@ import type { SwitchChangeEventHandler } from "antd/es/switch";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FlashcardButtons from "./FlashcardButtons";
 import FlippingCard from "./FlippingCard";
 import Result from "./Result";
@@ -13,16 +13,16 @@ export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
 interface FlashcardsGameProps {
   cards: Flashcard[];
-  openEditModal?: (flashcard: Flashcard) => void;
+  openEditModal: (flashcard: Flashcard) => void;
   ownerId: string;
-  variant?: "small" | "large";
+  size?: "small" | "large";
 }
 
 const FlashcardsGame = ({
   cards,
   openEditModal,
   ownerId,
-  variant = "small",
+  size = "small",
 }: FlashcardsGameProps) => {
   const { push } = useRouter();
   const { data: session } = useSession();
@@ -35,6 +35,10 @@ const FlashcardsGame = ({
   const [learn, setLearn] = useState<boolean>(false);
   const cardWrapper = useRef<HTMLDivElement>(null);
   const animationCardWrapper = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setFlashcards(cards);
+  }, [cards]);
 
   const animateScoreCard = (variant: "learning" | "know") => {
     const { current } = animationCardWrapper;
@@ -128,9 +132,46 @@ const FlashcardsGame = ({
     setLearn(value);
   };
 
+  const firstButton = {
+    text:
+      hard.length > 0
+        ? "Review the tough terms"
+        : size === "small"
+        ? "Learn flashcards"
+        : "Back to set",
+    description:
+      hard.length > 0
+        ? `Review Flashcards again with the ${hard.length} terms you're still learing.`
+        : size === "small"
+        ? "Learn flashcards"
+        : "Get back to the study set.",
+    callback:
+      hard.length > 0
+        ? reviewToughTerms
+        : size === "small"
+        ? learnFlashcards
+        : backToStudySet,
+    Icon: (
+      <Image
+        src={size === "small" ? "/study.png" : "/back.svg"}
+        alt=""
+        width={48}
+        height={48}
+      />
+    ),
+  };
+
+  const secondButton = {
+    text: "Reset Flashcards",
+    description: `Study all ${cards.length} terms from the beginning.`,
+    callback: resetFlashcards,
+    Icon: <Image src="/back.svg" alt="" width={48} height={48} />,
+  };
+
   return currentCard ? (
     <>
       <FlippingCard
+        size={size}
         openEditModal={openEditModal}
         flashcard={currentCard}
         editable={ownerId === session?.user.id}
@@ -139,7 +180,7 @@ const FlashcardsGame = ({
         animationCardWrapper={animationCardWrapper}
       />
       <FlashcardButtons
-        cardCount={cards.length}
+        cardCount={flashcards.length}
         cardIndex={cardIndex}
         handleLeft={handleLeft}
         handleRight={handleRight}
@@ -157,40 +198,8 @@ const FlashcardsGame = ({
     <Result
       hard={hard.length}
       cardCount={cards.length}
-      firstButton={{
-        text:
-          hard.length > 0
-            ? "Review the tough terms"
-            : variant === "small"
-            ? "Learn flashcards"
-            : "Back to set",
-        description:
-          hard.length > 0
-            ? `Review Flashcards again with the ${hard.length} terms you're still learing.`
-            : variant === "small"
-            ? "Learn flashcards"
-            : "Get back to the study set.",
-        callback:
-          hard.length > 0
-            ? reviewToughTerms
-            : variant === "small"
-            ? learnFlashcards
-            : backToStudySet,
-        Icon: (
-          <Image
-            src={variant === "small" ? "/study.png" : "/back.svg"}
-            alt=""
-            width={48}
-            height={48}
-          />
-        ),
-      }}
-      secondButton={{
-        text: "Reset Flashcards",
-        description: `Study all ${cards.length} terms from the beginning.`,
-        callback: resetFlashcards,
-        Icon: <Image src="/back.svg" alt="" width={48} height={48} />,
-      }}
+      firstButton={firstButton}
+      secondButton={secondButton}
     />
   );
 };

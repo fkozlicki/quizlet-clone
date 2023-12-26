@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Flashcard } from "@prisma/client";
-import { Form, Input, Modal } from "antd";
+import { Form, Input, Modal, message } from "antd";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
@@ -12,12 +12,39 @@ import { api } from "../../../utils/api";
 import { useEffect } from "react";
 
 interface FlashcardModalProps {
+  setId: string;
   flashcard?: Flashcard;
   closeModal: () => void;
 }
 
-const FlashcardModal = ({ flashcard, closeModal }: FlashcardModalProps) => {
-  const { mutate: editFlashcard, isLoading } = api.card.edit.useMutation();
+const FlashcardModal = ({
+  setId,
+  flashcard,
+  closeModal,
+}: FlashcardModalProps) => {
+  const {
+    studySet: {
+      getById: { setData },
+    },
+  } = api.useUtils();
+  const { mutate: editFlashcard, isLoading } = api.card.edit.useMutation({
+    onSuccess: (data) => {
+      void message.success("Edited successfully");
+      setData({ id: setId }, (oldData) => {
+        if (!oldData) {
+          return;
+        }
+        const newCards = oldData.cards.map((card) =>
+          card.id === data.id ? data : card
+        );
+        return {
+          ...oldData,
+          cards: newCards,
+        };
+      });
+      closeModal();
+    },
+  });
   const {
     handleSubmit,
     control,
@@ -36,14 +63,16 @@ const FlashcardModal = ({ flashcard, closeModal }: FlashcardModalProps) => {
     editFlashcard(values);
   };
 
+  const onCancel = () => {
+    reset();
+    closeModal();
+  };
+
   return (
     <Modal
       open={!!flashcard}
       onOk={handleSubmit(onFinish)}
-      onCancel={() => {
-        reset();
-        closeModal();
-      }}
+      onCancel={onCancel}
       title="Edit flashcard"
       centered
       confirmLoading={isLoading}
@@ -51,7 +80,7 @@ const FlashcardModal = ({ flashcard, closeModal }: FlashcardModalProps) => {
         disabled: !isValid,
       }}
     >
-      <Form layout="vertical">
+      <Form disabled={isLoading} layout="vertical">
         <FormItem control={control} name="term" label="Term">
           <Input placeholder="Term" />
         </FormItem>

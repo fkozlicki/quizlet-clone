@@ -63,9 +63,7 @@ const StudySetCTA = ({ userId, setId }: StudySetCTAProps) => {
         }}
         trigger={["click"]}
       >
-        <Tooltip title="More">
-          <Button shape="circle" icon={<EllipsisOutlined />} size="large" />
-        </Tooltip>
+        <Button shape="circle" icon={<EllipsisOutlined />} size="large" />
       </Dropdown>
     </div>
   );
