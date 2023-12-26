@@ -121,6 +121,15 @@ export const folderRouter = createTRPCRouter({
             },
           },
         },
+        include: {
+          studySets: {
+            include: {
+              cards: true,
+              user: true,
+            },
+          },
+          user: true,
+        },
       });
 
       if (!folder)
@@ -150,6 +159,15 @@ export const folderRouter = createTRPCRouter({
               id: input.setId,
             },
           },
+        },
+        include: {
+          studySets: {
+            include: {
+              cards: true,
+              user: true,
+            },
+          },
+          user: true,
         },
       });
 
@@ -185,5 +203,18 @@ export const folderRouter = createTRPCRouter({
         });
 
       return updated;
+    }),
+  delete: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await ctx.prisma.folder.delete({
+        where: {
+          id: input.id,
+        },
+      });
     }),
 });
