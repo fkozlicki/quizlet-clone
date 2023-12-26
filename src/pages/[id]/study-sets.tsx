@@ -1,58 +1,75 @@
-import { useSession } from "next-auth/react";
+import { Button, Empty } from "antd";
 import { NextSeo } from "next-seo";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import StudySetPreview from "../../components/StudySetPreview";
+import StudySetSkeleton from "../../components/StudySetSkeleton";
 import ProfileLayout from "../../components/layout/ProfileLayout";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
 
 const StudySets: NextPageWithLayout = () => {
-  const { query, isReady } = useRouter();
-  const { data: session } = useSession();
-
-  if (!isReady) return <div>Loading...</div>;
-
-  const userId = query.id as string;
-
+  const { query } = useRouter();
+  const { id: userId } = query as { id?: string };
   const {
     data: studySets,
     isLoading,
-    error,
-  } = api.studySet.getUserSets.useQuery({
-    id: userId,
-  });
+    isError,
+    refetch,
+  } = api.studySet.getUserSets.useQuery(
+    {
+      id: userId!,
+    },
+    {
+      enabled: !!userId,
+    }
+  );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) {
+    return (
+      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+        <StudySetSkeleton />
+        <StudySetSkeleton />
+        <StudySetSkeleton />
+        <StudySetSkeleton />
+      </div>
+    );
+  }
 
-  if (error) return <div>{error.message}</div>;
+  if (isError) {
+    return (
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-lg">Failed to load data</div>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Study sets" />
       {studySets.length > 0 ? (
-        <div>
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-            {studySets.map((set) => (
-              <StudySetPreview
-                key={set.id}
-                authorImage={set.user.image}
-                authorName={set.user.name}
-                title={set.title}
-                termsCount={set.cards.length}
-                id={set.id}
-                authorId={set.userId}
-              />
-            ))}
-          </div>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+          {studySets.map((set) => (
+            <StudySetPreview
+              key={set.id}
+              authorImage={set.user.image}
+              authorName={set.user.name}
+              title={set.title}
+              termsCount={set.cards.length}
+              id={set.id}
+              authorId={set.user.id}
+            />
+          ))}
         </div>
       ) : (
-        <>
-          {session ? (
-            <div>You have not sets</div>
-          ) : (
-            <div className="">This user doesn&apos;t have any sets</div>
-          )}
-        </>
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}>
+          <Link href="/create-set">
+            <Button type="primary">Create Now</Button>
+          </Link>
+        </Empty>
       )}
     </>
   );

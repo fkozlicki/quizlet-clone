@@ -10,35 +10,25 @@ import OtherSets from "../../../components/pages/study-set/OtherSets";
 import StudyModes from "../../../components/pages/study-set/StudyModes";
 import StudySetCTA from "../../../components/pages/study-set/StudySetCTA";
 import { api } from "../../../utils/api";
+import { Button, Skeleton } from "antd";
 
 const StudySet = () => {
   const { query } = useRouter();
-  const setId = query.id?.toString();
+  const { id: setId } = query as { id?: string };
   const {
     data: studySet,
     isLoading,
     error,
+    refetch,
   } = api.studySet.getById.useQuery(
     {
       id: setId!,
     },
     {
-      enabled: !!query.id,
+      enabled: !!setId,
     }
   );
   const [editFlashcard, setEditFlashcard] = useState<Flashcard>();
-
-  if (isLoading || !setId) return <div>Loading...</div>;
-
-  if (error) return <div>{error.message}</div>;
-
-  const otherSets = studySet.user.studySets;
-  const {
-    title,
-    cards,
-    userId,
-    user: { image, name },
-  } = studySet;
 
   const closeEditModal = () => {
     setEditFlashcard(undefined);
@@ -48,24 +38,59 @@ const StudySet = () => {
     setEditFlashcard(flashcard);
   };
 
+  if (isLoading || !setId)
+    return (
+      <div className="m-auto max-w-3xl">
+        <Skeleton.Input className="mb-6 block" />
+        <Skeleton.Input className="mb-6 h-4" />
+        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <Skeleton.Input className="h-12 w-full" />
+          <Skeleton.Input className="h-12 w-full" />
+          <Skeleton.Input className="h-12 w-full" />
+          <Skeleton.Input className="h-12 w-full" />
+        </div>
+        <Skeleton.Input className="mb-6 h-[400px] w-full" />
+        <Skeleton />
+      </div>
+    );
+
+  if (error) {
+    return (
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-lg">Failed to load data</div>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const {
+    title,
+    cards,
+    userId,
+    user: { image, name, studySets: otherSets },
+    description,
+  } = studySet;
+
   return (
     <>
       <NextSeo title={`Quizlet 2.0 - Study set ${title}`} />
       <div className="m-auto max-w-3xl">
-        <h1 className="mb-3 text-2xl font-bold sm:text-3xl">
-          {studySet.title}
-        </h1>
-        {studySet.description && (
-          <p className="mb-4 text-lg">{studySet.description}</p>
-        )}
+        <h1 className="mb-3 text-2xl font-bold sm:text-3xl">{title}</h1>
+        {description && <p className="mb-4 text-lg">{description}</p>}
         <StudyModes setId={setId} />
         <FlashcardsGame
-          cards={studySet.cards}
-          ownerId={studySet.userId}
+          cards={cards}
+          ownerId={userId}
           openEditModal={openEditModal}
         />
-        <FlashcardModal flashcard={editFlashcard} closeModal={closeEditModal} />
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <FlashcardModal
+          setId={setId}
+          flashcard={editFlashcard}
+          closeModal={closeEditModal}
+        />
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CreatedBy userImage={image} userName={name} />
           <StudySetCTA userId={userId} setId={setId} />
         </div>

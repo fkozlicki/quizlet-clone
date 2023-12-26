@@ -6,6 +6,7 @@ import EndScreen from "../../../components/pages/match/EndScreen";
 import GameScreen from "../../../components/pages/match/GameScreen";
 import StartScreen from "../../../components/pages/match/StartScreen";
 import { api } from "../../../utils/api";
+import { Button } from "antd";
 
 export interface GameCard {
   flashcardId: string;
@@ -174,7 +175,9 @@ const Match = () => {
           href={`/study-set/${id!}`}
           className="rounded-md px-4 py-2 font-medium hover:bg-slate-100"
         >
-          Back to set
+          <Button type="text" size="large">
+            Back to set
+          </Button>
         </Link>
       </div>
       {stage === "initial" && <StartScreen startGame={startGame} />}

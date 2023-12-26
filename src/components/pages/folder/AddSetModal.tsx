@@ -1,7 +1,7 @@
+import { LoadingOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
-import { Button, Modal } from "antd";
+import { Button, Empty, Modal } from "antd";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { api } from "../../../utils/api";
 import StudySetCard from "./StudySetCard";
 
@@ -10,6 +10,7 @@ interface AddSetModalProps {
   closeModal: () => void;
   folderId: string;
   setsInFolder: StudySet[];
+  userId: string;
 }
 
 const AddSetModal = ({
@@ -17,11 +18,14 @@ const AddSetModal = ({
   closeModal,
   folderId,
   setsInFolder,
+  userId,
 }: AddSetModalProps) => {
-  const { query } = useRouter();
-  const id = query.id as string;
-  const { data: studySets, status } = api.studySet.getUserSets.useQuery({
-    id,
+  const {
+    data: studySets,
+    status,
+    refetch,
+  } = api.studySet.getUserSets.useQuery({
+    id: userId,
   });
 
   return (
@@ -35,8 +39,13 @@ const AddSetModal = ({
         footer: "hidden",
       }}
     >
-      {status === "loading" && <div>Loading sets</div>}
-      {status === "error" && <div>Couldn&apos;t load sets</div>}
+      {status === "loading" && <LoadingOutlined />}
+      {status === "error" && (
+        <div>
+          <div>Couldn&apos;t load sets</div>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      )}
       {status === "success" && (
         <div className="flex flex-col gap-4">
           <Link href="/create-set">
@@ -49,8 +58,15 @@ const AddSetModal = ({
               title={title}
               folderId={folderId}
               setsInFolder={setsInFolder}
+              userId={userId}
             />
           ))}
+          {studySets.length === 0 && (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="You have not sets yet"
+            ></Empty>
+          )}
         </div>
       )}
     </Modal>

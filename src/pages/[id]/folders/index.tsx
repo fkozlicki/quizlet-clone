@@ -5,29 +5,52 @@ import FolderPreview from "../../../components/FolderPreview";
 import ProfileLayout from "../../../components/layout/ProfileLayout";
 import { api } from "../../../utils/api";
 import type { NextPageWithLayout } from "../../_app";
+import FolderSkeleton from "../../../components/FolderSkeleton";
+import { Button, Empty } from "antd";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 
 const Folders: NextPageWithLayout = () => {
   const { data: session } = useSession();
   const { query } = useRouter();
-  const userId = query.id as string;
-
+  const { id: userId } = query as { id?: string };
   const {
     data: folders,
     isError,
     isLoading,
-    error,
+    refetch,
   } = api.folder.getAll.useQuery(
     {
-      userId,
+      userId: userId!,
     },
     {
       enabled: !!userId,
     }
   );
+  const [, dispatch] = useFolderModalContext();
 
-  if (isLoading) return <div>Loading...</div>;
+  const openFolderModal = () => {
+    dispatch({ type: "open" });
+  };
 
-  if (isError) return <div>{error.message}</div>;
+  if (isLoading || !userId)
+    return (
+      <div className="grid gap-y-4">
+        <FolderSkeleton />
+        <FolderSkeleton />
+        <FolderSkeleton />
+        <FolderSkeleton />
+      </div>
+    );
+
+  if (isError)
+    return (
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-lg">Failed to load data</div>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      </div>
+    );
 
   return (
     <>
@@ -44,13 +67,18 @@ const Folders: NextPageWithLayout = () => {
           ))}
         </div>
       ) : (
-        <>
-          {session ? (
-            <div>You have no folders</div>
-          ) : (
-            <div>User have no folders</div>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={`${
+            userId === session?.user.id ? "You have" : "User has"
+          } no folders yet`}
+        >
+          {userId === session?.user.id && (
+            <Button onClick={openFolderModal} type="primary">
+              Create
+            </Button>
           )}
-        </>
+        </Empty>
       )}
     </>
   );

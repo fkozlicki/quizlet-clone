@@ -6,6 +6,7 @@ import type { StudySetTest } from "../../../server/api/routers/study-set";
 import MultipleChoice from "../../cards/MultipleChoice";
 import TrueOrFalse from "../../cards/TrueOrFalse";
 import Written from "../../cards/Written";
+import { Button } from "antd";
 
 const flashcard = z.object({
   id: z.string(),
@@ -64,38 +65,36 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
 
   return (
     <form onSubmit={handleSubmit(formCallack)} className="flex flex-col gap-6">
-      <div className="flex flex-col gap-6">
-        {trueOrFalse.map(({ answer, term }, index) => (
-          <TrueOrFalse
-            key={index}
-            term={term}
-            answer={answer}
-            index={index}
-            register={register(`trueOrFalse.${index}.userAnswer`)}
-          />
-        ))}
-        {multipleChoice.map(({ term, answers }, index) => (
-          <MultipleChoice
-            key={index}
-            term={term}
-            answers={answers}
-            register={register(`multipleChoice.${index}.userAnswer`)}
-            index={index}
-            type="radio"
-          />
-        ))}
-        {written.map(({ term }, index) => (
-          <Written
-            key={index}
-            term={term}
-            register={register(`written.${index}.userAnswer`)}
-            index={index}
-          />
-        ))}
-      </div>
-      <button type="submit" className="rounded-md bg-blue-600 py-2 text-white">
+      {trueOrFalse.map(({ answer, term }, index) => (
+        <TrueOrFalse
+          key={index}
+          term={term}
+          answer={answer}
+          index={index}
+          register={register(`trueOrFalse.${index}.userAnswer`)}
+        />
+      ))}
+      {multipleChoice.map(({ term, answers }, index) => (
+        <MultipleChoice
+          key={index}
+          term={term}
+          answers={answers}
+          register={register(`multipleChoice.${index}.userAnswer`)}
+          index={index}
+          type="radio"
+        />
+      ))}
+      {written.map(({ term }, index) => (
+        <Written
+          key={index}
+          term={term}
+          register={register(`written.${index}.userAnswer`)}
+          index={index}
+        />
+      ))}
+      <Button htmlType="submit" className="h-12" type="primary" size="large">
         Send anwers
-      </button>
+      </Button>
     </form>
   );
 };

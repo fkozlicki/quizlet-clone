@@ -12,7 +12,7 @@ const UserAnswers = ({ result }: UserAnswersProps) => {
   const { trueOrFalse, multipleChoice, written } = result;
 
   return (
-    <div>
+    <>
       <div className="mb-6 text-xl font-semibold">Your answers</div>
       <div className="flex flex-col gap-6">
         {trueOrFalse.map(({ answer, term, userAnswer, definition }, index) => (
@@ -51,7 +51,7 @@ const UserAnswers = ({ result }: UserAnswersProps) => {
           />
         ))}
       </div>
-    </div>
+    </>
   );
 };
 

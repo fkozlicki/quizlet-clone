@@ -1,16 +1,16 @@
-import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
+import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import { useState } from "react";
+import Result from "../../../components/Result";
 import type { TestInputs } from "../../../components/pages/test/TestForm";
 import TestForm from "../../../components/pages/test/TestForm";
 import UserAnswers from "../../../components/pages/test/UserAnswers";
-import Result from "../../../components/Result";
 import { api } from "../../../utils/api";
 
 const Test = () => {
   const { query, push } = useRouter();
-  const setId = query.id?.toString();
+  const { id: setId } = query as { id?: string };
   const {
     data: studySetTest,
     isLoading,
@@ -24,51 +24,43 @@ const Test = () => {
     }
   );
   const [result, setResult] = useState<TestInputs>();
-  const [correctness, setCorrectness] = useState<{
-    correct: number;
-    incorrect: number;
-  }>();
+  const [hard, setHard] = useState<number>();
 
   const submitAnswers = (data: TestInputs) => {
-    setResult({ ...data });
-
-    // correctness
-    const correct = calculateCorrectness(data);
-    const incorrect =
-      Object.values(data).reduce((acc, el) => acc + el.length, 0) - correct;
-    setCorrectness({ correct, incorrect });
+    setResult(data);
+    setHard(calculateHard(data));
     window && window.scrollTo(0, 0);
   };
 
-  const calculateCorrectness = (answers: TestInputs) => {
+  const calculateHard = (answers: TestInputs) => {
     const { multipleChoice, written, trueOrFalse } = answers;
-    const correctiness =
+    const hard =
       multipleChoice.reduce(
         (acc, { userAnswer, definition }) =>
-          userAnswer === definition ? acc + 1 : acc,
+          userAnswer !== definition ? acc + 1 : acc,
         0
       ) +
       written.reduce(
         (acc, { userAnswer, definition }) =>
-          userAnswer === definition ? acc + 1 : acc,
+          userAnswer !== definition ? acc + 1 : acc,
         0
       ) +
       trueOrFalse.reduce((acc, { answer, definition, userAnswer }) => {
         if (
-          (answer === definition && userAnswer === "true") ||
-          (answer !== definition && userAnswer === "false")
+          (answer === definition && userAnswer === "false") ||
+          (answer !== definition && userAnswer === "true")
         )
           return acc + 1;
         return acc;
       }, 0);
 
-    return correctiness;
+    return hard;
   };
 
   const takeNewTest = async () => {
-    await refetch();
     setResult(undefined);
-    setCorrectness(undefined);
+    setHard(undefined);
+    await refetch();
   };
 
   if (isLoading || !setId) return <div>Loading...</div>;
@@ -79,34 +71,43 @@ const Test = () => {
     await push(`/study-set/${setId}`);
   };
 
+  const cardCount = Object.values(studySetTest).flatMap((e) => e).length;
+
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Test" />
-      {result && correctness ? (
-        <div>
-          <Result
-            know={correctness.correct}
-            learning={correctness.incorrect}
-            firstButton={{
-              text: "Take a new test",
-              Icon: ArrowPathIcon,
-              callback: takeNewTest,
-            }}
-            secondButton={{
-              text: "Back to study set",
-              Icon: ArrowUturnLeftIcon,
-              callback: backToStudySet,
-            }}
-          />
-          <UserAnswers result={result} />
-        </div>
-      ) : (
-        <>
-          {studySetTest && (
-            <TestForm studySetTest={studySetTest} formCallack={submitAnswers} />
-          )}
-        </>
-      )}
+      <div className="m-auto max-w-3xl">
+        {result && hard ? (
+          <>
+            <Result
+              hard={hard}
+              cardCount={cardCount}
+              firstButton={{
+                text: "Take a new test",
+                description: "Take a new test with another questions.",
+                Icon: <ReloadOutlined />,
+                callback: takeNewTest,
+              }}
+              secondButton={{
+                text: "Back to study set",
+                description: "Back to study set",
+                Icon: <RollbackOutlined />,
+                callback: backToStudySet,
+              }}
+            />
+            <UserAnswers result={result} />
+          </>
+        ) : (
+          <>
+            {studySetTest && (
+              <TestForm
+                studySetTest={studySetTest}
+                formCallack={submitAnswers}
+              />
+            )}
+          </>
+        )}
+      </div>
     </>
   );
 };

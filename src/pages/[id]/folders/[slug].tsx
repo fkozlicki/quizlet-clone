@@ -1,31 +1,31 @@
+import { Button, Skeleton } from "antd";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
-import React, { useState } from "react";
-import AddSetModal from "../../../components/pages/folder/AddSetModal";
-import FolderCTA from "../../../components/pages/folder/FolderCTA";
-import FolderAuthor from "../../../components/pages/folder/FolderAuthor";
-import { api } from "../../../utils/api";
-import FolderInfo from "../../../components/pages/folder/FolderInfo";
-import EmptyFolder from "../../../components/pages/folder/EmptyFolder";
-import FolderContent from "../../../components/pages/folder/FolderContent";
 import { NextSeo } from "next-seo";
+import { useRouter } from "next/router";
+import { useState } from "react";
+import StudySetPreview from "../../../components/StudySetPreview";
+import StudySetSkeleton from "../../../components/StudySetSkeleton";
+import AddSetModal from "../../../components/pages/folder/AddSetModal";
+import EmptyFolder from "../../../components/pages/folder/EmptyFolder";
+import FolderAuthor from "../../../components/pages/folder/FolderAuthor";
+import FolderCTA from "../../../components/pages/folder/FolderCTA";
+import FolderInfo from "../../../components/pages/folder/FolderInfo";
+import { api } from "../../../utils/api";
 
 const Folder = () => {
-  const [addSetModalOpen, setAddSetModalOpen] = useState<boolean>(false);
-
   const { query } = useRouter();
   const { data: session } = useSession();
-  const userId = query.id as string;
-  const slug = query.slug as string;
+  const [addSetModalOpen, setAddSetModalOpen] = useState<boolean>(false);
+  const { id: userId, slug } = query as { id?: string; slug?: string };
   const {
     data: folder,
     isLoading,
     isError,
-    error,
+    refetch,
   } = api.folder.getByTitle.useQuery(
     {
-      userId,
-      slug,
+      userId: userId!,
+      slug: slug!,
     },
     {
       enabled: !!userId && !!slug,
@@ -40,9 +40,36 @@ const Folder = () => {
     setAddSetModalOpen(false);
   };
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading || !userId) {
+    return (
+      <div>
+        <div className="flex items-center justify-between">
+          <Skeleton.Input className="h-4 w-full max-w-xs" active />
+          <div className="flex gap-2">
+            <Skeleton.Avatar size="large" active />
+            <Skeleton.Avatar size="large" active />
+          </div>
+        </div>
+        <Skeleton.Input className="mb-10 mt-2 h-12 w-full max-w-sm" active />
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          <StudySetSkeleton />
+          <StudySetSkeleton />
+          <StudySetSkeleton />
+          <StudySetSkeleton />
+        </div>
+      </div>
+    );
+  }
 
-  if (isError) return <div>{error.message}</div>;
+  if (isError)
+    return (
+      <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-2">
+          <div className="text-lg">Failed to load data</div>
+          <Button onClick={() => refetch()}>Try again</Button>
+        </div>
+      </div>
+    );
 
   const {
     studySets,
@@ -55,38 +82,49 @@ const Folder = () => {
   return (
     <>
       <NextSeo title={`Quizlet 2.0 | ${title} Folder`} />
-      <div className="pb-8">
-        <div className="mb-4 flex items-center justify-between">
-          <FolderAuthor
-            setsCount={studySets.length}
-            userImage={image}
-            userName={name}
-          />
-          {session && (
+      <div className="mb-4 flex items-center justify-between">
+        <FolderAuthor
+          setsCount={studySets.length}
+          userImage={image}
+          userName={name}
+        />
+        {session && userId === session.user.id && (
+          <>
             <FolderCTA
+              userId={userId}
               openAddSetModal={openAddSetModal}
-              defaultData={{ id, title, description }}
+              defaultData={folder}
             />
-          )}
-        </div>
-        <FolderInfo title={title} description={description} />
-      </div>
-      <div>
-        {studySets.length > 0 ? (
-          <FolderContent studySets={studySets} />
-        ) : (
-          <EmptyFolder
-            openAddSetModal={openAddSetModal}
-            ownerId={folder.userId}
-          />
+            <AddSetModal
+              folderId={id}
+              userId={userId}
+              setsInFolder={studySets}
+              closeModal={closeAddSetModal}
+              open={addSetModalOpen}
+            />
+          </>
         )}
       </div>
-      <AddSetModal
-        open={addSetModalOpen}
-        closeModal={closeAddSetModal}
-        folderId={id}
-        setsInFolder={studySets}
-      />
+      <FolderInfo title={title} description={description} />
+      {studySets.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {studySets.map(
+            ({ title, id, cards, user: { image, name }, userId }, index) => (
+              <StudySetPreview
+                key={index}
+                title={title}
+                id={id}
+                termsCount={cards.length}
+                authorImage={image}
+                authorName={name}
+                authorId={userId}
+              />
+            )
+          )}
+        </div>
+      ) : (
+        <EmptyFolder openAddSetModal={openAddSetModal} ownerId={userId} />
+      )}
     </>
   );
 };

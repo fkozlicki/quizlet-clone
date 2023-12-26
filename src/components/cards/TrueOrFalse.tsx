@@ -24,12 +24,12 @@ const TrueOrFalse = ({
     <div className="flex min-h-[30rem] flex-col rounded-md bg-white p-4 shadow-lg md:px-8 md:py-6">
       <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
         <div
-          className={`flex-1 border-b-2 pb-4 sm:border-r-2 sm:border-b-0 sm:pb-0 sm:pr-4`}
+          className={`flex-1 border-b-2 pb-4 sm:border-b-0 sm:border-r-2 sm:pb-0 sm:pr-4`}
         >
           <div className="mb-6">Term</div>
           <div>{term}</div>
         </div>
-        <div className="flex-1 pt-4 sm:pt-0 sm:pl-4">
+        <div className="flex-1 pt-4 sm:pl-4 sm:pt-0">
           <div className="mb-6">Definition</div>
           <div>{answer}</div>
         </div>
@@ -99,7 +99,7 @@ const TrueOrFalse = ({
             </div>
           </label>
         </div>
-        {result && term !== definition && (
+        {result && definition !== answer && (
           <div className="mt-6 ">
             <p className="mb-2 font-medium text-gray-600">Correct definition</p>
             <div className="rounded-md border-2 border-green-500 bg-green-50 p-4">

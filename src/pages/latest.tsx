@@ -6,6 +6,7 @@ import { NextSeo } from "next-seo";
 import StudySetPreview from "../components/StudySetPreview";
 import { api } from "../utils/api";
 import Link from "next/link";
+import StudySetSkeleton from "../components/StudySetSkeleton";
 
 export const getServerSideProps: GetServerSideProps<{
   user: Session["user"];
@@ -28,58 +29,53 @@ export const getServerSideProps: GetServerSideProps<{
   };
 };
 
-const StudySetSkeleton = () => {
-  return (
-    <Card>
-      <Skeleton active title={false} className="mb-4" />
-      <Skeleton.Avatar active size="small" />
-    </Card>
-  );
-};
-
 const Latest = ({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { data: studySets, isLoading } = api.studySet.getUserSets.useQuery({
+  const { data: studySets, status } = api.studySet.getUserSets.useQuery({
     id: user.id,
   });
 
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Latest" />
-      {studySets?.length === 0 ? (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}>
-          <Link href="/create-set">
-            <Button type="primary">Create Now</Button>
-          </Link>
-        </Empty>
-      ) : (
-        <div>
-          <h1 className="mb-8 text-lg font-medium">Your study sets</h1>
+      <>
+        <h1 className="mb-8 text-lg font-medium">Your study sets</h1>
+        {status === "loading" && (
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
-            {isLoading && (
-              <>
-                <StudySetSkeleton />
-                <StudySetSkeleton />
-                <StudySetSkeleton />
-                <StudySetSkeleton />
-              </>
-            )}
-            {studySets &&
-              studySets.map((set) => (
-                <StudySetPreview
-                  key={set.id}
-                  authorImage={set.user.image}
-                  authorName={set.user.name}
-                  title={set.title}
-                  termsCount={set.cards.length}
-                  id={set.id}
-                  authorId={set.user.id}
-                />
-              ))}
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
           </div>
-        </div>
-      )}
+        )}
+        {status === "error" && <div>Couldn&apos;t load sets</div>}
+        {status === "success" && (
+          <>
+            {studySets.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+                {studySets.map((set) => (
+                  <StudySetPreview
+                    key={set.id}
+                    authorImage={set.user.image}
+                    authorName={set.user.name}
+                    title={set.title}
+                    termsCount={set.cards.length}
+                    id={set.id}
+                    authorId={set.user.id}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}>
+                <Link href="/create-set">
+                  <Button type="primary">Create Now</Button>
+                </Link>
+              </Empty>
+            )}
+          </>
+        )}
+      </>
     </>
   );
 };
