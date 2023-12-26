@@ -1,12 +1,31 @@
+import { Button } from "antd";
+import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect, useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import EndScreen from "../../../components/pages/match/EndScreen";
 import GameScreen from "../../../components/pages/match/GameScreen";
 import StartScreen from "../../../components/pages/match/StartScreen";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
-import { Button } from "antd";
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
+  const setId = context.query?.id;
+
+  if (typeof setId !== "string") {
+    throw new Error("No setId");
+  }
+
+  await ssg.studySet.getRandomCards.prefetch({ id: setId, count: 3 });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      setId,
+    },
+  };
+};
 
 export interface GameCard {
   flashcardId: string;
@@ -68,17 +87,14 @@ const initialGameState: GameState = {
   ellapsedTime: 0,
 };
 
-const Match = () => {
-  const { query } = useRouter();
-  const id = query.id?.toString();
+const Match = ({ setId }: { setId: string }) => {
   const [
     { cards, matched, mismatch, selected, stage, ellapsedTime },
     dispatch,
   ] = useReducer(gameReducer, initialGameState);
   const { refetch } = api.studySet.getRandomCards.useQuery(
-    { id: id!, count: 3 },
+    { id: setId, count: 3 },
     {
-      enabled: !!id,
       refetchOnWindowFocus: false,
       onSuccess(data) {
         const shuffeledCards = data
@@ -167,12 +183,16 @@ const Match = () => {
     dispatch({ type: "setStage", payload: "start" });
   };
 
+  if (!cards) {
+    return <div>404</div>;
+  }
+
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Match" />
       <div className="mb-5 flex justify-end">
         <Link
-          href={`/study-set/${id!}`}
+          href={`/study-set/${setId}`}
           className="rounded-md px-4 py-2 font-medium hover:bg-slate-100"
         >
           <Button type="text" size="large">

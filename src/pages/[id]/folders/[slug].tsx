@@ -1,35 +1,53 @@
-import { Button, Empty, Skeleton } from "antd";
+import { Button, Empty } from "antd";
+import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import StudySetPreview from "../../../components/StudySetPreview";
-import StudySetSkeleton from "../../../components/StudySetSkeleton";
 import AddSetModal from "../../../components/pages/folder/AddSetModal";
 import FolderAuthor from "../../../components/pages/folder/FolderAuthor";
 import FolderCTA from "../../../components/pages/folder/FolderCTA";
 import FolderInfo from "../../../components/pages/folder/FolderInfo";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 
-const Folder = () => {
-  const { query } = useRouter();
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
+  const slug = context.query?.slug;
+  const userId = context.query?.id;
+
+  if (typeof slug !== "string") {
+    throw new Error("No setId");
+  }
+
+  if (typeof userId !== "string") {
+    throw new Error("No userId");
+  }
+
+  await ssg.folder.getByTitle.prefetch({ slug, userId });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      slug,
+      userId,
+    },
+  };
+};
+
+const Folder = ({ slug, userId }: { slug: string; userId: string }) => {
   const { data: session } = useSession();
   const [addSetModalOpen, setAddSetModalOpen] = useState<boolean>(false);
-  const { id: userId, slug } = query as { id?: string; slug?: string };
-  const {
-    data: folder,
-    isLoading,
-    isError,
-    refetch,
-  } = api.folder.getByTitle.useQuery(
-    {
-      userId: userId!,
-      slug: slug!,
-    },
-    {
-      enabled: !!userId && !!slug,
-    }
-  );
+  const { data: folder } = api.folder.getByTitle.useQuery({
+    userId,
+    slug,
+  });
+
+  if (!folder) {
+    return <div>404</div>;
+  }
+
+  const { studySets, user, title, description, id } = folder;
 
   const openAddSetModal = () => {
     setAddSetModalOpen(true);
@@ -38,39 +56,6 @@ const Folder = () => {
   const closeAddSetModal = () => {
     setAddSetModalOpen(false);
   };
-
-  if (isLoading || !userId) {
-    return (
-      <>
-        <div className="flex items-center justify-between">
-          <Skeleton.Input className="h-4 w-full max-w-xs" active />
-          <div className="flex gap-2">
-            <Skeleton.Avatar size="large" active />
-            <Skeleton.Avatar size="large" active />
-          </div>
-        </div>
-        <Skeleton.Input className="mb-10 mt-2 h-12 w-full max-w-sm" active />
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          <StudySetSkeleton />
-          <StudySetSkeleton />
-          <StudySetSkeleton />
-          <StudySetSkeleton />
-        </div>
-      </>
-    );
-  }
-
-  if (isError)
-    return (
-      <div className="flex justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-lg">Failed to load data</div>
-          <Button onClick={() => refetch()}>Try again</Button>
-        </div>
-      </div>
-    );
-
-  const { studySets, user, title, description, id } = folder;
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { ArrowPathIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/solid";
+import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
 import { Progress } from "antd";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -7,25 +7,41 @@ import CardPreview from "../../../components/CardPreview";
 import Result from "../../../components/Result";
 import MultipleChoice from "../../../components/cards/MultipleChoice";
 import { api } from "../../../utils/api";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
+import type { GetServerSideProps } from "next";
 
-const Learn = () => {
-  const { query, push } = useRouter();
-  const setId = query.id?.toString();
-  const {
-    data: cards,
-    isLoading,
-    refetch,
-    isError,
-  } = api.studySet.getLearnSet.useQuery(
-    { id: setId! },
-    {
-      refetchOnWindowFocus: false,
-      enabled: !!setId,
-    }
-  );
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
+  const setId = context.query?.id;
+
+  if (typeof setId !== "string") {
+    throw new Error("No setId");
+  }
+
+  await ssg.studySet.getLearnSet.prefetch({ id: setId });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      setId,
+    },
+  };
+};
+
+const Learn = ({ setId }: { setId: string }) => {
+  const { push } = useRouter();
+  const { data: cards, refetch } = api.studySet.getLearnSet.useQuery({
+    id: setId,
+  });
   const [cardIndex, setCardIndex] = useState<number>(0);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [correct, setCorrect] = useState<number>(0);
+
+  if (!cards) {
+    return <div>404</div>;
+  }
+
+  const currentCard = cards[cardIndex];
 
   const resetLearning = async () => {
     await refetch();
@@ -60,12 +76,6 @@ const Learn = () => {
     }, 1000);
   };
 
-  if (isLoading || !setId) return <div>Loading...</div>;
-
-  if (isError) return <div>Error</div>;
-
-  const currentCard = cards[cardIndex];
-
   const backToStudySet = async () => {
     await push(`/study-set/${setId}`);
   };
@@ -88,22 +98,22 @@ const Learn = () => {
         />
       )}
       {cards && cardIndex === cards.length && (
-        <div>
+        <>
           <div className="mb-8 text-2xl font-bold">U finished learning</div>
           <Result
             hard={cards.length - correct}
             cardCount={cards.length}
             firstButton={{
-              text: "Lear with new set",
-              Icon: <ArrowPathIcon className="h-6 w-6" />,
+              text: "Learn with new set",
+              description: "Learn with new set",
+              Icon: <ReloadOutlined className="text-2xl" />,
               callback: resetLearning,
-              description: "Essa",
             }}
             secondButton={{
               text: "Back to study set",
-              Icon: <ArrowUturnLeftIcon className="h-6 w-6" />,
+              description: "Back to study set",
+              Icon: <RollbackOutlined className="text-2xl" />,
               callback: backToStudySet,
-              description: "essa",
             }}
           />
           <div>
@@ -116,7 +126,7 @@ const Learn = () => {
               ))}
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );

@@ -7,24 +7,43 @@ import type { TestInputs } from "../../../components/pages/test/TestForm";
 import TestForm from "../../../components/pages/test/TestForm";
 import UserAnswers from "../../../components/pages/test/UserAnswers";
 import { api } from "../../../utils/api";
+import type { GetServerSideProps } from "next";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 
-const Test = () => {
-  const { query, push } = useRouter();
-  const { id: setId } = query as { id?: string };
-  const {
-    data: studySetTest,
-    isLoading,
-    error,
-    refetch,
-  } = api.studySet.getTest.useQuery(
-    { id: setId! },
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
+  const setId = context.query?.id;
+
+  if (typeof setId !== "string") {
+    throw new Error("No setId");
+  }
+
+  await ssg.studySet.getTest.prefetch({ id: setId });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      setId,
+    },
+  };
+};
+
+const Test = ({ setId }: { setId: string }) => {
+  const { push } = useRouter();
+  const { data: studySetTest, refetch } = api.studySet.getTest.useQuery(
+    { id: setId },
     {
-      enabled: !!setId,
       refetchOnWindowFocus: false,
     }
   );
   const [result, setResult] = useState<TestInputs>();
   const [hard, setHard] = useState<number>();
+
+  if (!studySetTest) {
+    return <div>404</div>;
+  }
+
+  const cardCount = Object.values(studySetTest).flatMap((e) => e).length;
 
   const submitAnswers = (data: TestInputs) => {
     setResult(data);
@@ -57,21 +76,15 @@ const Test = () => {
     return hard;
   };
 
-  const takeNewTest = async () => {
+  const takeNewTest = () => {
     setResult(undefined);
     setHard(undefined);
-    await refetch();
+    void refetch();
   };
 
-  if (isLoading || !setId) return <div>Loading...</div>;
-
-  if (error) return <div>{error.message}</div>;
-
-  const backToStudySet = async () => {
-    await push(`/study-set/${setId}`);
+  const backToStudySet = () => {
+    void push(`/study-set/${setId}`);
   };
-
-  const cardCount = Object.values(studySetTest).flatMap((e) => e).length;
 
   return (
     <>

@@ -1,7 +1,8 @@
-import type { Flashcard } from "@prisma/client";
+import { Button } from "antd";
+import type { GetServerSideProps } from "next";
+import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import { useRouter } from "next/router";
-import { useState } from "react";
+import Link from "next/link";
 import FlashcardsGame from "../../../components/FlashcardsGame";
 import CardsList from "../../../components/pages/study-set/CardsList";
 import CreatedBy from "../../../components/pages/study-set/CreatedBy";
@@ -9,63 +10,35 @@ import FlashcardModal from "../../../components/pages/study-set/FlashcardModal";
 import OtherSets from "../../../components/pages/study-set/OtherSets";
 import StudyModes from "../../../components/pages/study-set/StudyModes";
 import StudySetCTA from "../../../components/pages/study-set/StudySetCTA";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
-import { Button, Skeleton } from "antd";
-import Link from "next/link";
-import { useSession } from "next-auth/react";
 
-const StudySet = () => {
-  const { data: session } = useSession();
-  const { query } = useRouter();
-  const { id: setId } = query as { id?: string };
-  const {
-    data: studySet,
-    isLoading,
-    error,
-    refetch,
-  } = api.studySet.getById.useQuery(
-    {
-      id: setId!,
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
+  const setId = context.query?.id;
+
+  if (typeof setId !== "string") {
+    throw new Error("No setId");
+  }
+
+  await ssg.studySet.getById.prefetch({ id: setId });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+      setId,
     },
-    {
-      enabled: !!setId,
-    }
-  );
-  const [editFlashcard, setEditFlashcard] = useState<Flashcard>();
-
-  const closeEditModal = () => {
-    setEditFlashcard(undefined);
   };
+};
 
-  const openEditModal = (flashcard: Flashcard) => {
-    setEditFlashcard(flashcard);
-  };
+const StudySet = ({ setId }: { setId: string }) => {
+  const { data: session } = useSession();
+  const { data: studySet } = api.studySet.getById.useQuery({
+    id: setId,
+  });
 
-  if (isLoading || !setId)
-    return (
-      <div className="m-auto max-w-3xl">
-        <Skeleton.Input className="mb-6 block" />
-        <Skeleton.Input className="mb-6 h-4" />
-        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <Skeleton.Input className="h-12 w-full" />
-          <Skeleton.Input className="h-12 w-full" />
-          <Skeleton.Input className="h-12 w-full" />
-          <Skeleton.Input className="h-12 w-full" />
-        </div>
-        <Skeleton.Input className="mb-6 h-[400px] w-full" />
-        <Skeleton />
-      </div>
-    );
-
-  if (error) {
-    return (
-      <div className="flex justify-center">
-        <div className="flex flex-col items-center gap-2">
-          <div className="text-lg">Failed to load data</div>
-          <Button onClick={() => refetch()}>Try again</Button>
-        </div>
-      </div>
-    );
+  if (!studySet) {
+    return <div>404</div>;
   }
 
   const { title, cards, userId, user, description } = studySet;
@@ -78,27 +51,15 @@ const StudySet = () => {
         <h1 className="mb-3 text-2xl font-bold sm:text-3xl">{title}</h1>
         {description && <p className="mb-4 text-lg">{description}</p>}
         <StudyModes setId={setId} />
-        <FlashcardsGame
-          cards={cards}
-          ownerId={userId}
-          openEditModal={openEditModal}
-        />
-        <FlashcardModal
-          setId={setId}
-          flashcard={editFlashcard}
-          closeModal={closeEditModal}
-        />
+        <FlashcardsGame setId={setId} cards={cards} ownerId={userId} />
+        <FlashcardModal />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CreatedBy user={user} />
           <StudySetCTA userId={userId} setId={setId} />
         </div>
-        <CardsList
-          userId={userId}
-          cards={cards}
-          openEditModal={openEditModal}
-        />
+        <CardsList userId={userId} cards={cards} />
         {userId === session?.user.id && (
-          <div className="flex justify-center">
+          <div className="mb-8 flex justify-center">
             <Link href={`${setId}/edit`}>
               <Button type="primary" className="h-14 font-medium" size="large">
                 Add or Remove Terms
