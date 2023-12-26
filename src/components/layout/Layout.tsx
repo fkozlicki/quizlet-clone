@@ -6,6 +6,7 @@ import AuthDropdown from "./AuthDropdown";
 import FolderModal from "./FolderModal";
 import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
+import FlashcardModal from "../pages/study-set/FlashcardModal";
 
 const Layout = ({ children }: PropsWithChildren) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
@@ -53,6 +54,7 @@ const Layout = ({ children }: PropsWithChildren) => {
       {!session && <AuthDropdown />}
       <MobileMenu open={mobileMenuOpen} onClose={closeMobileMenu} />
       {session && <FolderModal session={session} />}
+      {session && <FlashcardModal />}
     </>
   );
 };

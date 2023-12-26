@@ -3,11 +3,10 @@ import CardPreview from "../../CardPreview";
 
 interface CardsListProps {
   cards: Flashcard[];
-  openEditModal: (flashcard: Flashcard) => void;
   userId: string;
 }
 
-const CardsList = ({ cards, openEditModal, userId }: CardsListProps) => {
+const CardsList = ({ cards, userId }: CardsListProps) => {
   return (
     <div className="mb-8">
       <div className="mb-5 text-lg font-bold">
@@ -15,12 +14,7 @@ const CardsList = ({ cards, openEditModal, userId }: CardsListProps) => {
       </div>
       <div className="flex flex-col gap-3">
         {cards.map((flashcard, index) => (
-          <CardPreview
-            userId={userId}
-            key={index}
-            flashcard={flashcard}
-            openEditModal={() => openEditModal(flashcard)}
-          />
+          <CardPreview userId={userId} key={index} flashcard={flashcard} />
         ))}
       </div>
     </div>

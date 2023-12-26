@@ -13,15 +13,15 @@ export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
 interface FlashcardsGameProps {
   cards: Flashcard[];
-  openEditModal: (flashcard: Flashcard) => void;
   ownerId: string;
+  setId: string;
   size?: "small" | "large";
 }
 
 const FlashcardsGame = ({
   cards,
-  openEditModal,
   ownerId,
+  setId,
   size = "small",
 }: FlashcardsGameProps) => {
   const { push } = useRouter();
@@ -90,7 +90,7 @@ const FlashcardsGame = ({
   };
 
   const learnFlashcards = async () => {
-    await push(`/study-set/${cards[0]!.studySetId}/learn`);
+    await push(`/study-set/${setId}/learn`);
   };
 
   const addToHard = () => {
@@ -101,7 +101,7 @@ const FlashcardsGame = ({
   };
 
   const backToStudySet = async () => {
-    await push(`/study-set/${cards[0]!.studySetId}`);
+    await push(`/study-set/${setId}`);
   };
 
   const handleLeft = () => {
@@ -172,7 +172,6 @@ const FlashcardsGame = ({
     <>
       <FlippingCard
         size={size}
-        openEditModal={openEditModal}
         flashcard={currentCard}
         editable={ownerId === session?.user.id}
         moveAnimation={moveAnimation}

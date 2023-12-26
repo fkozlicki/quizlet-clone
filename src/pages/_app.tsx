@@ -11,6 +11,7 @@ import AuthDropdownProvider from "../contexts/AuthDropdownContext";
 import FolderModalProvider from "../contexts/FolderModalContext";
 import "../styles/globals.css";
 import { api } from "../utils/api";
+import FlashcardModalProvider from "../contexts/FlashcardModalContext";
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -31,18 +32,20 @@ const MyApp = ({
       <ConfigProvider>
         <AuthDropdownProvider>
           <FolderModalProvider>
-            <Layout>
-              <DefaultSeo
-                title="Quizlet 2.0"
-                description="Quizlet Clone app built with T3Stack"
-                openGraph={{
-                  type: "website",
-                  locale: "en_IE",
-                  url: process.env.NEXT_PUBLIC_APP_DOMAIN,
-                }}
-              />
-              {getLayout(<Component {...pageProps} />)}
-            </Layout>
+            <FlashcardModalProvider>
+              <Layout>
+                <DefaultSeo
+                  title="Quizlet 2.0"
+                  description="Quizlet Clone app built with T3Stack"
+                  openGraph={{
+                    type: "website",
+                    locale: "en_IE",
+                    url: process.env.NEXT_PUBLIC_APP_DOMAIN,
+                  }}
+                />
+                {getLayout(<Component {...pageProps} />)}
+              </Layout>
+            </FlashcardModalProvider>
           </FolderModalProvider>
         </AuthDropdownProvider>
       </ConfigProvider>

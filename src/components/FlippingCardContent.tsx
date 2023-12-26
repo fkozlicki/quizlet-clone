@@ -1,25 +1,29 @@
 import { EditOutlined, StarFilled } from "@ant-design/icons";
+import type { Flashcard } from "@prisma/client";
 import { Button } from "antd";
 import type { MouseEventHandler } from "react";
+import { useFlashcardModalContext } from "../contexts/FlashcardModalContext";
 
 interface FlippingCardContentProps {
   content: string;
   title: string;
-  openEditModal: () => void;
   editable: boolean;
   back?: boolean;
+  flashcard: Flashcard;
 }
 
 const FlippingCardContent = ({
   content,
   title,
-  openEditModal,
   editable,
   back,
+  flashcard,
 }: FlippingCardContentProps) => {
+  const [, dispatch] = useFlashcardModalContext();
+
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
     event.stopPropagation();
-    openEditModal && openEditModal();
+    dispatch({ type: "open", payload: flashcard });
   };
 
   const handleAddToFavourites: MouseEventHandler<HTMLElement> = (event) => {

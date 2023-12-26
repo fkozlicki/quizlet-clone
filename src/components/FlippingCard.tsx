@@ -7,7 +7,6 @@ import FlippingCardContent from "./FlippingCardContent";
 interface FlippingCardProps {
   flashcard: Flashcard;
   editable: boolean;
-  openEditModal: (flashcard: Flashcard) => void;
   size?: "small" | "large";
   moveAnimation: FlashcardAnimation;
   cardWrapper: RefObject<HTMLDivElement>;
@@ -17,7 +16,6 @@ interface FlippingCardProps {
 const FlippingCard = ({
   flashcard,
   editable,
-  openEditModal,
   size = "small",
   moveAnimation,
   cardWrapper,
@@ -67,14 +65,14 @@ const FlippingCard = ({
             } `}
           >
             <FlippingCardContent
-              openEditModal={() => openEditModal(flashcard)}
               title="Term"
+              flashcard={flashcard}
               content={flashcard.term}
               editable={editable}
             />
             <FlippingCardContent
-              openEditModal={() => openEditModal(flashcard)}
               title="Definition"
+              flashcard={flashcard}
               content={flashcard.definition}
               editable={editable}
               back
