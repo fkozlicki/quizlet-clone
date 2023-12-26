@@ -1,4 +1,4 @@
-import { Button, Form, Input } from "antd";
+import { Button, Form, Input, message } from "antd";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { api } from "../utils/api";
@@ -9,8 +9,9 @@ import type {
   CreateStudySetValues,
   EditStudySetValues,
 } from "../schemas/study-set";
-import { createStudySetSchema } from "../schemas/study-set";
+import { createStudySetSchema, editStudySetSchema } from "../schemas/study-set";
 import { FormItem } from "react-hook-form-antd";
+import { useRouter } from "next/router";
 
 interface StudySetFormProps {
   initialData?: EditStudySetValues;
@@ -23,12 +24,33 @@ const initialCards = Array.from({ length: 4 }, (_, index) => ({
 }));
 
 const StudySetForm = ({ initialData }: StudySetFormProps) => {
-  const { mutate: createSet } = api.studySet.create.useMutation();
-  const { mutate: editSet } = api.studySet.editById.useMutation();
+  const { push } = useRouter();
+  const { mutate: createSet, isLoading: createLoading } =
+    api.studySet.create.useMutation({
+      onSuccess: async ({ id }) => {
+        await push(`/study-set/${id}`);
+        void message.success("Created set successfully");
+      },
+      onError: () => {
+        void message.error("Couldn't create set");
+      },
+    });
+  const { mutate: editSet, isLoading: editLoading } =
+    api.studySet.editById.useMutation({
+      onSuccess: async ({ id }) => {
+        await push(`/study-set/${id}`);
+        void message.success("Edited set successfully");
+      },
+      onError: () => {
+        void message.error("Couldn't edit set");
+      },
+    });
   const { handleSubmit, control, setValue } = useForm<
     CreateStudySetValues | EditStudySetValues
   >({
-    resolver: zodResolver(createStudySetSchema),
+    resolver: zodResolver(
+      initialData ? editStudySetSchema : createStudySetSchema
+    ),
     defaultValues: initialData ?? {
       cards: initialCards,
     },
@@ -65,7 +87,11 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
   };
 
   return (
-    <Form onFinish={handleSubmit(onFinish)} layout="vertical">
+    <Form
+      disabled={createLoading || editLoading}
+      onFinish={handleSubmit(onFinish)}
+      layout="vertical"
+    >
       <FormItem control={control} name="title" label="Title">
         <Input size="large" />
       </FormItem>
@@ -101,6 +127,8 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
         size="large"
         type="primary"
         className="ml-auto block h-14 w-28"
+        disabled={createLoading || editLoading}
+        loading={createLoading || editLoading}
       >
         {initialData ? "Edit" : "Create"}
       </Button>
