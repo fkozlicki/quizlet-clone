@@ -54,11 +54,12 @@ export function requestWrapper(
             const sessionMaxAge = 60 * 60 * 24 * 30; // 30 Days
             const sessionExpiry = fromDate(sessionMaxAge);
 
-            await adapter.createSession({
-              sessionToken: sessionToken,
-              userId: user.id,
-              expires: sessionExpiry,
-            });
+            adapter.createSession &&
+              (await adapter.createSession({
+                sessionToken: sessionToken,
+                userId: user.id,
+                expires: sessionExpiry,
+              }));
 
             const cookies = new Cookies(req, res);
 
@@ -108,10 +109,6 @@ export function requestWrapper(
         clientId: env.FACEBOOK_CLIENT_ID,
         clientSecret: env.FACEBOOK_CLIENT_SECRET,
       }),
-      // AppleProvider({
-      //   clientId: env.APPLE_ID,
-      //   clientSecret: env.APPLE_SECRET,
-      // }),
       CredentialsProvider({
         id: "credentials",
         name: "credentials",
