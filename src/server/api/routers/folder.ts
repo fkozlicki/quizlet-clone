@@ -18,11 +18,12 @@ export const folderRouter = createTRPCRouter({
         },
       });
 
-      if (exists)
+      if (exists) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "Folder with this title already exists.",
         });
+      }
 
       const folder = await ctx.prisma.folder.create({
         data: {
@@ -32,12 +33,6 @@ export const folderRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         },
       });
-
-      if (!folder)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Could not create folder`,
-        });
 
       return folder;
     }),
@@ -93,12 +88,6 @@ export const folderRouter = createTRPCRouter({
         },
       });
 
-      if (!folder)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Couldn't find folder",
-        });
-
       return folder;
     }),
 
@@ -132,12 +121,6 @@ export const folderRouter = createTRPCRouter({
         },
       });
 
-      if (!folder)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Couldn't update folder",
-        });
-
       return folder;
     }),
 
@@ -170,12 +153,6 @@ export const folderRouter = createTRPCRouter({
           user: true,
         },
       });
-
-      if (!folder)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Couldn't update folder",
-        });
 
       return folder;
     }),
