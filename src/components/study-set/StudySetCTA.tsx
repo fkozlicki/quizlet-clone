@@ -11,6 +11,8 @@ import {
 import { Button, Dropdown, Tooltip } from "antd";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useState } from "react";
+import AddToFolderModal from "./AddToFolderModal";
 
 interface StudySetCTAProps {
   userId: string;
@@ -19,12 +21,33 @@ interface StudySetCTAProps {
 
 const StudySetCTA = ({ userId, setId }: StudySetCTAProps) => {
   const { data: session } = useSession();
+  const [addToFolderModalOpen, setAddToFolderModalOpen] =
+    useState<boolean>(false);
+
+  const openAddToFolderModal = () => {
+    setAddToFolderModalOpen(true);
+  };
+
+  const closeAddToFolderModal = () => [setAddToFolderModalOpen(false)];
 
   return (
     <div className="flex gap-2">
-      {session?.user.id === userId && (
+      {session && (
+        <AddToFolderModal
+          open={addToFolderModalOpen}
+          onCancel={closeAddToFolderModal}
+          userId={session.user.id}
+          setId={setId}
+        />
+      )}
+      {session && (
         <Tooltip title="Add to folder">
-          <Button shape="circle" icon={<PlusOutlined />} size="large" />
+          <Button
+            onClick={openAddToFolderModal}
+            shape="circle"
+            icon={<PlusOutlined />}
+            size="large"
+          />
         </Tooltip>
       )}
       {session?.user.id === userId && (
