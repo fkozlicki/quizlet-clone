@@ -32,8 +32,8 @@ export const getServerSideProps: GetServerSideProps<{
 const Latest = ({
   user,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { data: studySets, status } = api.studySet.getUserSets.useQuery({
-    id: user.id,
+  const { data: studySets, status } = api.studySet.getAll.useQuery({
+    userId: user.id,
   });
 
   return (

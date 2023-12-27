@@ -39,7 +39,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
       },
     });
   const { mutate: editSet, isLoading: editLoading } =
-    api.studySet.editById.useMutation({
+    api.studySet.edit.useMutation({
       onSuccess: async ({ id }) => {
         await push(`/study-set/${id}`);
         void message.success("Edited set successfully");

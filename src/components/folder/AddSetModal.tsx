@@ -11,6 +11,7 @@ interface AddSetModalProps {
   folderId: string;
   setsInFolder: StudySet[];
   userId: string;
+  slug: string;
 }
 
 const AddSetModal = ({
@@ -19,13 +20,14 @@ const AddSetModal = ({
   folderId,
   setsInFolder,
   userId,
+  slug,
 }: AddSetModalProps) => {
   const {
     data: studySets,
     status,
     refetch,
-  } = api.studySet.getUserSets.useQuery({
-    id: userId,
+  } = api.studySet.getAll.useQuery({
+    userId,
   });
 
   return (
@@ -59,6 +61,7 @@ const AddSetModal = ({
               folderId={folderId}
               setsInFolder={setsInFolder}
               userId={userId}
+              slug={slug}
             />
           ))}
           {studySets.length === 0 && (

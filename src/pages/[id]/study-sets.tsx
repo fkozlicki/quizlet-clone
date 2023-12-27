@@ -47,8 +47,8 @@ const StudySets: NextPageWithLayout<StudySetProps> = ({ user }) => {
     isLoading,
     isError,
     refetch,
-  } = api.studySet.getUserSets.useQuery({
-    id: user.id,
+  } = api.studySet.getAll.useQuery({
+    userId: user.id,
   });
 
   if (isLoading) {
