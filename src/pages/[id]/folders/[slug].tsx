@@ -75,6 +75,7 @@ const Folder = ({ slug, userId }: { slug: string; userId: string }) => {
               setsInFolder={studySets}
               closeModal={closeAddSetModal}
               open={addSetModalOpen}
+              slug={slug}
             />
           </>
         )}

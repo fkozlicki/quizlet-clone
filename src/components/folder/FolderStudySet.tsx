@@ -9,6 +9,7 @@ interface FolderStudySetProps {
   title: string;
   setId: string;
   userId: string;
+  slug: string;
 }
 
 const FolderStudySet = ({
@@ -17,6 +18,7 @@ const FolderStudySet = ({
   folderId,
   setsInFolder,
   userId,
+  slug,
 }: FolderStudySetProps) => {
   const {
     folder: {
@@ -26,7 +28,7 @@ const FolderStudySet = ({
   const { mutate: addSet, isLoading: addLoading } =
     api.folder.addSet.useMutation({
       onSuccess: (data) => {
-        setData({ slug: folderId, userId }, data);
+        setData({ slug, userId }, data);
         void message.success("Added successfully");
       },
       onError: () => {
@@ -36,7 +38,7 @@ const FolderStudySet = ({
   const { mutate: removeSet, isLoading: removeLoading } =
     api.folder.removeSet.useMutation({
       onSuccess: (data) => {
-        setData({ slug: folderId, userId }, data);
+        setData({ slug, userId }, data);
         void message.success("Removed successfully");
       },
       onError: () => {
