@@ -5,10 +5,10 @@ import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { useState, type MouseEvent } from "react";
 import FlashcardPreview from "../../../components/shared/FlashcardPreview";
-import Result from "../../../components/shared/Result";
 import MultipleChoice from "../../../components/shared/MultipleChoice";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
+import StudyModeResult from "../../../components/shared/StudyModeResult";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -100,7 +100,7 @@ const Learn = ({ setId }: { setId: string }) => {
       {cards && cardIndex === cards.length && (
         <>
           <div className="mb-8 text-2xl font-bold">U finished learning</div>
-          <Result
+          <StudyModeResult
             hard={cards.length - correct}
             cardCount={cards.length}
             firstButton={{

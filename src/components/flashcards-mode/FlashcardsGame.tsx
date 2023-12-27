@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import Result from "../shared/Result";
 import FlashcardButtons from "./FlashcardButtons";
 import FlipCard from "./FlipCard";
+import StudyModeResult from "../shared/StudyModeResult";
 
 export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
@@ -194,7 +194,7 @@ const FlashcardsGame = ({
       />
     </>
   ) : (
-    <Result
+    <StudyModeResult
       hard={hard.length}
       cardCount={cards.length}
       firstButton={firstButton}

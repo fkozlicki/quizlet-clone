@@ -9,19 +9,19 @@ type ResultButton = {
   callback: () => Promise<void> | void;
 };
 
-interface ResultProps {
+interface StudyModeResultProps {
   hard: number;
   cardCount: number;
   firstButton: ResultButton;
   secondButton?: ResultButton;
 }
 
-const Result = ({
+const StudyModeResult = ({
   hard,
   cardCount,
   firstButton,
   secondButton,
-}: ResultProps) => {
+}: StudyModeResultProps) => {
   return (
     <div className="mb-6">
       <div className="mb-6 flex">
@@ -113,4 +113,4 @@ const Result = ({
   );
 };
 
-export default Result;
+export default StudyModeResult;

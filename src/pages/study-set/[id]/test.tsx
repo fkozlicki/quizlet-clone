@@ -3,12 +3,12 @@ import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Result from "../../../components/shared/Result";
 import type { TestInputs } from "../../../components/test-mode/TestForm";
 import TestForm from "../../../components/test-mode/TestForm";
 import TestResult from "../../../components/test-mode/TestResult";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
+import StudyModeResult from "../../../components/shared/StudyModeResult";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -92,7 +92,7 @@ const Test = ({ setId }: { setId: string }) => {
       <div className="m-auto max-w-3xl">
         {result && hard ? (
           <>
-            <Result
+            <StudyModeResult
               hard={hard}
               cardCount={cardCount}
               firstButton={{

@@ -1,8 +1,8 @@
 import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
-import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
+import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();

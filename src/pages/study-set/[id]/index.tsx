@@ -3,7 +3,6 @@ import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
-import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
 import CreatedBy from "../../../components/study-set/CreatedBy";
 import FlashcardsList from "../../../components/study-set/FlashcardsList";
 import OtherSets from "../../../components/study-set/OtherSets";
@@ -11,6 +10,7 @@ import StudyModes from "../../../components/study-set/StudyModes";
 import StudySetCTA from "../../../components/study-set/StudySetCTA";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
+import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
