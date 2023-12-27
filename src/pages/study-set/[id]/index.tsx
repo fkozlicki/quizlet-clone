@@ -11,6 +11,8 @@ import StudySetCTA from "../../../components/study-set/StudySetCTA";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
+import { useState } from "react";
+import AddToFolderModal from "../../../components/study-set/AddToFolderModal";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
