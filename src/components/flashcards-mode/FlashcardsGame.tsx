@@ -8,6 +8,8 @@ import { useEffect, useRef, useState } from "react";
 import FlashcardButtons from "./FlashcardButtons";
 import FlipCard from "./FlipCard";
 import StudyModeResult from "../shared/StudyModeResult";
+import FlashcardsSettingsModal from "./FlashcardsSettingsModal";
+import { boolean } from "zod";
 
 export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
@@ -32,9 +34,10 @@ const FlashcardsGame = ({
     useState<FlashcardAnimation>("right");
   const currentCard = flashcards[cardIndex];
   const [hard, setHard] = useState<Flashcard[]>([]);
-  const [learn, setLearn] = useState<boolean>(false);
   const cardWrapper = useRef<HTMLDivElement>(null);
   const animationCardWrapper = useRef<HTMLDivElement>(null);
+  const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
+  const [sorting, setSorting] = useState<boolean>(false);
 
   useEffect(() => {
     setFlashcards(cards);
@@ -105,7 +108,7 @@ const FlashcardsGame = ({
   };
 
   const handleLeft = () => {
-    if (learn) {
+    if (sorting) {
       setMoveAnimation("learning");
       animateScoreCard("learning");
       addToHard();
@@ -118,7 +121,7 @@ const FlashcardsGame = ({
   };
 
   const handleRight = () => {
-    if (learn) {
+    if (sorting) {
       setMoveAnimation("know");
       animateScoreCard("know");
     } else {
@@ -128,8 +131,16 @@ const FlashcardsGame = ({
     changeCard(1);
   };
 
-  const switchMode: SwitchChangeEventHandler = (value) => {
-    setLearn(value);
+  const openSettingsModal = () => {
+    setSettingsModalOpen(true);
+  };
+
+  const closeSettingsModal = () => {
+    setSettingsModalOpen(false);
+  };
+
+  const switchSorting = (value: boolean) => {
+    setSorting(value);
   };
 
   const firstButton = {
@@ -179,18 +190,26 @@ const FlashcardsGame = ({
         animationCardWrapper={animationCardWrapper}
       />
       <FlashcardButtons
+        setId={setId}
         cardCount={flashcards.length}
         cardIndex={cardIndex}
         handleLeft={handleLeft}
         handleRight={handleRight}
-        learn={learn}
-        switchMode={switchMode}
+        sorting={sorting}
+        openSettingsModal={openSettingsModal}
       />
       <Progress
         percent={(cardIndex / cards.length) * 100}
         showInfo={false}
         size="small"
         className="mb-6"
+      />
+      <FlashcardsSettingsModal
+        open={settingsModalOpen}
+        onCancel={closeSettingsModal}
+        sorting={sorting}
+        switchSorting={switchSorting}
+        resetFlashcards={resetFlashcards}
       />
     </>
   ) : (

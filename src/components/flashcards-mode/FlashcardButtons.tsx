@@ -1,37 +1,44 @@
-import { ArrowLeftOutlined, ArrowRightOutlined } from "@ant-design/icons";
-import { Button, Switch } from "antd";
-import type { SwitchChangeEventHandler } from "antd/es/switch";
-import React from "react";
+import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  ExpandOutlined,
+  RetweetOutlined,
+  SettingOutlined,
+} from "@ant-design/icons";
+import { Button, Tooltip } from "antd";
+import Link from "next/link";
 
 interface FlashcardButtonsProps {
-  handleLeft: () => void;
-  handleRight: () => void;
-  switchMode: SwitchChangeEventHandler;
-  learn: boolean;
   cardIndex: number;
   cardCount: number;
+  handleLeft: () => void;
+  handleRight: () => void;
+  sorting: boolean;
+  setId: string;
+  openSettingsModal: () => void;
 }
 
 const FlashcardButtons = ({
   handleLeft,
   handleRight,
-  learn,
+  sorting,
   cardIndex,
   cardCount,
-  switchMode,
+  setId,
+  openSettingsModal,
 }: FlashcardButtonsProps) => {
   return (
     <div className="relative mb-2 mt-4 flex justify-center">
       <div className="relative z-10 flex items-center gap-4">
         <Button
           onClick={handleLeft}
-          disabled={!learn && cardIndex === 0}
+          disabled={!sorting && cardIndex === 0}
           icon={<ArrowLeftOutlined />}
           shape="circle"
           className="bg-transparent"
           size="large"
         />
-        <div className="font-semibold text-gray-500">
+        <div className="select-none font-semibold text-gray-500">
           {cardIndex + 1}/{cardCount}
         </div>
         <Button
@@ -44,13 +51,24 @@ const FlashcardButtons = ({
         />
       </div>
       <div className="absolute top-0 flex h-full w-full items-center justify-between">
-        <div></div>
-        <Switch
-          checkedChildren="learn"
-          unCheckedChildren="view"
-          onChange={switchMode}
-          value={learn}
-        />
+        <Tooltip title="Shuffle">
+          <Button size="large" type="text" icon={<RetweetOutlined />} />
+        </Tooltip>
+        <div className="flex gap-2">
+          <Tooltip title="Settings">
+            <Button
+              size="large"
+              type="text"
+              icon={<SettingOutlined />}
+              onClick={openSettingsModal}
+            />
+          </Tooltip>
+          <Tooltip title="Fullscreen">
+            <Link href={`/study-set/${setId}/flashcards`}>
+              <Button size="large" type="text" icon={<ExpandOutlined />} />
+            </Link>
+          </Tooltip>
+        </div>
       </div>
     </div>
   );
