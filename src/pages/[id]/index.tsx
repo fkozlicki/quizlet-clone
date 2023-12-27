@@ -8,26 +8,45 @@ import ProfileLayout from "../../components/layout/ProfileLayout";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
 import dayjs from "dayjs";
+import { prisma } from "../../server/db";
+import type { User } from "@prisma/client";
+import type { ReactElement } from "react";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);
-  const id = context.query.id as string;
+  const userId = context.query?.id;
 
-  if (id !== session?.user?.id) {
+  if (typeof userId !== "string") {
+    throw new Error("No userId");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (session?.user?.id !== userId) {
     return {
       redirect: {
-        destination: `/${id}/study-sets`,
+        destination: `/${userId}/study-sets`,
         permanent: false,
       },
     };
   }
 
   return {
-    props: {},
+    props: {
+      user,
+    },
   };
 };
 
-const Profile: NextPageWithLayout = () => {
+interface ProfileProps {
+  user: User;
+}
+
+const Profile: NextPageWithLayout<ProfileProps> = () => {
   const {
     data: activity,
     isLoading,
@@ -96,8 +115,8 @@ const Profile: NextPageWithLayout = () => {
   );
 };
 
-Profile.getLayout = (page) => {
-  return <ProfileLayout>{page}</ProfileLayout>;
+Profile.getLayout = (page: ReactElement<ProfileProps>) => {
+  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
 };
 
 export default Profile;

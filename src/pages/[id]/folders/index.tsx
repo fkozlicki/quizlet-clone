@@ -1,38 +1,64 @@
+import type { User } from "@prisma/client";
+import { Button, Empty } from "antd";
+import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import { useRouter } from "next/router";
+import type { ReactElement } from "react";
 import FolderPreview from "../../../components/FolderPreview";
+import FolderSkeleton from "../../../components/FolderSkeleton";
 import ProfileLayout from "../../../components/layout/ProfileLayout";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
+import { prisma } from "../../../server/db";
 import { api } from "../../../utils/api";
 import type { NextPageWithLayout } from "../../_app";
-import FolderSkeleton from "../../../components/FolderSkeleton";
-import { Button, Empty } from "antd";
-import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 
-const Folders: NextPageWithLayout = () => {
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const userId = context.query?.id;
+
+  if (typeof userId !== "string") {
+    throw new Error("No userId");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
+
+interface FoldersProps {
+  user: User;
+}
+
+const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
   const { data: session } = useSession();
-  const { query } = useRouter();
-  const { id: userId } = query as { id?: string };
   const {
     data: folders,
     isError,
     isLoading,
     refetch,
-  } = api.folder.getAll.useQuery(
-    {
-      userId: userId!,
-    },
-    {
-      enabled: !!userId,
-    }
-  );
+  } = api.folder.getAll.useQuery({
+    userId: user.id,
+  });
   const [, dispatch] = useFolderModalContext();
 
   const openFolderModal = () => {
     dispatch({ type: "open" });
   };
 
-  if (isLoading || !userId)
+  if (isLoading)
     return (
       <div className="grid gap-y-4">
         <FolderSkeleton />
@@ -62,7 +88,7 @@ const Folders: NextPageWithLayout = () => {
               key={index}
               title={title}
               setsCount={studySets.length}
-              href={`/${userId}/folders/${slug}`}
+              href={`/${user.id}/folders/${slug}`}
             />
           ))}
         </div>
@@ -70,10 +96,10 @@ const Folders: NextPageWithLayout = () => {
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={`${
-            userId === session?.user.id ? "You have" : "User has"
+            user.id === session?.user.id ? "You have" : "User has"
           } no folders yet`}
         >
-          {userId === session?.user.id && (
+          {user.id === session?.user.id && (
             <Button onClick={openFolderModal} type="primary">
               Create
             </Button>
@@ -84,8 +110,8 @@ const Folders: NextPageWithLayout = () => {
   );
 };
 
-Folders.getLayout = (page) => {
-  return <ProfileLayout>{page}</ProfileLayout>;
+Folders.getLayout = (page: ReactElement<FoldersProps>) => {
+  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
 };
 
 export default Folders;

@@ -1,29 +1,55 @@
 import { Button, Empty } from "antd";
+import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import StudySetPreview from "../../components/StudySetPreview";
-import StudySetSkeleton from "../../components/StudySetSkeleton";
+import StudySetPreview from "../../components/shared/StudySetPreview";
+import StudySetSkeleton from "../../components/shared/StudySetSkeleton";
 import ProfileLayout from "../../components/layout/ProfileLayout";
+import { prisma } from "../../server/db";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
+import type { ReactElement } from "react";
+import type { User } from "@prisma/client";
 
-const StudySets: NextPageWithLayout = () => {
-  const { query } = useRouter();
-  const { id: userId } = query as { id?: string };
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const userId = context.query?.id;
+
+  if (typeof userId !== "string") {
+    throw new Error("No userId");
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!user) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: {
+      user,
+    },
+  };
+};
+
+interface StudySetProps {
+  user: User;
+}
+
+const StudySets: NextPageWithLayout<StudySetProps> = ({ user }) => {
   const {
     data: studySets,
     isLoading,
     isError,
     refetch,
-  } = api.studySet.getUserSets.useQuery(
-    {
-      id: userId!,
-    },
-    {
-      enabled: !!userId,
-    }
-  );
+  } = api.studySet.getUserSets.useQuery({
+    id: user.id,
+  });
 
   if (isLoading) {
     return (
@@ -75,8 +101,8 @@ const StudySets: NextPageWithLayout = () => {
   );
 };
 
-StudySets.getLayout = (page) => {
-  return <ProfileLayout>{page}</ProfileLayout>;
+StudySets.getLayout = (page: ReactElement<StudySetProps>) => {
+  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
 };
 
 export default StudySets;
