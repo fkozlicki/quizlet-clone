@@ -38,7 +38,7 @@ const FlipCardContent = ({
     >
       <div className="flex h-full w-full flex-col rounded-lg bg-white p-4 drop-shadow-lg md:p-6">
         <div className="flex items-center justify-between">
-          <div className="font-medium text-slate-400">{title}</div>
+          <div className="select-none font-medium text-slate-400">{title}</div>
           <div className="flex justify-end gap-2">
             {editable && (
               <Button
@@ -56,7 +56,7 @@ const FlipCardContent = ({
             />
           </div>
         </div>
-        <div className="flex flex-1 items-center justify-center text-3xl">
+        <div className="flex flex-1 select-none items-center justify-center text-3xl">
           {content}
         </div>
       </div>
