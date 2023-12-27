@@ -70,10 +70,9 @@ model StudySet {
   title       String
   description String?
   userId      String
-  folderId    String?
   cards       Flashcard[]
-  folder      Folder?     @relation(fields: [folderId], references: [id])
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folders     Folder[]    @relation("FolderToStudySet")
 }
 
 model Folder {
@@ -83,7 +82,7 @@ model Folder {
   userId      String
   slug        String
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studySets   StudySet[]
+  studySets   StudySet[] @relation("FolderToStudySet")
 }
 
 model Activity {
@@ -91,10 +90,4 @@ model Activity {
   date   DateTime @default(now())
   userId String
   user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Example {
-  id        String   @id
-  createdAt DateTime @default(now())
-  updatedAt DateTime
 }
