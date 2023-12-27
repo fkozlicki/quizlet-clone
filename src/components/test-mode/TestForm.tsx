@@ -2,10 +2,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
-import type { StudySetTest } from "../../../server/api/routers/study-set";
-import MultipleChoice from "../../cards/MultipleChoice";
-import TrueOrFalse from "../../cards/TrueOrFalse";
-import Written from "../../cards/Written";
+import type { StudySetTest } from "../../server/api/routers/study-set";
+import MultipleChoice from "../shared/MultipleChoice";
+import TrueOrFalse from "./TrueOrFalse";
+import Written from "./WrittenAnswer";
 import { Button } from "antd";
 
 const flashcard = z.object({

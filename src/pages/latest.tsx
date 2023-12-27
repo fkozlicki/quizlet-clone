@@ -3,10 +3,10 @@ import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import StudySetPreview from "../components/StudySetPreview";
+import StudySetPreview from "../components/shared/StudySetPreview";
 import { api } from "../utils/api";
 import Link from "next/link";
-import StudySetSkeleton from "../components/StudySetSkeleton";
+import StudySetSkeleton from "../components/shared/StudySetSkeleton";
 
 export const getServerSideProps: GetServerSideProps<{
   user: Session["user"];

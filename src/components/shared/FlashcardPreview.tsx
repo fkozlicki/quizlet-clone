@@ -2,14 +2,14 @@ import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
 import { Button } from "antd";
 import { useSession } from "next-auth/react";
-import { useFlashcardModalContext } from "../contexts/FlashcardModalContext";
+import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
 
 interface CardPreviewProps {
   flashcard: Flashcard;
   userId?: string;
 }
 
-const CardPreview = ({ flashcard, userId }: CardPreviewProps) => {
+const FlashcardPreview = ({ flashcard, userId }: CardPreviewProps) => {
   const { data: session } = useSession();
   const { term, definition } = flashcard;
   const [, dispatch] = useFlashcardModalContext();
@@ -34,4 +34,4 @@ const CardPreview = ({ flashcard, userId }: CardPreviewProps) => {
   );
 };
 
-export default CardPreview;
+export default FlashcardPreview;

@@ -1,6 +1,6 @@
 import type { Flashcard, StudySet, User } from "@prisma/client";
 import React from "react";
-import StudySetPreview from "../../StudySetPreview";
+import StudySetPreview from "../shared/StudySetPreview";
 
 interface OtherSetsProps {
   otherSets: (StudySet & {

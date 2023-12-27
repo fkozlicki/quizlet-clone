@@ -2,9 +2,9 @@ import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
 import { Button } from "antd";
 import type { MouseEventHandler } from "react";
-import { useFlashcardModalContext } from "../contexts/FlashcardModalContext";
+import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
 
-interface FlippingCardContentProps {
+interface FlipCardContentProps {
   content: string;
   title: string;
   editable: boolean;
@@ -12,13 +12,13 @@ interface FlippingCardContentProps {
   flashcard: Flashcard;
 }
 
-const FlippingCardContent = ({
+const FlipCardContent = ({
   content,
   title,
   editable,
   back,
   flashcard,
-}: FlippingCardContentProps) => {
+}: FlipCardContentProps) => {
   const [, dispatch] = useFlashcardModalContext();
 
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
@@ -63,4 +63,4 @@ const FlippingCardContent = ({
     </div>
   );
 };
-export default FlippingCardContent;
+export default FlipCardContent;

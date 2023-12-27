@@ -1,17 +1,20 @@
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Input, message } from "antd";
+import { useRouter } from "next/router";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { api } from "../utils/api";
-import CreateCard from "./CreateCard";
 import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { FormItem } from "react-hook-form-antd";
 import type {
   CreateStudySetValues,
   EditStudySetValues,
-} from "../schemas/study-set";
-import { createStudySetSchema, editStudySetSchema } from "../schemas/study-set";
-import { FormItem } from "react-hook-form-antd";
-import { useRouter } from "next/router";
+} from "../../schemas/study-set";
+import {
+  createStudySetSchema,
+  editStudySetSchema,
+} from "../../schemas/study-set";
+import { api } from "../../utils/api";
+import FlashcardDraggable from "./FlashcardDraggable";
 
 interface StudySetFormProps {
   initialData?: EditStudySetValues;
@@ -102,7 +105,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
       <DndProvider backend={HTML5Backend}>
         <div className="mb-6 flex flex-col gap-6">
           {fields.map((field, index) => (
-            <CreateCard
+            <FlashcardDraggable
               key={field.id}
               id={field.id}
               control={control}

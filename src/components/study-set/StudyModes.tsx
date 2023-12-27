@@ -1,5 +1,5 @@
 import React from "react";
-import IconCard from "../../IconCard";
+import IconCard from "./IconCard";
 
 interface StudyModesProps {
   setId: string;

@@ -1,14 +1,14 @@
 import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
+import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import Result from "../../../components/Result";
-import type { TestInputs } from "../../../components/pages/test/TestForm";
-import TestForm from "../../../components/pages/test/TestForm";
-import UserAnswers from "../../../components/pages/test/UserAnswers";
-import { api } from "../../../utils/api";
-import type { GetServerSideProps } from "next";
+import Result from "../../../components/shared/Result";
+import type { TestInputs } from "../../../components/test-mode/TestForm";
+import TestForm from "../../../components/test-mode/TestForm";
+import TestResult from "../../../components/test-mode/TestResult";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
+import { api } from "../../../utils/api";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -108,7 +108,7 @@ const Test = ({ setId }: { setId: string }) => {
                 callback: backToStudySet,
               }}
             />
-            <UserAnswers result={result} />
+            <TestResult result={result} />
           </>
         ) : (
           <>

@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
+import Result from "../shared/Result";
 import FlashcardButtons from "./FlashcardButtons";
-import FlippingCard from "./FlippingCard";
-import Result from "./Result";
+import FlipCard from "./FlipCard";
 
 export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
@@ -170,7 +170,7 @@ const FlashcardsGame = ({
 
   return currentCard ? (
     <>
-      <FlippingCard
+      <FlipCard
         size={size}
         flashcard={currentCard}
         editable={ownerId === session?.user.id}

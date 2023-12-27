@@ -1,7 +1,7 @@
 import React from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
-interface WrittenProps {
+interface WrittenAnswerProps {
   term: string;
   register?: UseFormRegisterReturn;
   index: number;
@@ -10,14 +10,14 @@ interface WrittenProps {
   userAnswer?: string;
 }
 
-const Written = ({
+const WrittenAnswer = ({
   term,
   register,
   index,
   result,
   definition,
   userAnswer,
-}: WrittenProps) => {
+}: WrittenAnswerProps) => {
   return (
     <div className="flex min-h-[30rem] flex-col rounded-md bg-white p-4 shadow-lg md:px-8 md:py-6">
       <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
@@ -38,7 +38,7 @@ const Written = ({
               id={`card-${index}-answer`}
               type="text"
               placeholder="Type the answer"
-              className="rounded-md bg-slate-200 py-2 px-4 outline-none"
+              className="rounded-md bg-slate-200 px-4 py-2 outline-none"
             />
           </label>
         )}
@@ -69,4 +69,4 @@ const Written = ({
   );
 };
 
-export default Written;
+export default WrittenAnswer;

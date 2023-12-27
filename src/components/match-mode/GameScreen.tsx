@@ -1,5 +1,5 @@
 import React from "react";
-import type { GameCard } from "../../../pages/study-set/[id]/match";
+import type { GameCard } from "../../pages/study-set/[id]/match";
 import MemoryCard from "./MemoryCard";
 
 interface GameScreenProps {

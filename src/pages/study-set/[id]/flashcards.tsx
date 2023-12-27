@@ -1,6 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
-import FlashcardsGame from "../../../components/FlashcardsGame";
+import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 

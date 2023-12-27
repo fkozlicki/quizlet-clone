@@ -2,7 +2,7 @@ import { type GetServerSideProps } from "next";
 import { getSession, useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
-import StudySetForm from "../../../components/StudySetForm";
+import StudySetForm from "../../../components/study-set/StudySetForm";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 

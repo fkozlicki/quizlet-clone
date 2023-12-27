@@ -3,13 +3,12 @@ import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
-import FlashcardsGame from "../../../components/FlashcardsGame";
-import CardsList from "../../../components/pages/study-set/CardsList";
-import CreatedBy from "../../../components/pages/study-set/CreatedBy";
-import FlashcardModal from "../../../components/pages/study-set/FlashcardModal";
-import OtherSets from "../../../components/pages/study-set/OtherSets";
-import StudyModes from "../../../components/pages/study-set/StudyModes";
-import StudySetCTA from "../../../components/pages/study-set/StudySetCTA";
+import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
+import CreatedBy from "../../../components/study-set/CreatedBy";
+import FlashcardsList from "../../../components/study-set/FlashcardsList";
+import OtherSets from "../../../components/study-set/OtherSets";
+import StudyModes from "../../../components/study-set/StudyModes";
+import StudySetCTA from "../../../components/study-set/StudySetCTA";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 
@@ -52,12 +51,11 @@ const StudySet = ({ setId }: { setId: string }) => {
         {description && <p className="mb-4 text-lg">{description}</p>}
         <StudyModes setId={setId} />
         <FlashcardsGame setId={setId} cards={cards} ownerId={userId} />
-        <FlashcardModal />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CreatedBy user={user} />
           <StudySetCTA userId={userId} setId={setId} />
         </div>
-        <CardsList userId={userId} cards={cards} />
+        <FlashcardsList userId={userId} cards={cards} />
         {userId === session?.user.id && (
           <div className="mb-8 flex justify-center">
             <Link href={`${setId}/edit`}>

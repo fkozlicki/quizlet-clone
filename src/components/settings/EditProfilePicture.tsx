@@ -9,8 +9,8 @@ import { Avatar, Divider, Upload, message } from "antd";
 import type { RcFile } from "antd/es/upload";
 import Image from "next/image";
 import { useState } from "react";
-import pictures from "../../../data/pictures.json";
-import { api } from "../../../utils/api";
+import pictures from "../../data/pictures.json";
+import { api } from "../../utils/api";
 
 interface EditProfilePictureProps {
   image: User["image"];

@@ -1,14 +1,14 @@
 import React from "react";
-import MultipleChoice from "../../cards/MultipleChoice";
-import TrueOrFalse from "../../cards/TrueOrFalse";
-import Written from "../../cards/Written";
+import MultipleChoice from "../shared/MultipleChoice";
+import TrueOrFalse from "./TrueOrFalse";
+import Written from "./WrittenAnswer";
 import type { TestInputs } from "./TestForm";
 
-interface UserAnswersProps {
+interface TestResultProps {
   result: TestInputs;
 }
 
-const UserAnswers = ({ result }: UserAnswersProps) => {
+const TestResult = ({ result }: TestResultProps) => {
   const { trueOrFalse, multipleChoice, written } = result;
 
   return (
@@ -55,4 +55,4 @@ const UserAnswers = ({ result }: UserAnswersProps) => {
   );
 };
 
-export default UserAnswers;
+export default TestResult;

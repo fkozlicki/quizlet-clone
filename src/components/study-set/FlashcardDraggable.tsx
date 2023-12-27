@@ -9,9 +9,9 @@ import { FormItem } from "react-hook-form-antd";
 import type {
   CreateStudySetValues,
   EditStudySetValues,
-} from "../schemas/study-set";
+} from "../../schemas/study-set";
 
-export interface CreateCardProps {
+export interface FlashcardDraggableProps {
   remove: (index: number) => void;
   swap: (from: number, to: number) => void;
   id: string;
@@ -26,21 +26,21 @@ interface DragItem {
   type: string;
 }
 
-const CreateCard = ({
+const FlashcardDraggable = ({
   remove,
   swap,
   id,
   index,
   control,
   cardsCount,
-}: CreateCardProps) => {
+}: FlashcardDraggableProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const [{ handlerId }, drop] = useDrop<
     DragItem,
     void,
     { handlerId: Identifier | null }
   >({
-    accept: "createcard",
+    accept: "FlashcardDraggable",
     collect(monitor) {
       return {
         handlerId: monitor.getHandlerId(),
@@ -97,7 +97,7 @@ const CreateCard = ({
   });
 
   const [{ isDragging }, drag] = useDrag({
-    type: "createcard",
+    type: "FlashcardDraggable",
     item: () => {
       return { id, index };
     },
@@ -152,4 +152,4 @@ const CreateCard = ({
   );
 };
 
-export default CreateCard;
+export default FlashcardDraggable;

@@ -1,7 +1,7 @@
 import { type GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import StudySetForm from "../components/StudySetForm";
+import StudySetForm from "../components/study-set/StudySetForm";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const session = await getSession(context);

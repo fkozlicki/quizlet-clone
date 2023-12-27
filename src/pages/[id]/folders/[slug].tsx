@@ -3,11 +3,11 @@ import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import { useState } from "react";
-import StudySetPreview from "../../../components/StudySetPreview";
-import AddSetModal from "../../../components/pages/folder/AddSetModal";
-import FolderAuthor from "../../../components/pages/folder/FolderAuthor";
-import FolderCTA from "../../../components/pages/folder/FolderCTA";
-import FolderInfo from "../../../components/pages/folder/FolderInfo";
+import StudySetPreview from "../../../components/shared/StudySetPreview";
+import AddSetModal from "../../../components/folder/AddSetModal";
+import FolderAuthor from "../../../components/folder/FolderAuthor";
+import FolderCTA from "../../../components/folder/FolderCTA";
+import FolderInfo from "../../../components/folder/FolderInfo";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 

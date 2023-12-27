@@ -2,9 +2,9 @@ import type { Flashcard } from "@prisma/client";
 import type { RefObject } from "react";
 import { useState } from "react";
 import type { FlashcardAnimation } from "./FlashcardsGame";
-import FlippingCardContent from "./FlippingCardContent";
+import FlipCardContent from "./FlipCardContent";
 
-interface FlippingCardProps {
+interface FlipCardProps {
   flashcard: Flashcard;
   editable: boolean;
   size?: "small" | "large";
@@ -13,14 +13,14 @@ interface FlippingCardProps {
   animationCardWrapper: RefObject<HTMLDivElement>;
 }
 
-const FlippingCard = ({
+const FlipCard = ({
   flashcard,
   editable,
   size = "small",
   moveAnimation,
   cardWrapper,
   animationCardWrapper,
-}: FlippingCardProps) => {
+}: FlipCardProps) => {
   const [animation, setAnimation] = useState<"flipIn" | "flipOut" | false>(
     false
   );
@@ -64,13 +64,13 @@ const FlippingCard = ({
                 : ""
             } `}
           >
-            <FlippingCardContent
+            <FlipCardContent
               title="Term"
               flashcard={flashcard}
               content={flashcard.term}
               editable={editable}
             />
-            <FlippingCardContent
+            <FlipCardContent
               title="Definition"
               flashcard={flashcard}
               content={flashcard.definition}
@@ -84,4 +84,4 @@ const FlippingCard = ({
   );
 };
 
-export default FlippingCard;
+export default FlipCard;

@@ -1,9 +1,9 @@
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Card, message } from "antd";
-import { api } from "../../../utils/api";
+import { api } from "../../utils/api";
 
-interface StudySetCardProps {
+interface FolderStudySetProps {
   folderId: string;
   setsInFolder: StudySet[];
   title: string;
@@ -11,13 +11,13 @@ interface StudySetCardProps {
   userId: string;
 }
 
-const StudySetCard = ({
+const FolderStudySet = ({
   setId,
   title,
   folderId,
   setsInFolder,
   userId,
-}: StudySetCardProps) => {
+}: FolderStudySetProps) => {
   const {
     folder: {
       getByTitle: { setData },
@@ -75,4 +75,4 @@ const StudySetCard = ({
   );
 };
 
-export default StudySetCard;
+export default FolderStudySet;

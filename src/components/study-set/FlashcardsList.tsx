@@ -1,12 +1,12 @@
 import type { Flashcard } from "@prisma/client";
-import CardPreview from "../../CardPreview";
+import FlashcardPreview from "../shared/FlashcardPreview";
 
-interface CardsListProps {
+interface FlashcardsListProps {
   cards: Flashcard[];
   userId: string;
 }
 
-const CardsList = ({ cards, userId }: CardsListProps) => {
+const FlashcardsList = ({ cards, userId }: FlashcardsListProps) => {
   return (
     <div className="mb-8">
       <div className="mb-5 text-lg font-bold">
@@ -14,11 +14,11 @@ const CardsList = ({ cards, userId }: CardsListProps) => {
       </div>
       <div className="flex flex-col gap-3">
         {cards.map((flashcard, index) => (
-          <CardPreview userId={userId} key={index} flashcard={flashcard} />
+          <FlashcardPreview userId={userId} key={index} flashcard={flashcard} />
         ))}
       </div>
     </div>
   );
 };
 
-export default CardsList;
+export default FlashcardsList;

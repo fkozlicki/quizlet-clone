@@ -5,10 +5,10 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Modal, Tag, Tooltip, message } from "antd";
-import { useFolderModalContext } from "../../../contexts/FolderModalContext";
-import type { EditFolderValues } from "../../../schemas/folder";
+import { useFolderModalContext } from "../../contexts/FolderModalContext";
+import type { EditFolderValues } from "../../schemas/folder";
 import { useState } from "react";
-import { api } from "../../../utils/api";
+import { api } from "../../utils/api";
 import { useRouter } from "next/router";
 
 interface FolderCTAProps {

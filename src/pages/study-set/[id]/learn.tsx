@@ -1,14 +1,14 @@
 import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
 import { Progress } from "antd";
+import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 import { useState, type MouseEvent } from "react";
-import CardPreview from "../../../components/CardPreview";
-import Result from "../../../components/Result";
-import MultipleChoice from "../../../components/cards/MultipleChoice";
-import { api } from "../../../utils/api";
+import FlashcardPreview from "../../../components/shared/FlashcardPreview";
+import Result from "../../../components/shared/Result";
+import MultipleChoice from "../../../components/shared/MultipleChoice";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
-import type { GetServerSideProps } from "next";
+import { api } from "../../../utils/api";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -122,7 +122,7 @@ const Learn = ({ setId }: { setId: string }) => {
             </div>
             <div className="flex flex-col gap-4">
               {cards.map((flashcard, index) => (
-                <CardPreview key={index} flashcard={flashcard} />
+                <FlashcardPreview key={index} flashcard={flashcard} />
               ))}
             </div>
           </div>

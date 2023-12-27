@@ -2,8 +2,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Empty, Modal } from "antd";
 import Link from "next/link";
-import { api } from "../../../utils/api";
-import StudySetCard from "./StudySetCard";
+import { api } from "../../utils/api";
+import FolderStudySet from "./FolderStudySet";
 
 interface AddSetModalProps {
   open: boolean;
@@ -52,7 +52,7 @@ const AddSetModal = ({
             <Button className="w-full">Create a new set</Button>
           </Link>
           {studySets.map(({ title, id }) => (
-            <StudySetCard
+            <FolderStudySet
               key={id}
               setId={id}
               title={title}

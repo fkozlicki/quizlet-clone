@@ -3,9 +3,9 @@ import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
 import { useEffect, useReducer } from "react";
-import EndScreen from "../../../components/pages/match/EndScreen";
-import GameScreen from "../../../components/pages/match/GameScreen";
-import StartScreen from "../../../components/pages/match/StartScreen";
+import EndScreen from "../../../components/match-mode/EndScreen";
+import GameScreen from "../../../components/match-mode/GameScreen";
+import StartScreen from "../../../components/match-mode/StartScreen";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 
