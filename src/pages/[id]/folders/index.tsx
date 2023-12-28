@@ -1,4 +1,3 @@
-import type { User } from "@prisma/client";
 import { Button, Empty } from "antd";
 import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
@@ -8,41 +7,33 @@ import FolderPreview from "../../../components/folder/FolderPreview";
 import FolderSkeleton from "../../../components/folder/FolderSkeleton";
 import ProfileLayout from "../../../components/layout/ProfileLayout";
 import { useFolderModalContext } from "../../../contexts/FolderModalContext";
-import { prisma } from "../../../server/db";
+import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 import type { NextPageWithLayout } from "../../_app";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
   const userId = context.query?.id;
 
   if (typeof userId !== "string") {
     throw new Error("No userId");
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!user) {
-    return {
-      notFound: true,
-    };
-  }
+  await ssg.user.getById.prefetch({ id: userId });
 
   return {
     props: {
-      user,
+      trpcState: ssg.dehydrate(),
+      userId,
     },
   };
 };
 
 interface FoldersProps {
-  user: User;
+  userId: string;
 }
 
-const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
+const Folders: NextPageWithLayout<FoldersProps> = ({ userId }) => {
   const { data: session } = useSession();
   const {
     data: folders,
@@ -50,7 +41,7 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
     isLoading,
     refetch,
   } = api.folder.getAll.useQuery({
-    userId: user.id,
+    userId,
   });
   const [, dispatch] = useFolderModalContext();
 
@@ -58,7 +49,7 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
     dispatch({ type: "open" });
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className="grid gap-y-4">
         <FolderSkeleton />
@@ -67,8 +58,9 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
         <FolderSkeleton />
       </div>
     );
+  }
 
-  if (isError)
+  if (isError) {
     return (
       <div className="flex justify-center">
         <div className="flex flex-col items-center gap-2">
@@ -77,6 +69,7 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
         </div>
       </div>
     );
+  }
 
   return (
     <>
@@ -88,7 +81,7 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
               key={index}
               title={title}
               setsCount={studySets.length}
-              href={`/${user.id}/folders/${slug}`}
+              href={`/${userId}/folders/${slug}`}
             />
           ))}
         </div>
@@ -96,10 +89,10 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={`${
-            user.id === session?.user.id ? "You have" : "User has"
+            userId === session?.user.id ? "You have" : "User has"
           } no folders yet`}
         >
-          {user.id === session?.user.id && (
+          {userId === session?.user.id && (
             <Button onClick={openFolderModal} type="primary">
               Create
             </Button>
@@ -111,7 +104,7 @@ const Folders: NextPageWithLayout<FoldersProps> = ({ user }) => {
 };
 
 Folders.getLayout = (page: ReactElement<FoldersProps>) => {
-  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
+  return <ProfileLayout userId={page.props.userId}>{page}</ProfileLayout>;
 };
 
 export default Folders;

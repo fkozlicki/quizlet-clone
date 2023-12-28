@@ -1,18 +1,18 @@
+import dayjs from "dayjs";
 import type { GetServerSideProps } from "next";
 import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Image from "next/image";
+import type { ReactElement } from "react";
 import ReactCalendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import ProfileLayout from "../../components/layout/ProfileLayout";
+import { generateSSGHelper } from "../../server/helpers/ssgHelper";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
-import dayjs from "dayjs";
-import { prisma } from "../../server/db";
-import type { User } from "@prisma/client";
-import type { ReactElement } from "react";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const ssg = generateSSGHelper();
   const session = await getSession(context);
   const userId = context.query?.id;
 
@@ -20,11 +20,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     throw new Error("No userId");
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
+  await ssg.user.getById.prefetch({ id: userId });
 
   if (session?.user?.id !== userId) {
     return {
@@ -37,13 +33,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      user,
+      trpcState: ssg.dehydrate(),
+      userId,
     },
   };
 };
 
 interface ProfileProps {
-  user: User;
+  userId: string;
 }
 
 const Profile: NextPageWithLayout<ProfileProps> = () => {
@@ -116,7 +113,7 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
 };
 
 Profile.getLayout = (page: ReactElement<ProfileProps>) => {
-  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
+  return <ProfileLayout userId={page.props.userId}>{page}</ProfileLayout>;
 };
 
 export default Profile;

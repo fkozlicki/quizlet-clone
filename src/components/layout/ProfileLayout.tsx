@@ -1,21 +1,26 @@
 import { UserOutlined } from "@ant-design/icons";
-import type { User } from "@prisma/client";
 import { Avatar, Tabs } from "antd";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactElement } from "react";
+import { api } from "../../utils/api";
 
 interface ProfileLayoutProps {
-  user: User;
   children: ReactElement;
+  userId: string;
 }
 
-const ProfileLayout = ({ children, user }: ProfileLayoutProps) => {
+const ProfileLayout = ({ children, userId }: ProfileLayoutProps) => {
   const { data: session } = useSession();
   const { pathname } = useRouter();
+  const { data } = api.user.getById.useQuery({ id: userId });
 
-  const { id, name, image } = user;
+  if (!data) {
+    return <div>404</div>;
+  }
+
+  const { id, name, image } = data;
 
   return (
     <>

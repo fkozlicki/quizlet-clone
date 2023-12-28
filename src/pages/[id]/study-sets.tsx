@@ -10,45 +10,38 @@ import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
 import type { ReactElement } from "react";
 import type { User } from "@prisma/client";
+import { generateSSGHelper } from "../../server/helpers/ssgHelper";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const userId = context.query?.id;
+  const ssg = generateSSGHelper();
 
   if (typeof userId !== "string") {
     throw new Error("No userId");
   }
 
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  });
-
-  if (!user) {
-    return {
-      notFound: true,
-    };
-  }
+  await ssg.user.getById.prefetch({ id: userId });
 
   return {
     props: {
-      user,
+      trpcState: ssg.dehydrate(),
+      userId,
     },
   };
 };
 
 interface StudySetProps {
-  user: User;
+  userId: string;
 }
 
-const StudySets: NextPageWithLayout<StudySetProps> = ({ user }) => {
+const StudySets: NextPageWithLayout<StudySetProps> = ({ userId }) => {
   const {
     data: studySets,
     isLoading,
     isError,
     refetch,
   } = api.studySet.getAll.useQuery({
-    userId: user.id,
+    userId,
   });
 
   if (isLoading) {
@@ -102,7 +95,7 @@ const StudySets: NextPageWithLayout<StudySetProps> = ({ user }) => {
 };
 
 StudySets.getLayout = (page: ReactElement<StudySetProps>) => {
-  return <ProfileLayout user={page.props.user}>{page}</ProfileLayout>;
+  return <ProfileLayout userId={page.props.userId}>{page}</ProfileLayout>;
 };
 
 export default StudySets;
