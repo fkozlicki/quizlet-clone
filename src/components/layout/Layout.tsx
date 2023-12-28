@@ -21,18 +21,6 @@ const Layout = ({ children }: PropsWithChildren) => {
     }
   }, [session]);
 
-  useEffect(() => {
-    closeMobileMenu();
-  }, [pathname]);
-
-  useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-  }, [mobileMenuOpen]);
-
   const openMobileMenu = () => {
     setMobileMenuOpen(true);
   };
@@ -51,10 +39,14 @@ const Layout = ({ children }: PropsWithChildren) => {
           {children}
         </div>
       </main>
-      {!session && <AuthDropdown />}
       <MobileMenu open={mobileMenuOpen} onClose={closeMobileMenu} />
-      {session && <FolderModal session={session} />}
-      {session && <FlashcardModal />}
+      {!session && <AuthDropdown />}
+      {session && (
+        <>
+          <FolderModal session={session} />
+          <FlashcardModal />
+        </>
+      )}
     </>
   );
 };
