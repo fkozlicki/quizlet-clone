@@ -48,9 +48,8 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
       entry[1].map((question) => ({ ...question, userAnswer: "" })),
     ])
   );
-
   const { control, register, handleSubmit } = useForm<TestInputs>({
-    // resolver: zodResolver(testInputs),
+    resolver: zodResolver(testInputs),
     defaultValues: initialData,
   });
   const { fields: multipleChoice } = useFieldArray({

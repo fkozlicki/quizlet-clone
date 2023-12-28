@@ -4,7 +4,7 @@ import { NextSeo } from "next-seo";
 import Link from "next/link";
 import { useEffect, useReducer } from "react";
 import EndScreen from "../../../components/match-mode/EndScreen";
-import GameScreen from "../../../components/match-mode/GameScreen";
+import MemoryCard from "../../../components/match-mode/MemoryCard";
 import StartScreen from "../../../components/match-mode/StartScreen";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
@@ -122,7 +122,7 @@ const Match = ({ setId }: { setId: string }) => {
         dispatch({ type: "setStage", payload: "finished" });
       }, 300);
     }
-  }, [matched]);
+  }, [matched, cards]);
 
   useEffect(() => {
     if (selected.length === 2) {
@@ -138,7 +138,7 @@ const Match = ({ setId }: { setId: string }) => {
         }, 300);
       }
     }
-  }, [selected]);
+  }, [selected, cards, matched]);
 
   useEffect(() => {
     const interval =
@@ -154,18 +154,6 @@ const Match = ({ setId }: { setId: string }) => {
 
     return () => clearInterval(interval);
   }, [stage]);
-
-  const checkIsSelected = (index: number) => {
-    return selected.includes(index);
-  };
-
-  const checkIsMatched = (index: number) => {
-    return matched.includes(index);
-  };
-
-  const checkIsMisatch = (index: number) => {
-    return mismatch.includes(index);
-  };
 
   const selectCard = (index: number) => {
     if (selected.length < 2 && !selected.includes(index)) {
@@ -202,14 +190,21 @@ const Match = ({ setId }: { setId: string }) => {
       </div>
       {stage === "initial" && <StartScreen startGame={startGame} />}
       {stage === "start" && (
-        <GameScreen
-          cards={cards}
-          time={ellapsedTime}
-          selectCard={selectCard}
-          checkIsMatched={checkIsMatched}
-          checkIsMisatch={checkIsMisatch}
-          checkIsSelected={checkIsSelected}
-        />
+        <>
+          <div className="mb-4 text-xl">{ellapsedTime.toFixed(1)} sec.</div>
+          <div className="grid h-full grid-cols-3 gap-4">
+            {cards.map((card, index) => (
+              <MemoryCard
+                key={index}
+                content={card.content}
+                selectCallback={() => selectCard(index)}
+                isSelected={selected.includes(index)}
+                isMatched={matched.includes(index)}
+                isMismatch={mismatch.includes(index)}
+              />
+            ))}
+          </div>
+        </>
       )}
       {stage === "finished" && (
         <EndScreen time={ellapsedTime} playAgain={playAgain} />

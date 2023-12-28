@@ -90,7 +90,7 @@ const Test = ({ setId }: { setId: string }) => {
     <>
       <NextSeo title="Quizlet 2.0 - Test" />
       <div className="m-auto max-w-3xl">
-        {result && hard ? (
+        {result && hard !== undefined ? (
           <>
             <StudyModeResult
               hard={hard}
@@ -98,13 +98,13 @@ const Test = ({ setId }: { setId: string }) => {
               firstButton={{
                 text: "Take a new test",
                 description: "Take a new test with another questions.",
-                Icon: <ReloadOutlined />,
+                Icon: <ReloadOutlined className="text-3xl" />,
                 callback: takeNewTest,
               }}
               secondButton={{
                 text: "Back to study set",
                 description: "Back to study set",
-                Icon: <RollbackOutlined />,
+                Icon: <RollbackOutlined className="text-3xl" />,
                 callback: backToStudySet,
               }}
             />
