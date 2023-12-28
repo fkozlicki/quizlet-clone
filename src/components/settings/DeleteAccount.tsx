@@ -3,7 +3,7 @@ import type { User } from "@prisma/client";
 import { Alert, Avatar, Button, Modal, message } from "antd";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import { api } from "../../../utils/api";
+import { api } from "../../utils/api";
 
 interface DeleteAccountProps {
   image: User["image"];
