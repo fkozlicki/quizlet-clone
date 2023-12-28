@@ -60,20 +60,20 @@ const MultipleChoice = ({
                 value={answer}
                 id={`card-${index}-choice-${answerIndex}`}
                 className="peer hidden"
-                name="userAnswer"
+                disabled={!!result}
               />
               <div
                 onClick={
                   callback ? (event) => callback(answerIndex, event) : undefined
                 }
-                className={`cursor-pointer rounded-md border-2 px-4 py-2 peer-checked:border-blue-600 peer-checked:bg-blue-50 ${
+                className={`rounded-md border-2 px-4 py-2 peer-checked:border-blue-600 peer-checked:bg-blue-50 ${
                   result
                     ? answer === definition
                       ? "border-green-500 bg-green-50"
                       : ""
                     : userAnswer === answer
                     ? "border-red-500 bg-red-50"
-                    : ""
+                    : "cursor-pointer"
                 }`}
               >
                 {answer}

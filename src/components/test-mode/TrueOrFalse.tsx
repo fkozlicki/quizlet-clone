@@ -61,6 +61,7 @@ const TrueOrFalse = ({
               className="peer hidden"
               id={`${result ? "result-card" : "card"}-${index}-true`}
               value={"true"}
+              disabled={!!result}
             />
             <div
               className={`peer-checked:bg-blue-50" rounded-md border-2 px-4 py-2 text-center peer-checked:border-blue-600 ${
@@ -70,7 +71,7 @@ const TrueOrFalse = ({
                     : userAnswer === "true"
                     ? "border-red-500 bg-red-50"
                     : ""
-                  : ""
+                  : "cursor-pointer"
               }`}
             >
               True
@@ -83,6 +84,7 @@ const TrueOrFalse = ({
               className="peer hidden"
               value="false"
               id={`card-${index}-false`}
+              disabled={!!result}
             />
             <div
               className={`rounded-md border-2 px-4 py-2 text-center peer-checked:border-blue-600 peer-checked:bg-blue-50 ${
@@ -92,7 +94,7 @@ const TrueOrFalse = ({
                     : userAnswer === "false"
                     ? "border-red-500 bg-red-50"
                     : ""
-                  : ""
+                  : "cursor-pointer"
               }`}
             >
               False

@@ -40,7 +40,13 @@ const StudyModeResult = ({
             How you&apos;re doing
           </div>
           <div className="flex items-center gap-6">
-            <Progress type="circle" percent={75} size={100} strokeWidth={12} />
+            <Progress
+              type="circle"
+              percent={((cardCount - hard) / cardCount) * 100}
+              size={100}
+              strokeWidth={12}
+              format={(percent) => `${percent ?? 0}%`}
+            />
             <div className="flex flex-1 flex-col gap-2">
               <Alert
                 className="rounded-full border-0 bg-green-200 py-1 font-medium text-green-700"

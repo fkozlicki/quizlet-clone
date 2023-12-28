@@ -1,12 +1,12 @@
-import { Button, Card, Empty, Skeleton } from "antd";
+import { Button, Empty } from "antd";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
-import StudySetPreview from "../components/shared/StudySetPreview";
-import { api } from "../utils/api";
 import Link from "next/link";
+import StudySetPreview from "../components/shared/StudySetPreview";
 import StudySetSkeleton from "../components/shared/StudySetSkeleton";
+import { api } from "../utils/api";
 
 export const getServerSideProps: GetServerSideProps<{
   user: Session["user"];
@@ -40,7 +40,7 @@ const Latest = ({
     <>
       <NextSeo title="Quizlet 2.0 - Latest" />
       <>
-        <h1 className="mb-8 text-lg font-medium">Your study sets</h1>
+        <div className="mb-6 text-2xl font-medium">Your study sets</div>
         {status === "loading" && (
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
             <StudySetSkeleton />

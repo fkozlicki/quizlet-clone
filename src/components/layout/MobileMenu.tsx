@@ -85,7 +85,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
         ].concat(
           session
             ? [
-                { key: "3", type: "divider" },
+                { key: "3", type: "divider", className: "my-4" },
                 getItem(
                   <div className="flex items-center gap-2">
                     <Avatar

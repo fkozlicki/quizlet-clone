@@ -51,7 +51,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
             </Link>
             <Link
               href="/"
-              className="mx-3 hidden h-full text-lg font-medium leading-[4rem] lg:block"
+              className="mx-3 hidden h-full text-sm font-medium leading-[4rem] md:block"
             >
               Home
             </Link>
@@ -72,7 +72,9 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               }}
               trigger={["click"]}
             >
-              <Button icon={<DownOutlined />}>Create</Button>
+              <Button icon={<DownOutlined />} className="ml-2">
+                Create
+              </Button>
             </Dropdown>
           </div>
           <div className="flex items-center">
