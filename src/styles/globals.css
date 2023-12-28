@@ -34,24 +34,25 @@ button {
 }
 
 .react-calendar {
-  border: none !important;
+  border: unset !important;
 }
 .react-calendar__month-view__weekdays {
-  color: gray;
+  color: #757575;
   font-weight: 600 !important;
 }
 .react-calendar__month-view__weekdays__weekday abbr {
   text-decoration: none !important;
   cursor: default !important;
 }
-.react-calendar__tile:hover {
-  background: transparent !important;
+.react-calendar__tile {
+  pointer-events: none !important;
 }
+
 .react-calendar__tile--now:enabled {
-  background: white;
+  background: unset;
 }
 .react-calendar__month-view__days__day--weekend {
-  color: initial !important;
+  color: unset !important;
 }
 .react-calendar__month-view__days__day--neighboringMonth {
   color: #757575 !important;
