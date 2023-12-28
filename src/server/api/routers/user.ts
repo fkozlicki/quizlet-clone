@@ -49,14 +49,7 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      if (!user) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Couldn't create user",
-        });
-      }
-
-      const account = await ctx.prisma.account.create({
+      await ctx.prisma.account.create({
         data: {
           providerAccountId: user.id,
           userId: user.id,
@@ -64,13 +57,6 @@ export const userRouter = createTRPCRouter({
           provider: "credentials",
         },
       });
-
-      if (!account) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Couldn't create account",
-        });
-      }
 
       return user;
     }),
@@ -87,11 +73,12 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      if (!user)
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Could not find user with id ${input.id}`,
         });
+      }
 
       return exclude(user, ["password"]);
     }),

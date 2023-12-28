@@ -1,5 +1,3 @@
-import { TRPCError } from "@trpc/server";
-
 import { editFlashcardSchema } from "../../../schemas/flashcard";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -17,12 +15,6 @@ export const cardRouter = createTRPCRouter({
           definition,
         },
       });
-
-      if (!edited)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Could not find card with id ${id}`,
-        });
 
       return edited;
     }),

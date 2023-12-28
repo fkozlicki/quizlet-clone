@@ -88,6 +88,13 @@ export const folderRouter = createTRPCRouter({
         },
       });
 
+      if (!folder) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Couldn't find folder",
+        });
+      }
+
       return folder;
     }),
 
@@ -172,12 +179,6 @@ export const folderRouter = createTRPCRouter({
           slug: slugify(title),
         },
       });
-
-      if (!updated)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Couldn't update folder",
-        });
 
       return updated;
     }),

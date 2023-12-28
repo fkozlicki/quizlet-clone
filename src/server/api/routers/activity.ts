@@ -1,7 +1,5 @@
-import { TRPCError } from "@trpc/server";
-
-import { createTRPCRouter, protectedProcedure } from "../trpc";
 import dayjs from "dayjs";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const activityRouter = createTRPCRouter({
   create: protectedProcedure.mutation(async ({ ctx }) => {
@@ -22,12 +20,6 @@ export const activityRouter = createTRPCRouter({
           userId: ctx.session.user.id,
         },
       });
-
-      if (!activity)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: `Could not create activity`,
-        });
 
       return activity;
     }

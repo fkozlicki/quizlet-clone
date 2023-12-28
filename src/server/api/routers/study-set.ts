@@ -93,7 +93,12 @@ export const studySetRouter = createTRPCRouter({
         },
       });
 
-      if (!set) throw new TRPCError({ code: "NOT_FOUND" });
+      if (!set) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Could not find set with id ${input.id}`,
+        });
+      }
 
       return set;
     }),
@@ -128,24 +133,22 @@ export const studySetRouter = createTRPCRouter({
         },
       });
 
-      if (!cards) throw new TRPCError({ code: "NOT_FOUND" });
-
       // COPYING CARDS FOR RANDOM ANSWERS
-      const cardsCopy = [...cards];
+      const cardsCopy = [...cards].sort(() => 0.5 - Math.random());
 
       // ADDING 3 RANDOM ANSWERS + DEFINITION
-      const learnSet = cards
-        .map((card) => {
-          const randomAnswers = cardsCopy
+      const learnSet = cardsCopy.map((multipleChoice) => {
+        const answers = [
+          ...cards
+            .filter((card) => card.id !== multipleChoice.id)
             .sort(() => 0.5 - Math.random())
-            .slice(0, 3)
-            .map((card) => card.definition);
-          const allAnswers = [...randomAnswers, card.definition].sort(
-            () => 0.5 - Math.random()
-          );
-          return { ...card, answers: allAnswers };
-        })
-        .sort(() => 0.5 - Math.random());
+            .slice(0)
+            .map((card) => card.definition),
+          multipleChoice.definition,
+        ].sort(() => 0.5 - Math.random());
+
+        return { ...multipleChoice, answers };
+      });
 
       return learnSet;
     }),
@@ -159,9 +162,7 @@ export const studySetRouter = createTRPCRouter({
         },
       });
 
-      if (!cards) throw new TRPCError({ code: "NOT_FOUND" });
-
-      const cardsCopy = [...cards];
+      const cardsCopy = [...cards].sort(() => 0.5 - Math.random());
       // multipleChoice should be 10% and minimum 1
       // write should be 10% and minimum 1
       // tureFalse should be the rest
@@ -172,29 +173,34 @@ export const studySetRouter = createTRPCRouter({
 
       // RANDOMIZING QUESTIONS
       //multipleChoice
-      const multipleChoiceWithoutAnswers = cardsCopy
-        .sort(() => 0.5 - Math.random())
-        .splice(0, count);
-      const multipleChoice = multipleChoiceWithoutAnswers.map((question) => {
-        const randomAnswers = [...cards]
-          .sort(() => 0.5 - Math.random())
-          .slice(0, 3)
-          .map((card) => card.definition);
-        return {
-          ...question,
-          answers: [...randomAnswers, question.definition],
-        };
-      });
+      const multipleChoiceWithoutAnswers = cardsCopy.splice(0, count);
+      const multipleChoice = multipleChoiceWithoutAnswers.map(
+        (multipleChoice) => {
+          const answers = [
+            ...cards
+              .filter((card) => card.id !== multipleChoice.id)
+              .sort(() => 0.5 - Math.random())
+              .slice(0)
+              .map((card) => card.definition),
+            multipleChoice.definition,
+          ].sort(() => 0.5 - Math.random());
+
+          return {
+            ...multipleChoice,
+            answers,
+          };
+        }
+      );
       // written
       const written = cardsCopy.splice(0, count);
       // trueFalse
       const trueOrFalse = cardsCopy.map((card) => {
-        const randomFalseAnswer = [...cards]
-          .filter((el) => el.id !== card.id)
-          .sort(() => 0.5 - Math.random())[0]?.definition;
-        const answer = [randomFalseAnswer, card.definition][
-          Math.floor(Math.random() * 2)
-        ]!;
+        const otherCards = cards.filter((el) => el.id !== card.id);
+        const randomFalseAnswer =
+          otherCards[Math.floor(Math.random() * otherCards.length)]!.definition;
+        const answer =
+          Math.random() < 0.5 ? randomFalseAnswer : card.definition;
+
         return { ...card, answer };
       });
 
@@ -226,12 +232,6 @@ export const studySetRouter = createTRPCRouter({
           },
         },
       });
-
-      if (!updated)
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Could not find post with id ${input.id}`,
-        });
 
       return updated;
     }),
