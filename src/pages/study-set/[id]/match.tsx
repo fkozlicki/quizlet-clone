@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     throw new Error("No setId");
   }
 
-  await ssg.studySet.getRandomCards.prefetch({ id: setId, count: 3 });
+  await ssg.studySet.getMatchCards.prefetch({ setId });
 
   return {
     props: {
@@ -92,26 +92,12 @@ const Match = ({ setId }: { setId: string }) => {
     { cards, matched, mismatch, selected, stage, ellapsedTime },
     dispatch,
   ] = useReducer(gameReducer, initialGameState);
-  const { refetch } = api.studySet.getRandomCards.useQuery(
-    { id: setId, count: 3 },
+  const { refetch } = api.studySet.getMatchCards.useQuery(
+    { setId },
     {
       refetchOnWindowFocus: false,
       onSuccess(data) {
-        const shuffeledCards = data
-          .reduce((acc, card) => {
-            const termCard = {
-              flashcardId: card.id,
-              content: card.term,
-            };
-            const definitionCard = {
-              flashcardId: card.id,
-              content: card.definition,
-            };
-            acc.push(termCard, definitionCard);
-            return acc;
-          }, [] as GameCard[])
-          .sort(() => 0.5 - Math.random());
-        dispatch({ type: "setCards", payload: shuffeledCards });
+        dispatch({ type: "setCards", payload: data });
       },
     }
   );

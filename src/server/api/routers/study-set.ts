@@ -103,27 +103,6 @@ export const studySetRouter = createTRPCRouter({
       return set;
     }),
 
-  getRandomCards: publicProcedure
-    .input(
-      z.object({
-        id: z.string(),
-        count: z.number(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const cards = await ctx.prisma.flashcard.findMany({
-        where: {
-          studySetId: input.id,
-        },
-      });
-
-      if (!cards) throw new TRPCError({ code: "NOT_FOUND" });
-
-      cards.sort(() => 0.5 - Math.random());
-
-      return cards.slice(0, input.count);
-    }),
-
   getLearnSet: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -211,6 +190,34 @@ export const studySetRouter = createTRPCRouter({
       };
 
       return test;
+    }),
+
+  getMatchCards: publicProcedure
+    .input(
+      z.object({
+        setId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const cards = await ctx.prisma.flashcard.findMany({
+        where: {
+          studySetId: input.setId,
+        },
+      });
+
+      const MAX_CARDS = 4;
+
+      const matchCards = cards
+        .sort(() => 0.5 - Math.random())
+        .slice(0, Math.min(cards.length, MAX_CARDS))
+        .map((card) => [
+          { flashcardId: card.id, content: card.term },
+          { flashcardId: card.id, content: card.definition },
+        ])
+        .flat()
+        .sort(() => 0.5 - Math.random());
+
+      return matchCards;
     }),
 
   edit: protectedProcedure
