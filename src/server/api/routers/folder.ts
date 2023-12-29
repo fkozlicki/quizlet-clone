@@ -3,7 +3,11 @@ import slugify from "slugify";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
-import { createFolderSchema, editFolderSchema } from "../../../schemas/folder";
+import {
+  addSetSchema,
+  createFolderSchema,
+  editFolderSchema,
+} from "../../../schemas/folder";
 
 export const folderRouter = createTRPCRouter({
   create: protectedProcedure
@@ -99,12 +103,7 @@ export const folderRouter = createTRPCRouter({
     }),
 
   addSet: protectedProcedure
-    .input(
-      z.object({
-        folderId: z.string(),
-        setId: z.string(),
-      })
-    )
+    .input(addSetSchema)
     .mutation(async ({ input, ctx }) => {
       const folder = await ctx.prisma.folder.update({
         where: {
@@ -132,12 +131,7 @@ export const folderRouter = createTRPCRouter({
     }),
 
   removeSet: protectedProcedure
-    .input(
-      z.object({
-        folderId: z.string(),
-        setId: z.string(),
-      })
-    )
+    .input(addSetSchema)
     .mutation(async ({ input, ctx }) => {
       const folder = await ctx.prisma.folder.update({
         where: {

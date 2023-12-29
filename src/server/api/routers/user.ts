@@ -3,6 +3,7 @@ import { z } from "zod";
 import { hash } from "bcrypt";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+import { createUserSchema } from "../../../schemas/user";
 
 function exclude<User, Key extends keyof User>(
   user: User,
@@ -16,14 +17,7 @@ function exclude<User, Key extends keyof User>(
 
 export const userRouter = createTRPCRouter({
   create: publicProcedure
-    .input(
-      z.object({
-        birthday: z.string(),
-        email: z.string().email(),
-        name: z.string(),
-        password: z.string(),
-      })
-    )
+    .input(createUserSchema)
     .mutation(async ({ input, ctx }) => {
       const { birthday, email, name, password } = input;
 

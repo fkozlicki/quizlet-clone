@@ -14,3 +14,8 @@ export const editFolderSchema = createFolderSchema.merge(
 );
 
 export type EditFolderValues = z.infer<typeof editFolderSchema>;
+
+export const addSetSchema = z.object({
+  folderId: z.string(),
+  setId: z.string(),
+});
