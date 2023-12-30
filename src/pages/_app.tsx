@@ -1,17 +1,17 @@
-import { ConfigProvider } from "antd";
 import "antd/dist/reset.css";
 import type { NextPage } from "next";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { DefaultSeo } from "next-seo";
 import type { AppProps } from "next/app";
-import type { ReactElement, ReactNode } from "react";
+import { type ReactElement, type ReactNode } from "react";
 import Layout from "../components/layout/Layout";
 import AuthDropdownProvider from "../contexts/AuthDropdownContext";
+import FlashcardModalProvider from "../contexts/FlashcardModalContext";
 import FolderModalProvider from "../contexts/FolderModalContext";
+import ThemeProvider from "../contexts/ThemeProvider";
 import "../styles/globals.css";
 import { api } from "../utils/api";
-import FlashcardModalProvider from "../contexts/FlashcardModalContext";
 
 export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -29,7 +29,7 @@ const MyApp = ({
 
   return (
     <SessionProvider session={session}>
-      <ConfigProvider>
+      <ThemeProvider>
         <AuthDropdownProvider>
           <FolderModalProvider>
             <FlashcardModalProvider>
@@ -48,7 +48,7 @@ const MyApp = ({
             </FlashcardModalProvider>
           </FolderModalProvider>
         </AuthDropdownProvider>
-      </ConfigProvider>
+      </ThemeProvider>
     </SessionProvider>
   );
 };

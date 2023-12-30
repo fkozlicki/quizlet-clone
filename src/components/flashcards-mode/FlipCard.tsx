@@ -3,6 +3,7 @@ import type { RefObject } from "react";
 import { useState } from "react";
 import type { FlashcardAnimation } from "./FlashcardsGame";
 import FlipCardContent from "./FlipCardContent";
+import { theme } from "antd";
 
 interface FlipCardProps {
   flashcard: Flashcard;
@@ -24,6 +25,9 @@ const FlipCard = ({
   const [animation, setAnimation] = useState<"flipIn" | "flipOut" | false>(
     false
   );
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const flipCard = () => {
     setAnimation((prev) =>

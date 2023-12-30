@@ -1,5 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Drawer, Menu } from "antd";
+import { Avatar, Drawer, Menu, theme } from "antd";
 import type { MenuProps } from "antd/es/menu";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -8,6 +8,7 @@ import type { Key, ReactNode } from "react";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
 import { useRouter } from "next/router";
+import { useThemeContext } from "../../contexts/ThemeProvider";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -21,6 +22,10 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
   const { push } = useRouter();
   const [, dispatchAuthDropdown] = useAuthDropdownContext();
   const [, dispatchFolderModal] = useFolderModalContext();
+  const { switchDarkMode } = useThemeContext();
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const handleCreateFolder = () => {
     if (session) {
@@ -63,6 +68,9 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
       className="md:hidden"
       classNames={{
         mask: "md:hidden",
+      }}
+      style={{
+        background: colorBgContainer,
       }}
     >
       <Menu
@@ -112,7 +120,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                 ),
                 getItem(<Link href={`/${session.user.id}`}>Profile</Link>, "5"),
                 getItem(<Link href="/settings">Settings</Link>, "6"),
-                getItem("Dark mode", "7"),
+                { key: "7", label: "Dark mode", onClick: switchDarkMode },
                 {
                   label: "Logout",
                   key: "8",

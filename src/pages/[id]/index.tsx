@@ -10,6 +10,7 @@ import ProfileLayout from "../../components/layout/ProfileLayout";
 import { generateSSGHelper } from "../../server/helpers/ssgHelper";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
+import { Typography, theme } from "antd";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -51,6 +52,9 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
     error,
   } = api.activity.getAll.useQuery();
   const today = dayjs().format("YYYY-MM-DD");
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -60,11 +64,19 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
     <>
       <NextSeo title="Quizlet 2.0 - Profile" />
       <h2 className="mb-4 text-xl font-bold">Recent activity</h2>
-      <div className="grid h-[400px] w-full place-items-center rounded-2xl bg-white p-4 shadow-lg">
+      <div
+        className="grid h-[400px] w-full place-items-center rounded-2xl"
+        style={{
+          background: colorBgContainer,
+        }}
+      >
         <div>
-          <h3 className="mb-4 text-center text-xl font-semibold">
+          <Typography.Title
+            level={3}
+            className="mb-4 text-center text-xl font-semibold"
+          >
             {dayjs().format("MMMM")}
-          </h3>
+          </Typography.Title>
           <ReactCalendar
             view="month"
             showNavigation={false}

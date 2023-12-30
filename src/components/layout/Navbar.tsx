@@ -1,11 +1,12 @@
 import { DownOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Tag } from "antd";
+import { Avatar, Button, Dropdown, Tag, Typography, theme } from "antd";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
+import { useThemeContext } from "../../contexts/ThemeProvider";
 
 interface NavbarProps {
   openMobileMenu: () => void;
@@ -16,6 +17,10 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
   const { push } = useRouter();
   const [, dispatchAuthDropdown] = useAuthDropdownContext();
   const [, dispatchFolderModal] = useFolderModalContext();
+  const { switchDarkMode } = useThemeContext();
+  const {
+    token: { colorBgContainer, colorBorder },
+  } = theme.useToken();
 
   const handleCreateFolder = () => {
     if (session) {
@@ -34,7 +39,13 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
   };
 
   return (
-    <div className="sticky top-0 z-30 border-b bg-white">
+    <div
+      className="sticky top-0 z-30 border-b"
+      style={{
+        background: colorBgContainer,
+        borderColor: colorBorder,
+      }}
+    >
       <div className="h-16 px-4 md:h-16">
         <div className="flex h-full justify-between">
           <div className="flex items-center">
@@ -53,7 +64,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               href="/"
               className="mx-3 hidden h-full text-sm font-medium leading-[4rem] md:block"
             >
-              Home
+              <Typography.Text>Home</Typography.Text>
             </Link>
             <Dropdown
               className="hidden md:block"
@@ -131,15 +142,9 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
                       key: "2",
                     },
                     {
-                      label: (
-                        <div>
-                          Dark mode
-                          <Tag color="processing" className="ml-2 leading-4">
-                            soon
-                          </Tag>
-                        </div>
-                      ),
+                      label: "Dark mode",
                       key: "3",
+                      onClick: switchDarkMode,
                     },
                     {
                       key: "4",

@@ -1,6 +1,15 @@
 import { CloseOutlined, UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import { Alert, Avatar, Button, Modal, message } from "antd";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Card,
+  Modal,
+  Typography,
+  message,
+  theme,
+} from "antd";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
 import { api } from "../../utils/api";
@@ -21,6 +30,9 @@ const DeleteAccount = ({ userName, image }: DeleteAccountProps) => {
       void message.error("Couldn't delete an account");
     },
   });
+  const {
+    token: { colorText },
+  } = theme.useToken();
 
   const openModal = () => {
     setModalOpen(true);
@@ -33,10 +45,17 @@ const DeleteAccount = ({ userName, image }: DeleteAccountProps) => {
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:gap-8">
       <div className="flex items-center gap-2 lg:basis-48 lg:flex-col lg:justify-center">
-        <CloseOutlined className="text-4xl" />
-        <div className="text-xl font-semibold">Delete Account</div>
+        <CloseOutlined
+          className="text-5xl"
+          style={{
+            color: colorText,
+          }}
+        />
+        <Typography.Text className="text-xl font-semibold">
+          Delete Account
+        </Typography.Text>
       </div>
-      <div className="flex-1 rounded-lg bg-white p-4 shadow">
+      <Card className="flex-1">
         <div className="mb-4 text-xl font-semibold">
           Permanently delete {userName}
         </div>
@@ -48,7 +67,7 @@ const DeleteAccount = ({ userName, image }: DeleteAccountProps) => {
         <Button onClick={openModal} type="primary" danger size="large">
           Delete Account
         </Button>
-      </div>
+      </Card>
       <Modal
         open={modalOpen}
         title="Delete Account"

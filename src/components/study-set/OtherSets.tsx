@@ -1,6 +1,7 @@
 import type { Flashcard, StudySet, User } from "@prisma/client";
 import React from "react";
 import StudySetPreview from "../shared/StudySetPreview";
+import { Typography } from "antd";
 
 interface OtherSetsProps {
   otherSets: (StudySet & {
@@ -12,7 +13,9 @@ interface OtherSetsProps {
 const OtherSets = ({ otherSets }: OtherSetsProps) => {
   return (
     <div>
-      <div className="mb-6 font-bold">Other sets by this creator</div>
+      <Typography.Title level={2} className="mb-5 text-lg font-bold">
+        Other sets by this creator
+      </Typography.Title>
       <div className="grid gap-4 md:grid-cols-2">
         {otherSets.map(
           ({

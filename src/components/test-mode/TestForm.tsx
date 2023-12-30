@@ -6,7 +6,7 @@ import type { StudySetTest } from "../../server/api/routers/study-set";
 import MultipleChoice from "../shared/MultipleChoice";
 import TrueOrFalse from "./TrueOrFalse";
 import Written from "./WrittenAnswer";
-import { Button } from "antd";
+import { Button, Form } from "antd";
 
 const flashcard = z.object({
   id: z.string(),
@@ -63,7 +63,11 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
   const { fields: written } = useFieldArray({ control, name: "written" });
 
   return (
-    <form onSubmit={handleSubmit(formCallack)} className="flex flex-col gap-6">
+    <Form
+      onFinish={handleSubmit(formCallack)}
+      layout="vertical"
+      className="flex flex-col gap-6"
+    >
       {trueOrFalse.map(({ answer, term }, index) => (
         <TrueOrFalse
           key={index}
@@ -87,14 +91,14 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
         <Written
           key={index}
           term={term}
-          register={register(`written.${index}.userAnswer`)}
-          index={index}
+          control={control}
+          name={`written.${index}.userAnswer`}
         />
       ))}
       <Button htmlType="submit" className="h-12" type="primary" size="large">
         Send anwers
       </Button>
-    </form>
+    </Form>
   );
 };
 

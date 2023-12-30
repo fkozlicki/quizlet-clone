@@ -5,7 +5,7 @@ import {
   RetweetOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { Button, Tooltip } from "antd";
+import { Button, Tooltip, Typography } from "antd";
 import Link from "next/link";
 
 interface FlashcardButtonsProps {
@@ -38,9 +38,9 @@ const FlashcardButtons = ({
           className="bg-transparent"
           size="large"
         />
-        <div className="select-none font-semibold text-gray-500">
+        <Typography.Text className="select-none font-semibold tracking-[0.4em] text-gray-500">
           {cardIndex + 1}/{cardCount}
-        </div>
+        </Typography.Text>
         <Button
           onClick={handleRight}
           disabled={cardIndex === cardCount}

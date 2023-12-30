@@ -1,3 +1,4 @@
+import { Typography, theme } from "antd";
 import type { MouseEvent } from "react";
 import React from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
@@ -25,26 +26,50 @@ const MultipleChoice = ({
   callback,
   type,
 }: MultipleChoiceProps) => {
+  const {
+    token: { colorBgContainer, green1, red1, green5, red5, colorBorder },
+  } = theme.useToken();
+
   return (
-    <div className="flex min-h-[30rem] flex-col rounded-md bg-white p-4 shadow-lg md:px-8 md:py-6">
+    <div
+      className="flex min-h-[30rem] flex-col rounded-md p-4 shadow-lg md:px-8 md:py-6"
+      style={{
+        background: colorBgContainer,
+      }}
+    >
       <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
         <div className={`flex-1 pb-4`}>
-          <div className="mb-6">Term</div>
-          <div>{term}</div>
+          <Typography.Text
+            className="mb-6 block font-semibold"
+            type="secondary"
+          >
+            Term
+          </Typography.Text>
+          <Typography.Text className="text-2xl">{term}</Typography.Text>
         </div>
       </div>
       <div>
-        {!result && <div className="mb-4">Choose answer</div>}
+        {!result && (
+          <Typography.Text className="mb-4 block">
+            Choose answer
+          </Typography.Text>
+        )}
         {result && (
           <>
             {userAnswer === definition ? (
-              <div className="mb-2 font-medium text-green-500">
+              <Typography.Text
+                type="success"
+                className="mb-2 inline-block text-base font-medium"
+              >
                 You&apos;ve got this
-              </div>
+              </Typography.Text>
             ) : (
-              <div className="mb-2 font-medium text-red-500">
+              <Typography.Text
+                type="danger"
+                className="mb-2 inline-block text-base font-medium"
+              >
                 You are still learning
-              </div>
+              </Typography.Text>
             )}
           </>
         )}
@@ -66,17 +91,25 @@ const MultipleChoice = ({
                 onClick={
                   callback ? (event) => callback(answerIndex, event) : undefined
                 }
-                className={`rounded-md border-2 px-4 py-2 peer-checked:border-blue-600 peer-checked:bg-blue-50 ${
-                  result
-                    ? answer === definition
-                      ? "border-green-500 bg-green-50"
-                      : ""
-                    : userAnswer === answer
-                    ? "border-red-500 bg-red-50"
-                    : "cursor-pointer"
+                className={`rounded-md border-2 px-4 py-2 peer-checked:!border-blue-600 ${
+                  !result ? "cursor-pointer" : ""
                 }`}
+                style={{
+                  background:
+                    answer === definition
+                      ? green1
+                      : userAnswer === answer
+                      ? red1
+                      : "",
+                  borderColor:
+                    answer === definition
+                      ? green5
+                      : userAnswer === answer
+                      ? red5
+                      : colorBorder,
+                }}
               >
-                {answer}
+                <Typography.Text>{answer}</Typography.Text>
               </div>
             </label>
           ))}

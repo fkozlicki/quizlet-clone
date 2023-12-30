@@ -1,4 +1,4 @@
-import { Alert, Button, Progress } from "antd";
+import { Alert, Button, Progress, Typography } from "antd";
 import Image from "next/image";
 import type { ReactNode } from "react";
 
@@ -25,9 +25,9 @@ const StudyModeResult = ({
   return (
     <div className="mb-6">
       <div className="mb-6 flex">
-        <div className="text-2xl font-bold text-slate-800 md:text-4xl">
+        <Typography.Title level={2} className="text-2xl font-bold md:text-4xl">
           Amazing! You&apos;re almost there.
-        </div>
+        </Typography.Title>
         <div className="flex w-[45%] justify-end">
           <div className="relative h-[77px] w-[120px] md:h-[103px] md:w-[160px]">
             <Image src="/permafetti.svg" alt="" fill />
@@ -36,9 +36,9 @@ const StudyModeResult = ({
       </div>
       <div className="flex flex-col gap-14 md:flex-row">
         <div className="flex-1">
-          <div className="mb-4 text-xl font-bold text-gray-600">
+          <Typography.Title level={4} className="mb-4 text-xl font-bold">
             How you&apos;re doing
-          </div>
+          </Typography.Title>
           <div className="flex items-center gap-6">
             <Progress
               type="circle"
@@ -82,18 +82,18 @@ const StudyModeResult = ({
           </div>
         </div>
         <div className="flex-1">
-          <div className="mb-4 text-xl font-bold text-gray-600">Next steps</div>
+          <Typography.Title level={4} className="mb-4 text-xl font-bold">
+            Next steps
+          </Typography.Title>
           <div className="flex flex-col gap-4">
             <Button onClick={firstButton.callback} className="h-28">
               <div className="flex items-center gap-4 whitespace-normal">
                 {firstButton.Icon}
                 <div className="flex flex-col items-start">
-                  <span className="text-base font-medium text-blue-500">
+                  <Typography.Text className="text-base font-medium text-blue-500">
                     {firstButton.text}
-                  </span>
-                  <span className="text-start text-black">
-                    {firstButton.description}
-                  </span>
+                  </Typography.Text>
+                  <Typography.Text>{firstButton.description}</Typography.Text>
                 </div>
               </div>
             </Button>
@@ -102,12 +102,12 @@ const StudyModeResult = ({
                 <div className="flex items-center gap-4 whitespace-normal">
                   {secondButton.Icon}
                   <div className="flex flex-col items-start">
-                    <span className="text-base font-medium text-blue-500">
+                    <Typography.Text className="text-base font-medium text-blue-500">
                       {secondButton.text}
-                    </span>
-                    <span className="text-black">
+                    </Typography.Text>
+                    <Typography.Text>
                       {secondButton.description}
-                    </span>
+                    </Typography.Text>
                   </div>
                 </div>
               </Button>

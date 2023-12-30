@@ -1,10 +1,13 @@
-import React from "react";
-import type { UseFormRegisterReturn } from "react-hook-form";
+import { Alert, Input, Typography } from "antd";
+import Card from "antd/es/card/Card";
+import type { Control, FieldPath } from "react-hook-form";
+import { FormItem } from "react-hook-form-antd";
+import type { TestInputs } from "./TestForm";
 
 interface WrittenAnswerProps {
   term: string;
-  register?: UseFormRegisterReturn;
-  index: number;
+  control: Control<TestInputs>;
+  name: FieldPath<TestInputs>;
   result?: boolean;
   definition?: string;
   userAnswer?: string;
@@ -12,60 +15,63 @@ interface WrittenAnswerProps {
 
 const WrittenAnswer = ({
   term,
-  register,
-  index,
   result,
   definition,
   userAnswer,
+  control,
+  name,
 }: WrittenAnswerProps) => {
   return (
-    <div className="flex min-h-[30rem] flex-col rounded-md bg-white p-4 shadow-lg md:px-8 md:py-6">
-      <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
-        <div className={`flex-1 pb-4`}>
-          <div className="mb-6">Term</div>
-          <div>{term}</div>
+    <Card>
+      <div className="flex min-h-[30rem] flex-col">
+        <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
+          <div className={`flex-1 pb-4`}>
+            <Typography.Text className="mb-6 block font-bold" type="secondary">
+              Term
+            </Typography.Text>
+            <Typography.Text className="text-2xl">{term}</Typography.Text>
+          </div>
+        </div>
+        <div>
+          {!result && (
+            <FormItem
+              control={control}
+              name={name}
+              label="Your answer"
+              className="mb-0"
+            >
+              <Input size="large" />
+            </FormItem>
+          )}
+          {result && (
+            <>
+              {userAnswer !== definition ? (
+                <>
+                  <Typography.Text
+                    className="mb-2 inline-block text-base font-medium"
+                    type="danger"
+                  >
+                    You are still learning
+                  </Typography.Text>
+                  <Alert message={userAnswer} type="error" className="mb-6" />
+                  <Typography.Text
+                    type="secondary"
+                    className="mb-2 inline-block text-base font-medium"
+                  >
+                    Correct answer
+                  </Typography.Text>
+                </>
+              ) : (
+                <Typography.Text type="success">
+                  You&apos;ve got this
+                </Typography.Text>
+              )}
+              <Alert message={definition} type="success" />
+            </>
+          )}
         </div>
       </div>
-      <div>
-        {!result && (
-          <label
-            htmlFor={`card-${index}-answer`}
-            className="flex flex-col gap-4"
-          >
-            <span>Your answer</span>
-            <input
-              {...register}
-              id={`card-${index}-answer`}
-              type="text"
-              placeholder="Type the answer"
-              className="rounded-md bg-slate-200 px-4 py-2 outline-none"
-            />
-          </label>
-        )}
-        {result && (
-          <>
-            {userAnswer !== definition ? (
-              <>
-                <p className="mb-2 font-medium text-red-500/90">
-                  You are still learning
-                </p>
-                <div className="mb-6 rounded-md border-2 border-red-500 bg-red-50 p-4">
-                  {userAnswer}
-                </div>
-                <p className="mb-2 font-medium text-gray-500">Correct answer</p>
-              </>
-            ) : (
-              <p className="mb-2 font-medium text-green-500">
-                You&apos;ve got this
-              </p>
-            )}
-            <div className="rounded-md border-2 border-green-500 bg-green-50 p-4">
-              {definition}
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+    </Card>
   );
 };
 

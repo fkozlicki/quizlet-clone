@@ -1,22 +1,18 @@
 import { BarsOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Button, Card, Flex, Input } from "antd";
+import { Button, Card, Flex, Input, theme } from "antd";
 import type { Identifier, XYCoord } from "dnd-core";
 import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { DragSourceMonitor } from "react-dnd/dist/types";
-import type { Control } from "react-hook-form";
+import type { Control, FieldValues } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
-import type {
-  CreateStudySetValues,
-  EditStudySetValues,
-} from "../../schemas/study-set";
 
 export interface FlashcardDraggableProps {
   remove: (index: number) => void;
   swap: (from: number, to: number) => void;
   id: string;
   index: number;
-  control: Control<CreateStudySetValues | EditStudySetValues>;
+  control: Control<FieldValues>;
   cardsCount: number;
 }
 
@@ -95,7 +91,6 @@ const FlashcardDraggable = ({
       item.index = hoverIndex;
     },
   });
-
   const [{ isDragging }, drag] = useDrag({
     type: "FlashcardDraggable",
     item: () => {
@@ -105,6 +100,9 @@ const FlashcardDraggable = ({
       isDragging: monitor.isDragging(),
     }),
   });
+  const {
+    token: { colorBorder },
+  } = theme.useToken();
 
   drag(drop(ref));
 
@@ -112,13 +110,16 @@ const FlashcardDraggable = ({
     <Card
       ref={ref}
       data-handler-id={handlerId}
-      className={`border-[#d9d9d9] opacity-${isDragging ? 0 : "100"}`}
+      style={{
+        border: colorBorder,
+        opacity: isDragging ? 0 : 100,
+      }}
       extra={
         <div className="flex items-center">
           <Button
             icon={<BarsOutlined />}
-            type="link"
-            className="cursor-default text-black"
+            type="text"
+            className="cursor-default"
           />
           <Button
             onClick={() => remove(index)}
@@ -135,7 +136,7 @@ const FlashcardDraggable = ({
           control={control}
           name={`cards.${index}.term`}
           label="term"
-          className="flex-1"
+          className="mb-0 flex-1"
         >
           <Input placeholder="Enter term" />
         </FormItem>
@@ -143,7 +144,7 @@ const FlashcardDraggable = ({
           control={control}
           name={`cards.${index}.definition`}
           label="definition"
-          className="flex-1"
+          className="mb-0 flex-1"
         >
           <Input placeholder="Enter definition" />
         </FormItem>

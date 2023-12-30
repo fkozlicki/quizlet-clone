@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Typography } from "antd";
 import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
@@ -165,10 +165,7 @@ const Match = ({ setId }: { setId: string }) => {
     <>
       <NextSeo title="Quizlet 2.0 - Match" />
       <div className="mb-5 flex justify-end">
-        <Link
-          href={`/study-set/${setId}`}
-          className="rounded-md px-4 py-2 font-medium hover:bg-slate-100"
-        >
+        <Link href={`/study-set/${setId}`}>
           <Button type="text" size="large">
             Back to set
           </Button>
@@ -177,7 +174,9 @@ const Match = ({ setId }: { setId: string }) => {
       {stage === "initial" && <StartScreen startGame={startGame} />}
       {stage === "start" && (
         <>
-          <div className="mb-4 text-xl">{ellapsedTime.toFixed(1)} sec.</div>
+          <Typography.Text className="mb-4 inline-block text-xl">
+            {ellapsedTime.toFixed(1)} sec.
+          </Typography.Text>
           <div className="grid h-full grid-cols-3 gap-4">
             {cards.map((card, index) => (
               <MemoryCard

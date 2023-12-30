@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Typography } from "antd";
 import React from "react";
 
 interface StartScreenProps {
@@ -8,12 +8,12 @@ interface StartScreenProps {
 const StartScreen = ({ startGame }: StartScreenProps) => {
   return (
     <div>
-      <div className="mb-2 text-center text-2xl font-semibold">
+      <Typography.Text className="mb-2 block text-center text-2xl font-semibold">
         Are you ready?
-      </div>
-      <div className="mb-5 text-center text-lg">
+      </Typography.Text>
+      <Typography.Text className="mb-5 block text-center text-lg">
         Match all terms with definitions
-      </div>
+      </Typography.Text>
       <Button
         type="primary"
         size="large"

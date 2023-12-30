@@ -1,4 +1,4 @@
-import { Button, Empty } from "antd";
+import { Button, Empty, Typography } from "antd";
 import type { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import type { Session } from "next-auth";
 import { getSession } from "next-auth/react";
@@ -40,7 +40,9 @@ const Latest = ({
     <>
       <NextSeo title="Quizlet 2.0 - Latest" />
       <>
-        <div className="mb-6 text-2xl font-medium">Your study sets</div>
+        <Typography.Title level={2} className="mb-6 text-2xl font-bold">
+          Your study sets
+        </Typography.Title>
         {status === "loading" && (
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
             <StudySetSkeleton />

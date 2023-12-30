@@ -1,5 +1,5 @@
 import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
-import { Progress } from "antd";
+import { Divider, Progress, Typography, theme } from "antd";
 import type { GetServerSideProps } from "next";
 import { NextSeo } from "next-seo";
 import { useRouter } from "next/router";
@@ -30,12 +30,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const Learn = ({ setId }: { setId: string }) => {
   const { push } = useRouter();
-  const { data: cards, refetch } = api.studySet.getLearnSet.useQuery({
-    id: setId,
-  });
+  const { data: cards, refetch } = api.studySet.getLearnSet.useQuery(
+    {
+      id: setId,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
   const [cardIndex, setCardIndex] = useState<number>(0);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [correct, setCorrect] = useState<number>(0);
+  const {
+    token: { green1, green5, red1, red5, colorBorder },
+  } = theme.useToken();
 
   if (!cards) {
     return <div>404</div>;
@@ -50,8 +58,10 @@ const Learn = ({ setId }: { setId: string }) => {
   };
 
   const chooseAnswer = (index: number, event: MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
     if (disabled) return;
-    const button = event.target as HTMLDivElement;
+    const button = event.currentTarget as HTMLDivElement;
     const selectedAnswer = currentCard?.answers[index];
     if (!selectedAnswer) return;
 
@@ -59,19 +69,21 @@ const Learn = ({ setId }: { setId: string }) => {
     let backgroundColor: string;
 
     if (selectedAnswer === currentCard.definition) {
-      borderColor = "border-green-500";
-      backgroundColor = "bg-green-50";
+      borderColor = green5;
+      backgroundColor = green1;
       setCorrect((prev) => prev + 1);
     } else {
-      borderColor = "border-red-500";
-      backgroundColor = "bg-red-50";
+      borderColor = red5;
+      backgroundColor = red1;
     }
     setDisabled(true);
-    button.classList.add(borderColor, backgroundColor);
+    button.style.background = backgroundColor;
+    button.style.borderColor = borderColor;
 
     setTimeout(() => {
+      button.style.background = "";
+      button.style.borderColor = colorBorder;
       setDisabled(false);
-      button.classList.remove(borderColor, backgroundColor);
       setCardIndex((prev) => prev + 1);
     }, 1000);
   };
@@ -106,20 +118,21 @@ const Learn = ({ setId }: { setId: string }) => {
             firstButton={{
               text: "Learn with new set",
               description: "Learn with new set",
-              Icon: <ReloadOutlined className="text-2xl" />,
+              Icon: <ReloadOutlined className="text-4xl" />,
               callback: resetLearning,
             }}
             secondButton={{
               text: "Back to study set",
               description: "Back to study set",
-              Icon: <RollbackOutlined className="text-2xl" />,
+              Icon: <RollbackOutlined className="text-4xl" />,
               callback: backToStudySet,
             }}
           />
+          <Divider className="my-4 md:my-8" />
           <div>
-            <div className="mb-4 text-xl font-bold text-gray-600">
+            <Typography.Title level={4} className="mb-4 text-xl font-bold">
               Terms studied in this round
-            </div>
+            </Typography.Title>
             <div className="flex flex-col gap-4">
               {cards.map((flashcard, index) => (
                 <FlashcardPreview key={index} flashcard={flashcard} />

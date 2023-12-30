@@ -46,7 +46,7 @@ const initialState: FolderModalState = {
 
 type FolderModalContext = [FolderModalState, Dispatch<FolderModalAction>];
 
-export const FolderModalContext = createContext<FolderModalContext>([
+const FolderModalContext = createContext<FolderModalContext>([
   initialState,
   () => null,
 ]);

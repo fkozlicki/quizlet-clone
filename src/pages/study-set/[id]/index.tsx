@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Typography } from "antd";
 import type { GetServerSideProps } from "next";
 import { useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
@@ -47,8 +47,16 @@ const StudySet = ({ setId }: { setId: string }) => {
     <>
       <NextSeo title={`Quizlet 2.0 - Study set ${title}`} />
       <div className="m-auto max-w-3xl">
-        <h1 className="mb-3 text-2xl font-bold sm:text-3xl">{title}</h1>
-        {description && <p className="mb-4 text-lg">{description}</p>}
+        <div className="mb-4">
+          <Typography.Title className="mb-0 text-2xl font-bold sm:text-3xl">
+            {title}
+          </Typography.Title>
+          {description && (
+            <Typography.Text className="text-base">
+              {description}
+            </Typography.Text>
+          )}
+        </div>
         <StudyModes setId={setId} />
         <FlashcardsGame setId={setId} cards={cards} ownerId={userId} />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -57,13 +65,15 @@ const StudySet = ({ setId }: { setId: string }) => {
         </div>
         <FlashcardsList userId={userId} cards={cards} />
         {userId === session?.user.id && (
-          <div className="mb-8 flex justify-center">
-            <Link href={`${setId}/edit`}>
-              <Button type="primary" className="h-14 font-medium" size="large">
-                Add or Remove Terms
-              </Button>
-            </Link>
-          </div>
+          <Link href={`${setId}/edit`}>
+            <Button
+              type="primary"
+              className="m-auto mb-8 block h-14 font-bold"
+              size="large"
+            >
+              Add or Remove Terms
+            </Button>
+          </Link>
         )}
         {otherSets.length > 0 && <OtherSets otherSets={otherSets} />}
       </div>

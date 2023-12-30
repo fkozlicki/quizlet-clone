@@ -1,6 +1,6 @@
 import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
-import { Button } from "antd";
+import { Button, Typography, theme } from "antd";
 import type { MouseEventHandler } from "react";
 import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
 
@@ -20,6 +20,9 @@ const FlipCardContent = ({
   flashcard,
 }: FlipCardContentProps) => {
   const [, dispatch] = useFlashcardModalContext();
+  const {
+    token: { colorBgContainer },
+  } = theme.useToken();
 
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
     event.stopPropagation();
@@ -36,9 +39,16 @@ const FlipCardContent = ({
         back ? "[transform:rotateX(180deg)]" : ""
       }`}
     >
-      <div className="flex h-full w-full flex-col rounded-lg bg-white p-4 drop-shadow-lg md:p-6">
+      <div
+        className="flex h-full w-full flex-col rounded-lg p-4 drop-shadow-lg md:p-6"
+        style={{
+          background: colorBgContainer,
+        }}
+      >
         <div className="flex items-center justify-between">
-          <div className="select-none font-medium text-slate-400">{title}</div>
+          <Typography.Text className="select-none font-semibold">
+            {title}
+          </Typography.Text>
           <div className="flex justify-end gap-2">
             {editable && (
               <Button
@@ -56,8 +66,10 @@ const FlipCardContent = ({
             />
           </div>
         </div>
-        <div className="flex flex-1 select-none items-center justify-center text-3xl">
-          {content}
+        <div className="flex flex-1 items-center justify-center">
+          <Typography.Text className="select-none text-3xl">
+            {content}
+          </Typography.Text>
         </div>
       </div>
     </div>

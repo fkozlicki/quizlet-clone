@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Typography } from "antd";
 import React from "react";
 
 interface EndScreenProps {
@@ -9,8 +9,10 @@ interface EndScreenProps {
 const EndScreen = ({ time, playAgain }: EndScreenProps) => {
   return (
     <div className="flex flex-col items-center">
-      <div className="text-lg">You finished in</div>
-      <div className="mb-4 text-2xl font-bold">{time.toFixed(1)} sec.</div>
+      <Typography.Text className="text-lg">You finished in</Typography.Text>
+      <Typography.Text className="mb-4 text-2xl font-bold">
+        {time.toFixed(1)} sec.
+      </Typography.Text>
       <Button type="primary" size="large" onClick={playAgain}>
         Play again
       </Button>

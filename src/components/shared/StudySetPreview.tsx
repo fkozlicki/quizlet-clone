@@ -1,6 +1,6 @@
 import { UserOutlined } from "@ant-design/icons";
 import type { StudySet, User } from "@prisma/client";
-import { Avatar, Card, Tag } from "antd";
+import { Avatar, Card, Tag, Typography } from "antd";
 import Link from "next/link";
 
 interface StudySetPreviewProps {
@@ -38,7 +38,9 @@ const StudySetPreview = ({
           src={authorImage}
           alt="set author avatar"
         />
-        <span className="group-hover:underline">{authorName}</span>
+        <Typography.Text className="group-hover:underline">
+          {authorName}
+        </Typography.Text>
       </Link>
     </Card>
   );

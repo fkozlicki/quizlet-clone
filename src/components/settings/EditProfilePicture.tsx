@@ -5,7 +5,7 @@ import {
 } from "@ant-design/icons";
 import type { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { Avatar, Divider, Upload, message } from "antd";
+import { Avatar, Card, Divider, Typography, Upload, message } from "antd";
 import type { RcFile } from "antd/es/upload";
 import Image from "next/image";
 import { useState } from "react";
@@ -62,51 +62,57 @@ const EditProfilePicture = ({ image }: EditProfilePictureProps) => {
           alt=""
           className="h-16 w-16"
         />
-        <div className="text-xl font-semibold">Profile Picture</div>
+        <Typography.Text className="text-xl font-semibold">
+          Profile Picture
+        </Typography.Text>
       </div>
-      <div className="flex-1 rounded-lg bg-white p-4 shadow">
-        <div className="mb-2">Choose your profile picture</div>
-        <div className="flex flex-wrap gap-2">
-          {pictures.map((picture, index) => (
-            <Image
-              key={index}
-              onClick={() => updateUser({ image: `/profile/${picture}` })}
-              src={`/profile/${picture}`}
-              alt=""
-              width={48}
-              height={48}
-              className="cursor-pointer rounded-full border"
-            />
-          ))}
+      <Card className="flex-1">
+        <div>
+          <Typography.Text className="mb-4 inline-block text-base font-bold">
+            Choose your profile picture
+          </Typography.Text>
+          <div className="flex flex-wrap gap-2">
+            {pictures.map((picture, index) => (
+              <Image
+                key={index}
+                onClick={() => updateUser({ image: `/profile/${picture}` })}
+                src={`/profile/${picture}`}
+                alt=""
+                width={48}
+                height={48}
+                className="cursor-pointer rounded-full border"
+              />
+            ))}
+          </div>
+          <Divider className="text-sm">OR</Divider>
+          <Upload.Dragger
+            name="file"
+            multiple={false}
+            showUploadList={false}
+            customRequest={(options) => {
+              const data = new FormData();
+              data.append("file", options.file);
+              data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+              uploadImage(data);
+            }}
+            beforeUpload={beforeUpload}
+            disabled={updateLoading || uploadLoading}
+          >
+            <p className="ant-upload-drag-icon">
+              {uploadLoading || updateLoading ? (
+                <LoadingOutlined />
+              ) : (
+                <InboxOutlined />
+              )}
+            </p>
+            <p className="ant-upload-text">
+              {uploadLoading || updateLoading
+                ? "Uploading image"
+                : "Click or drag file to this area to upload"}
+            </p>
+          </Upload.Dragger>
         </div>
-        <Divider className="text-sm text-gray-400">OR</Divider>
-        <Upload.Dragger
-          name="file"
-          multiple={false}
-          showUploadList={false}
-          customRequest={(options) => {
-            const data = new FormData();
-            data.append("file", options.file);
-            data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-            uploadImage(data);
-          }}
-          beforeUpload={beforeUpload}
-          disabled={updateLoading || uploadLoading}
-        >
-          <p className="ant-upload-drag-icon">
-            {uploadLoading || updateLoading ? (
-              <LoadingOutlined />
-            ) : (
-              <InboxOutlined />
-            )}
-          </p>
-          <p className="ant-upload-text">
-            {uploadLoading || updateLoading
-              ? "Uploading image"
-              : "Click or drag file to this area to upload"}
-          </p>
-        </Upload.Dragger>
-      </div>
+      </Card>
     </div>
   );
 };

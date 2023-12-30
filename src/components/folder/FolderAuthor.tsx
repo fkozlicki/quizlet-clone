@@ -1,6 +1,6 @@
 import { UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import { Avatar } from "antd";
+import { Avatar, Typography } from "antd";
 import Link from "next/link";
 
 interface FolderInfoProps {
@@ -11,9 +11,11 @@ interface FolderInfoProps {
 const FolderAuthor = ({ setsCount, user }: FolderInfoProps) => {
   return (
     <div className="flex items-center gap-6">
-      <div>{setsCount} sets</div>
+      <Typography.Text>{setsCount} sets</Typography.Text>
       <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-600">created by</span>
+        <Typography.Text className="text-sm font-semibold" type="secondary">
+          created by
+        </Typography.Text>
         <Link href={`/${user.id}`} className="contents">
           <Avatar
             icon={<UserOutlined />}
@@ -21,7 +23,9 @@ const FolderAuthor = ({ setsCount, user }: FolderInfoProps) => {
             size="small"
             alt=""
           />
-          <span className="text-sm font-medium">{user.name}</span>
+          <Typography.Text className="text-sm font-semibold" type="secondary">
+            {user.name}
+          </Typography.Text>
         </Link>
       </div>
     </div>

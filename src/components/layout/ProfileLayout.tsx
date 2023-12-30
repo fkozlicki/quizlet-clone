@@ -1,5 +1,5 @@
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Tabs } from "antd";
+import { Avatar, Tabs, Typography } from "antd";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -32,8 +32,12 @@ const ProfileLayout = ({ children, userId }: ProfileLayoutProps) => {
           className="h-16 w-16"
         />
         <div>
-          <div className="text-2xl font-bold">{name}</div>
-          <div className="font-semibold text-gray-400">{name}</div>
+          <Typography.Text className="block text-2xl font-bold">
+            {name}
+          </Typography.Text>
+          <Typography.Text className="block font-semibold" type="secondary">
+            {name}
+          </Typography.Text>
         </div>
       </div>
       <Tabs
