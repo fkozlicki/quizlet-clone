@@ -1,6 +1,6 @@
 import { ConfigProvider, theme } from "antd";
 import type { PropsWithChildren } from "react";
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 interface ThemeContext {
   darkMode: boolean;
@@ -17,7 +17,15 @@ const ThemeContext = createContext<ThemeContext>(initialState);
 const ThemeProvider = ({ children }: PropsWithChildren) => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
 
+  useEffect(() => {
+    const savedMode = localStorage.getItem("darkMode");
+    if (savedMode) {
+      setDarkMode(Boolean(savedMode));
+    }
+  }, []);
+
   const switchDarkMode = () => {
+    localStorage.setItem("darkMode", JSON.stringify(!darkMode));
     setDarkMode((prev) => !prev);
   };
 
