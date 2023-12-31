@@ -34,18 +34,19 @@ model Session {
 }
 
 model User {
-  id            String     @id @default(cuid())
-  name          String?
-  password      String?
-  email         String?    @unique
-  emailVerified DateTime?
-  image         String?
-  birthday      DateTime?
-  accounts      Account[]
-  activity      Activity[]
-  folders       Folder[]
-  sessions      Session[]
-  studySets     StudySet[]
+  id                String             @id @default(cuid())
+  name              String?
+  password          String?
+  email             String?            @unique
+  emailVerified     DateTime?
+  image             String?
+  birthday          DateTime?
+  accounts          Account[]
+  activity          Activity[]
+  folders           Folder[]
+  sessions          Session[]
+  studySets         StudySet[]
+  starredFlashcards StarredFlashcard[]
 }
 
 model VerificationToken {
@@ -57,12 +58,13 @@ model VerificationToken {
 }
 
 model Flashcard {
-  id         String   @id @default(cuid())
-  term       String
-  definition String
-  studySetId String
-  position   Int
-  studySet   StudySet @relation(fields: [studySetId], references: [id], onDelete: Cascade)
+  id                String             @id @default(cuid())
+  term              String
+  definition        String
+  studySetId        String
+  position          Int
+  studySet          StudySet           @relation(fields: [studySetId], references: [id], onDelete: Cascade)
+  starredFlashcards StarredFlashcard[]
 }
 
 model StudySet {
@@ -73,6 +75,14 @@ model StudySet {
   cards       Flashcard[]
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   folders     Folder[]    @relation("FolderToStudySet")
+}
+
+model StarredFlashcard {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  flashcardId String
+  flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
 }
 
 model Folder {
