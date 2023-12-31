@@ -1,6 +1,8 @@
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
+  CheckOutlined,
+  CloseOutlined,
   ExpandOutlined,
   RetweetOutlined,
   SettingOutlined,
@@ -16,6 +18,7 @@ interface FlashcardButtonsProps {
   sorting: boolean;
   setId: string;
   openSettingsModal: () => void;
+  shuffle: () => void;
 }
 
 const FlashcardButtons = ({
@@ -25,6 +28,7 @@ const FlashcardButtons = ({
   cardIndex,
   cardCount,
   setId,
+  shuffle,
   openSettingsModal,
 }: FlashcardButtonsProps) => {
   return (
@@ -33,9 +37,11 @@ const FlashcardButtons = ({
         <Button
           onClick={handleLeft}
           disabled={!sorting && cardIndex === 0}
-          icon={<ArrowLeftOutlined />}
+          icon={sorting ? <CloseOutlined /> : <ArrowLeftOutlined />}
           shape="circle"
-          className="bg-transparent"
+          className={`bg-transparent ${
+            sorting ? "hover:border-red-500 hover:text-red-500" : ""
+          }`}
           size="large"
         />
         <Typography.Text className="select-none font-semibold tracking-[0.4em] text-gray-500">
@@ -44,15 +50,22 @@ const FlashcardButtons = ({
         <Button
           onClick={handleRight}
           disabled={cardIndex === cardCount}
-          icon={<ArrowRightOutlined />}
+          icon={sorting ? <CheckOutlined /> : <ArrowRightOutlined />}
           shape="circle"
-          className="bg-transparent"
+          className={`bg-transparent ${
+            sorting ? "hover:border-green-600 hover:text-green-600" : ""
+          }`}
           size="large"
         />
       </div>
       <div className="absolute top-0 flex h-full w-full items-center justify-between">
         <Tooltip title="Shuffle">
-          <Button size="large" type="text" icon={<RetweetOutlined />} />
+          <Button
+            onClick={shuffle}
+            size="large"
+            type="text"
+            icon={<RetweetOutlined />}
+          />
         </Tooltip>
         <div className="flex gap-2">
           <Tooltip title="Settings">

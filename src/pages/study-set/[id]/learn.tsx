@@ -9,6 +9,7 @@ import MultipleChoice from "../../../components/shared/MultipleChoice";
 import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 import StudyModeResult from "../../../components/shared/StudyModeResult";
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -29,6 +30,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 const Learn = ({ setId }: { setId: string }) => {
+  const { data: session } = useSession();
   const { push } = useRouter();
   const { data: cards, refetch } = api.studySet.getLearnSet.useQuery(
     {
@@ -36,6 +38,14 @@ const Learn = ({ setId }: { setId: string }) => {
     },
     {
       refetchOnWindowFocus: false,
+    }
+  );
+  const { data: starredFlashcards } = api.starredFlashcard.getSetCards.useQuery(
+    {
+      setId,
+    },
+    {
+      enabled: !!session,
     }
   );
   const [cardIndex, setCardIndex] = useState<number>(0);
@@ -129,16 +139,18 @@ const Learn = ({ setId }: { setId: string }) => {
             }}
           />
           <Divider className="my-4 md:my-8" />
-          <div>
-            <Typography.Title level={4} className="mb-4 text-xl font-bold">
-              Terms studied in this round
-            </Typography.Title>
-            <div className="flex flex-col gap-4">
-              {cards.map((flashcard, index) => (
-                <FlashcardPreview key={index} flashcard={flashcard} />
-              ))}
+          {starredFlashcards && (
+            <div>
+              <Typography.Title level={4} className="mb-4 text-xl font-bold">
+                Terms studied in this round
+              </Typography.Title>
+              <div className="flex flex-col gap-4">
+                {cards.map((flashcard, index) => (
+                  <FlashcardPreview key={index} flashcard={flashcard} />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
     </>

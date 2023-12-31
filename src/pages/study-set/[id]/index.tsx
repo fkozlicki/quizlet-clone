@@ -32,9 +32,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 const StudySet = ({ setId }: { setId: string }) => {
   const { data: session } = useSession();
-  const { data: studySet } = api.studySet.getById.useQuery({
-    id: setId,
-  });
+  const { data: studySet } = api.studySet.getById.useQuery(
+    {
+      id: setId,
+    },
+    {
+      refetchOnWindowFocus: false,
+    }
+  );
+  const { data: starredFlashcards } = api.starredFlashcard.getSetCards.useQuery(
+    {
+      setId,
+    },
+    {
+      enabled: !!session,
+    }
+  );
 
   if (!studySet) {
     return <div>404</div>;
@@ -58,10 +71,15 @@ const StudySet = ({ setId }: { setId: string }) => {
           )}
         </div>
         <StudyModes setId={setId} />
-        <FlashcardsGame setId={setId} cards={cards} ownerId={userId} />
+        <FlashcardsGame
+          starredFlashcards={starredFlashcards}
+          setId={setId}
+          cards={cards}
+          ownerId={userId}
+        />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CreatedBy user={user} />
-          <StudySetCTA userId={userId} setId={setId} />
+          <StudySetCTA studySetName={title} userId={userId} setId={setId} />
         </div>
         <FlashcardsList userId={userId} cards={cards} />
         {userId === session?.user.id && (

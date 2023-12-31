@@ -242,4 +242,15 @@ export const studySetRouter = createTRPCRouter({
 
       return updated;
     }),
+  delete: protectedProcedure
+    .input(z.object({ setId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const deletedStudySet = await ctx.prisma.studySet.delete({
+        where: {
+          id: input.setId,
+        },
+      });
+
+      return deletedStudySet;
+    }),
 });

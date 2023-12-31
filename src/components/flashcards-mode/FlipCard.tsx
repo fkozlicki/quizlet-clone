@@ -1,9 +1,9 @@
 import type { Flashcard } from "@prisma/client";
+import { theme } from "antd";
 import type { RefObject } from "react";
 import { useState } from "react";
 import type { FlashcardAnimation } from "./FlashcardsGame";
 import FlipCardContent from "./FlipCardContent";
-import { theme } from "antd";
 
 interface FlipCardProps {
   flashcard: Flashcard;
@@ -39,7 +39,10 @@ const FlipCard = ({
     <div className="relative flex">
       <div
         ref={animationCardWrapper}
-        className={`invisible absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center rounded-lg border bg-white opacity-0`}
+        className={`invisible absolute left-0 top-0 z-20 flex h-full w-full items-center justify-center rounded-lg opacity-0 shadow`}
+        style={{
+          background: colorBgContainer,
+        }}
       >
         {moveAnimation === "know" ? (
           <div className="text-3xl font-bold text-green-400">Know</div>

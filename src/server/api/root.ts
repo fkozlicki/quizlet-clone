@@ -4,6 +4,7 @@ import { userRouter } from "./routers/user";
 import { cardRouter } from "./routers/card";
 import { folderRouter } from "./routers/folder";
 import { activityRouter } from "./routers/activity";
+import { starredFlashcardRouter } from "./routers/starred-flashcard";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   card: cardRouter,
   folder: folderRouter,
   activity: activityRouter,
+  starredFlashcard: starredFlashcardRouter,
 });
 
 // export type definition of API

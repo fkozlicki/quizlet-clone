@@ -42,7 +42,9 @@ const Layout = ({ children }: PropsWithChildren) => {
         }}
       >
         <div
-          className={`${pathname === "/" ? "" : "m-auto max-w-6xl px-4 py-12"}`}
+          className={`${
+            pathname === "/" ? "" : "m-auto max-w-6xl px-4 py-4 md:py-12"
+          }`}
         >
           {children}
         </div>

@@ -1,4 +1,4 @@
-import { Button, Divider, Modal, Switch } from "antd";
+import { Button, Divider, Modal, Switch, Tooltip } from "antd";
 import React from "react";
 
 interface FlashcardsSettingsModalProps {
@@ -7,6 +7,9 @@ interface FlashcardsSettingsModalProps {
   sorting: boolean;
   switchSorting: (value: boolean) => void;
   resetFlashcards: () => void;
+  disableStarredOnly: boolean;
+  starredOnly: boolean;
+  switchStarredOnly: (value: boolean) => void;
 }
 
 const FlashcardsSettingsModal = ({
@@ -15,6 +18,9 @@ const FlashcardsSettingsModal = ({
   sorting,
   switchSorting,
   resetFlashcards,
+  disableStarredOnly,
+  starredOnly,
+  switchStarredOnly,
 }: FlashcardsSettingsModalProps) => {
   return (
     <Modal
@@ -41,7 +47,20 @@ const FlashcardsSettingsModal = ({
       <Divider />
       <div className="flex items-center justify-between">
         <div className="text-base font-medium">Study only starred terms</div>
-        <Switch />
+        <Tooltip
+          rootClassName="text-xs max-w-[150px]"
+          title={
+            disableStarredOnly
+              ? "You have to star some terms to use this feature"
+              : undefined
+          }
+        >
+          <Switch
+            disabled={disableStarredOnly}
+            value={starredOnly}
+            onChange={switchStarredOnly}
+          />
+        </Tooltip>
       </div>
       <Divider />
       <div>

@@ -45,11 +45,11 @@ const StudyModeResult = ({
               percent={((cardCount - hard) / cardCount) * 100}
               size={100}
               strokeWidth={12}
-              format={(percent) => `${percent ?? 0}%`}
+              format={(percent) => `${percent?.toFixed(0) ?? 0}%`}
             />
             <div className="flex flex-1 flex-col gap-2">
               <Alert
-                className="rounded-full border-0 bg-green-200 py-1 font-medium text-green-700"
+                className="rounded-full border-0  py-1 font-medium"
                 message={
                   <div className="flex justify-between">
                     <span>Know</span>
@@ -59,7 +59,7 @@ const StudyModeResult = ({
                 type="success"
               />
               <Alert
-                className="rounded-full border-0 bg-orange-200 py-1 font-medium text-orange-700"
+                className="rounded-full border-0 py-1 font-medium"
                 message={
                   <div className="flex justify-between">
                     <span>Learning</span>
@@ -69,7 +69,7 @@ const StudyModeResult = ({
                 type="warning"
               />
               <Alert
-                className="rounded-full border-0 bg-gray-200 py-1 font-medium text-gray-600"
+                className="rounded-full border-0 py-1 font-medium"
                 message={
                   <div className="flex justify-between">
                     <span>Terms left</span>
@@ -93,7 +93,9 @@ const StudyModeResult = ({
                   <Typography.Text className="text-base font-medium text-blue-500">
                     {firstButton.text}
                   </Typography.Text>
-                  <Typography.Text>{firstButton.description}</Typography.Text>
+                  <Typography.Text className="text-start">
+                    {firstButton.description}
+                  </Typography.Text>
                 </div>
               </div>
             </Button>
@@ -105,7 +107,7 @@ const StudyModeResult = ({
                     <Typography.Text className="text-base font-medium text-blue-500">
                       {secondButton.text}
                     </Typography.Text>
-                    <Typography.Text>
+                    <Typography.Text className="text-start">
                       {secondButton.description}
                     </Typography.Text>
                   </div>

@@ -1,8 +1,9 @@
 import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
-import { Button, Typography, theme } from "antd";
+import { Button, Typography, message, theme } from "antd";
 import type { MouseEventHandler } from "react";
 import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
+import { api } from "../../utils/api";
 
 interface FlipCardContentProps {
   content: string;
@@ -23,14 +24,63 @@ const FlipCardContent = ({
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const {
+    starredFlashcard: {
+      getSetCards: { setData, getData },
+    },
+  } = api.useUtils();
+  const { mutate: addToStarred, isLoading: addLoading } =
+    api.starredFlashcard.create.useMutation({
+      onSuccess(data) {
+        setData({ setId: flashcard.studySetId }, (oldData) => {
+          if (!oldData) {
+            return;
+          }
+
+          return [...oldData, data];
+        });
+      },
+      onError: () => {
+        void message.error("Couldn't add flashcard to starred");
+      },
+    });
+  const { mutate: removeFromStarred, isLoading: removeLoading } =
+    api.starredFlashcard.delete.useMutation({
+      onSuccess: (data) => {
+        setData({ setId: flashcard.studySetId }, (oldData) => {
+          if (!oldData) {
+            return;
+          }
+
+          return oldData.filter((card) => card.id !== data.id);
+        });
+      },
+      onError: () => {
+        void message.error("Couldn't remove flashcard from starred");
+      },
+    });
+  const starredFlashcards = getData({ setId: flashcard.studySetId });
+
+  const starredFlashcard = starredFlashcards?.find(
+    (card) => card.flashcardId === flashcard.id
+  );
 
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
     event.stopPropagation();
     dispatch({ type: "open", payload: flashcard });
   };
 
-  const handleAddToFavourites: MouseEventHandler<HTMLElement> = (event) => {
+  const toggleStar: MouseEventHandler<HTMLElement> = (event) => {
     event.stopPropagation();
+    if (starredFlashcard) {
+      removeFromStarred({
+        starredId: starredFlashcard.id,
+      });
+    } else {
+      addToStarred({
+        flashcardId: flashcard.id,
+      });
+    }
   };
 
   return (
@@ -59,10 +109,16 @@ const FlipCardContent = ({
               />
             )}
             <Button
-              onClick={handleAddToFavourites}
-              icon={<StarFilled />}
+              onClick={toggleStar}
+              icon={
+                <StarFilled
+                  className={starredFlashcard ? "text-yellow-300" : undefined}
+                />
+              }
               type="text"
               shape="circle"
+              loading={addLoading || removeLoading}
+              disabled={addLoading || removeLoading}
             />
           </div>
         </div>

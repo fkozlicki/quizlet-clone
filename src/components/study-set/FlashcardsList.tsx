@@ -1,6 +1,6 @@
 import type { Flashcard } from "@prisma/client";
-import FlashcardPreview from "../shared/FlashcardPreview";
 import { Typography } from "antd";
+import FlashcardPreview from "../shared/FlashcardPreview";
 
 interface FlashcardsListProps {
   cards: Flashcard[];

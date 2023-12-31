@@ -94,14 +94,17 @@ const FolderCTA = ({
         confirmLoading={isLoading}
         okButtonProps={{
           disabled: isLoading,
+          danger: true,
+          loading: isLoading,
         }}
+        okText="Delete"
       >
         <div className="py-5">
           <div className="mb-4 flex items-center text-base">
-            Are you sure you want to delete{" "}
+            Are you sure you want to delete
             <Tag color="red" className="mx-2">
               {defaultData.title}
-            </Tag>{" "}
+            </Tag>
             folder
           </div>
           <div>

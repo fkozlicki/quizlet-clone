@@ -44,7 +44,6 @@ const TestResult = ({ result }: TestResultProps) => {
           <Written
             key={index}
             term={term}
-            index={index}
             result
             userAnswer={userAnswer}
             definition={definition}

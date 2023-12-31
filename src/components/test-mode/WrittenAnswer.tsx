@@ -6,8 +6,8 @@ import type { TestInputs } from "./TestForm";
 
 interface WrittenAnswerProps {
   term: string;
-  control: Control<TestInputs>;
-  name: FieldPath<TestInputs>;
+  control?: Control<TestInputs>;
+  name?: FieldPath<TestInputs>;
   result?: boolean;
   definition?: string;
   userAnswer?: string;
@@ -33,7 +33,7 @@ const WrittenAnswer = ({
           </div>
         </div>
         <div>
-          {!result && (
+          {!result && name && control && (
             <FormItem
               control={control}
               name={name}
