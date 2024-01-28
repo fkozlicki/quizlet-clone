@@ -1,4 +1,5 @@
 import { ConfigProvider, theme } from "antd";
+import { useSession } from "next-auth/react";
 import type { PropsWithChildren } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -16,13 +17,18 @@ const ThemeContext = createContext<ThemeContext>(initialState);
 
 const ThemeProvider = ({ children }: PropsWithChildren) => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    if (savedMode) {
-      setDarkMode(Boolean(savedMode));
+    if (session) {
+      const savedMode = localStorage.getItem("darkMode");
+      if (savedMode) {
+        setDarkMode(Boolean(savedMode));
+      }
+    } else {
+      setDarkMode(false);
     }
-  }, []);
+  }, [session]);
 
   const switchDarkMode = () => {
     localStorage.setItem("darkMode", JSON.stringify(!darkMode));
