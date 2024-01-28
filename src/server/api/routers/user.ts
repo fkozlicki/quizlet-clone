@@ -4,6 +4,8 @@ import { hash } from "bcrypt";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { createUserSchema } from "../../../schemas/user";
+import { S3 } from "aws-sdk";
+import { env } from "../../../env/server.mjs";
 
 function exclude<User, Key extends keyof User>(
   user: User,
@@ -103,4 +105,26 @@ export const userRouter = createTRPCRouter({
       },
     });
   }),
+
+  presignedUrl: protectedProcedure
+    .input(z.object({ filename: z.string(), filetype: z.string() }))
+    .mutation(({ input, ctx }) => {
+      const s3 = new S3({
+        signatureVersion: "v4",
+        region: env._AWS_REGION,
+        accessKeyId: env._AWS_ACCESS_KEY,
+        secretAccessKey: env._AWS_SECRET_KEY,
+      });
+
+      const preSignedUrl = s3.getSignedUrl("putObject", {
+        Bucket: `${env._AWS_BUCKET_NAME}/users/${ctx.session.user.id}`,
+        Key: input.filename,
+        ContentType: input.filetype,
+        Expires: 60,
+      });
+
+      return {
+        preSignedUrl,
+      };
+    }),
 });

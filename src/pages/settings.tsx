@@ -39,7 +39,7 @@ const Settings: NextPage<{ user: User }> = ({ user }) => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Settings" />
-      <EditProfilePicture image={user.image} />
+      <EditProfilePicture image={user.image} userId={user.id} />
       <NightMode />
       <DeleteAccount userName={user.name} image={user.image} />
     </>

@@ -11,6 +11,7 @@ import { generateSSGHelper } from "../../server/helpers/ssgHelper";
 import { api } from "../../utils/api";
 import type { NextPageWithLayout } from "../_app";
 import { Typography, theme } from "antd";
+import { useThemeContext } from "../../contexts/ThemeProvider";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const ssg = generateSSGHelper();
@@ -55,6 +56,7 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+  const { darkMode } = useThemeContext();
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -63,7 +65,9 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
   return (
     <>
       <NextSeo title="Quizlet 2.0 - Profile" />
-      <h2 className="mb-4 text-xl font-bold">Recent activity</h2>
+      <Typography.Title className="mb-4 text-xl font-bold">
+        Recent activity
+      </Typography.Title>
       <div
         className="grid h-[400px] w-full place-items-center rounded-2xl"
         style={{
@@ -85,6 +89,7 @@ const Profile: NextPageWithLayout<ProfileProps> = () => {
             }
             calendarType="hebrew"
             tileClassName="relative [&>abbr]:relative [&>abbr]:z-20 [&>abbr]:text-xs [&>abbr]:font-medium hover:bg-transparent w-11 h-11"
+            className={darkMode ? "text-white" : "text-black"}
             tileContent={({ date }) => {
               const tileDate = dayjs(date).format("YYYY-MM-DD");
               const isToday = tileDate === today;

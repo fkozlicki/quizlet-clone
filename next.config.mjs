@@ -17,7 +17,7 @@ const config = {
     domains: [
       "lh3.googleusercontent.com",
       "platform-lookaside.fbsbx.com",
-      "res.cloudinary.com",
+      "quizletv2.s3.eu-central-1.amazonaws.com",
     ],
   },
 };

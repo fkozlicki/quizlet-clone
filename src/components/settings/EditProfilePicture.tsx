@@ -6,18 +6,20 @@ import {
 import type { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import { Avatar, Card, Divider, Typography, Upload, message } from "antd";
+import type { UploadFile } from "antd";
 import type { RcFile } from "antd/es/upload";
-import Image from "next/image";
+import NextImage from "next/image";
 import { useState } from "react";
 import pictures from "../../data/pictures.json";
 import { api } from "../../utils/api";
+import ImgCrop from "antd-img-crop";
+import { randomBytes } from "crypto";
+import { env } from "../../env/client.mjs";
 
 interface EditProfilePictureProps {
   image: User["image"];
+  userId: User["id"];
 }
-
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dkg9zehpc/image/upload";
-const CLOUDINARY_UPLOAD_PRESET = "quizletv2";
 
 const beforeUpload = (file: RcFile) => {
   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -31,7 +33,7 @@ const beforeUpload = (file: RcFile) => {
   return isJpgOrPng && isLt2M;
 };
 
-const EditProfilePicture = ({ image }: EditProfilePictureProps) => {
+const EditProfilePicture = ({ image, userId }: EditProfilePictureProps) => {
   const [picture, setPicture] = useState<User["image"]>(image);
   const { mutate: updateUser, isLoading: updateLoading } =
     api.user.update.useMutation({
@@ -40,18 +42,44 @@ const EditProfilePicture = ({ image }: EditProfilePictureProps) => {
         void message.success("Uploaded successfully");
       },
     });
+  const { mutateAsync: getPresignedUrl } = api.user.presignedUrl.useMutation();
   const { mutate: uploadImage, isLoading: uploadLoading } = useMutation({
-    mutationFn: async (data: FormData) => {
-      const res = await fetch(CLOUDINARY_URL, {
-        method: "POST",
-        body: data,
+    mutationFn: async (file: File) => {
+      const filename = randomBytes(32).toString("hex");
+      const { preSignedUrl } = await getPresignedUrl({
+        filename,
+        filetype: file.type,
       });
-      return res.json() as Promise<{ secure_url: string }>;
+
+      await fetch(preSignedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      const imageUrl = `https://${env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.eu-central-1.amazonaws.com/users/${userId}/${filename}`;
+
+      return imageUrl;
     },
     onSuccess: (data) => {
-      updateUser({ image: data.secure_url });
+      updateUser({ image: data });
     },
   });
+
+  const onPreview = async (file: UploadFile) => {
+    let src = file.url as string;
+    if (!src) {
+      src = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file.originFileObj as Blob);
+        reader.onload = () => resolve(reader.result as string);
+      });
+    }
+    const image = new Image();
+    image.src = src;
+    const imgWindow = window.open(src);
+    imgWindow?.document.write(image.outerHTML);
+  };
 
   return (
     <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:gap-8">
@@ -73,7 +101,7 @@ const EditProfilePicture = ({ image }: EditProfilePictureProps) => {
           </Typography.Text>
           <div className="flex flex-wrap gap-2">
             {pictures.map((picture, index) => (
-              <Image
+              <NextImage
                 key={index}
                 onClick={() => updateUser({ image: `/profile/${picture}` })}
                 src={`/profile/${picture}`}
@@ -85,32 +113,32 @@ const EditProfilePicture = ({ image }: EditProfilePictureProps) => {
             ))}
           </div>
           <Divider className="text-sm">OR</Divider>
-          <Upload.Dragger
-            name="file"
-            multiple={false}
-            showUploadList={false}
-            customRequest={(options) => {
-              const data = new FormData();
-              data.append("file", options.file);
-              data.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
-              uploadImage(data);
-            }}
-            beforeUpload={beforeUpload}
-            disabled={updateLoading || uploadLoading}
-          >
-            <p className="ant-upload-drag-icon">
-              {uploadLoading || updateLoading ? (
-                <LoadingOutlined />
-              ) : (
-                <InboxOutlined />
-              )}
-            </p>
-            <p className="ant-upload-text">
-              {uploadLoading || updateLoading
-                ? "Uploading image"
-                : "Click or drag file to this area to upload"}
-            </p>
-          </Upload.Dragger>
+          <ImgCrop aspect={1 / 1}>
+            <Upload.Dragger
+              name="file"
+              multiple={false}
+              showUploadList={false}
+              customRequest={(options) => {
+                uploadImage(options.file as File);
+              }}
+              beforeUpload={beforeUpload}
+              onPreview={onPreview}
+              disabled={updateLoading || uploadLoading}
+            >
+              <p className="ant-upload-drag-icon">
+                {uploadLoading || updateLoading ? (
+                  <LoadingOutlined />
+                ) : (
+                  <InboxOutlined />
+                )}
+              </p>
+              <p className="ant-upload-text">
+                {uploadLoading || updateLoading
+                  ? "Uploading image"
+                  : "Click or drag file to this area to upload"}
+              </p>
+            </Upload.Dragger>
+          </ImgCrop>
         </div>
       </Card>
     </div>

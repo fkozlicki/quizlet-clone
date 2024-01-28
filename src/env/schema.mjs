@@ -23,8 +23,10 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   FACEBOOK_CLIENT_SECRET: z.string(),
-  // APPLE_ID: z.string(),
-  // APPLE_SECRET: z.string(),
+  _AWS_REGION: z.string(),
+  _AWS_ACCESS_KEY: z.string(),
+  _AWS_SECRET_KEY: z.string(),
+  _AWS_BUCKET_NAME: z.string(),
 });
 
 /**
@@ -34,6 +36,7 @@ export const serverSchema = z.object({
  */
 export const clientSchema = z.object({
   NEXT_PUBLIC_APP_DOMAIN: z.string(),
+  NEXT_PUBLIC_AWS_BUCKET_NAME: z.string(),
 });
 
 /**
@@ -44,6 +47,6 @@ export const clientSchema = z.object({
  */
 export const clientEnv = {
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
-  NEXT_PUBLIC_APP_DOMAIN:
-    process.env.NEXT_PUBLIC_APP_DOMAIN ?? "https://quizletv2.com/",
+  NEXT_PUBLIC_APP_DOMAIN: process.env.NEXT_PUBLIC_APP_DOMAIN,
+  NEXT_PUBLIC_AWS_BUCKET_NAME: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME,
 };

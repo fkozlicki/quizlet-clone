@@ -8,7 +8,8 @@
     "dev": "next dev",
     "postinstall": "prisma generate",
     "lint": "next lint",
-    "start": "next start"
+    "start": "next start",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "@ant-design/cssinjs": "^1.18.1",
@@ -22,6 +23,8 @@
     "@trpc/react-query": "^10.7.0",
     "@trpc/server": "^10.7.0",
     "antd": "^5.12.2",
+    "antd-img-crop": "^4.21.0",
+    "aws-sdk": "^2.1545.0",
     "bcrypt": "^5.1.0",
     "cookies": "^0.8.0",
     "dayjs": "^1.11.10",
