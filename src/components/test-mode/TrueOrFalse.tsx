@@ -1,5 +1,4 @@
-import { Alert, Card, Divider, Typography, theme } from "antd";
-import React from "react";
+import { Alert, Card, Typography, theme } from "antd";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 interface TrueOrFalseProps {
@@ -89,18 +88,18 @@ const TrueOrFalse = ({
                 disabled={!!result}
               />
               <div
-                className={`peer-checked:bg-blue-50" rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 ${
+                className={`peer-checked:bg-blue-50" rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
                   !result ? "cursor-pointer" : ""
                 }`}
                 style={{
                   borderColor:
-                    answer === definition
+                    result && answer === definition
                       ? green5
                       : userAnswer === "true"
                       ? red5
                       : colorBorder,
                   background:
-                    answer === definition
+                    result && answer === definition
                       ? green1
                       : userAnswer === "true"
                       ? red1
@@ -120,18 +119,18 @@ const TrueOrFalse = ({
                 disabled={!!result}
               />
               <div
-                className={`rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 ${
+                className={`rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
                   !result ? "cursor-pointer" : ""
                 }`}
                 style={{
                   borderColor:
-                    answer !== definition
+                    result && answer !== definition
                       ? green5
                       : userAnswer === "false"
                       ? red5
                       : colorBorder,
                   background:
-                    answer !== definition
+                    result && answer !== definition
                       ? green1
                       : userAnswer === "false"
                       ? red1

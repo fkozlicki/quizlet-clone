@@ -4,15 +4,16 @@ import type { Identifier, XYCoord } from "dnd-core";
 import { useRef } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import type { DragSourceMonitor } from "react-dnd/dist/types";
-import type { Control, FieldValues } from "react-hook-form";
+import type { Control } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
+import type { CreateStudySetValues } from "../../schemas/study-set";
 
 export interface FlashcardDraggableProps {
   remove: (index: number) => void;
   swap: (from: number, to: number) => void;
   id: string;
   index: number;
-  control: Control<FieldValues>;
+  control: Control<CreateStudySetValues>;
   cardsCount: number;
 }
 

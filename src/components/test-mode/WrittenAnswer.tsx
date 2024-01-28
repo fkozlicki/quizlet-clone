@@ -1,5 +1,4 @@
-import { Alert, Input, Typography } from "antd";
-import Card from "antd/es/card/Card";
+import { Alert, Card, Input, Typography } from "antd";
 import type { Control, FieldPath } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
 import type { TestInputs } from "./TestForm";

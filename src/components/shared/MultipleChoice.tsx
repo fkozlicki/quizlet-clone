@@ -91,7 +91,7 @@ const MultipleChoice = ({
                 onClick={
                   callback ? (event) => callback(answerIndex, event) : undefined
                 }
-                className={`rounded-md border-2 px-4 py-2 peer-checked:!border-blue-600 ${
+                className={`rounded-md border-2 px-4 py-2 peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
                   !result ? "cursor-pointer" : ""
                 }`}
                 style={{
