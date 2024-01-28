@@ -1,5 +1,5 @@
 import { DownOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Tag, Typography, theme } from "antd";
+import { Avatar, Button, Dropdown, Typography, theme } from "antd";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
