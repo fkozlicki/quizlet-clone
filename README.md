@@ -1,11 +1,7 @@
-# Quizlet 2.0 app
-
-## Demo
-https://quizletv2.vercel.app/
-
+# Quizlet Clone
 ## Description
 
-Clone application of Quizlet app.
+Clone application of Quizlet app. <br> DEMO: https://quizletv2.vercel.app/
 
 ### Functionalities
 
@@ -19,7 +15,7 @@ Clone application of Quizlet app.
   - Resolving test
   - Playing memory game
 
-## Teach stack
+## Tech stack
 
 - Next.js (Typescript)
 - Prisma
@@ -27,6 +23,12 @@ Clone application of Quizlet app.
 - Next-auth
 - tRPC
 - TailwindCSS
+- Ant Design
 
 ## Preview
-![quizletv2app](https://user-images.githubusercontent.com/93607858/222453214-49f2d8b0-cd9c-40a0-87af-b5b9a4a7d049.png)
+| Study set | Test mode |
+|:-------------------------:|:-------------------------:|  
+| ![Study set](https://github.com/fkozlicki/quizletv2/assets/93607858/6ba7d9fe-7158-4caa-b5e2-d640f20a268b) | ![Test mode](https://github.com/fkozlicki/quizletv2/assets/93607858/e1335865-9895-4124-9d12-2d367832dc90) |
+| ![Create set](https://github.com/fkozlicki/quizletv2/assets/93607858/3b8051e8-8a71-4f5c-91e9-5b4af4971771) | ![Dark mode](https://github.com/fkozlicki/quizletv2/assets/93607858/281601be-c0a1-49d8-a855-f29061d75d6b) |
+
+
