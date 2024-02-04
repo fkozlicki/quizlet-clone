@@ -76,6 +76,7 @@ model StudySet {
   cards       Flashcard[]
   user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   folders     Folder[]    @relation("FolderToStudySet")
+  createdAt   DateTime    @default(now())
 }
 
 model StarredFlashcard {

@@ -23,6 +23,18 @@ export type StudySetTest = {
 };
 
 export const studySetRouter = createTRPCRouter({
+  getPopular: publicProcedure.query(async ({ ctx }) => {
+    return await ctx.prisma.studySet.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        user: true,
+        cards: true,
+      },
+      take: 6,
+    });
+  }),
   getAll: publicProcedure
     .input(
       z.object({
@@ -38,6 +50,7 @@ export const studySetRouter = createTRPCRouter({
           user: true,
           cards: true,
         },
+        take: 6,
       });
     }),
 
@@ -159,10 +172,11 @@ export const studySetRouter = createTRPCRouter({
             ...cards
               .filter((card) => card.id !== multipleChoice.id)
               .sort(() => 0.5 - Math.random())
-              .slice(0)
               .map((card) => card.definition),
             multipleChoice.definition,
-          ].sort(() => 0.5 - Math.random());
+          ]
+            .sort(() => 0.5 - Math.random())
+            .slice(0, 4);
 
           return {
             ...multipleChoice,

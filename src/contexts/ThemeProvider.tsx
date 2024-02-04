@@ -40,6 +40,9 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
       <ConfigProvider
         theme={{
           algorithm: darkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
+          token: {
+            fontFamily: "inherit",
+          },
         }}
       >
         {children}

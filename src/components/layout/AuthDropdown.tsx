@@ -28,12 +28,14 @@ const AuthDropdown = () => {
         className="absolute right-4 top-4 z-10"
         icon={<CloseOutlined />}
       ></Button>
-      <div className="relative hidden flex-1 md:block">
+      <div className="relative hidden flex-1 border-r lg:block">
+        <Image src="/login.svg" alt="login image" fill />
         <Image
-          src="/login.avif"
-          alt="login image"
-          fill
-          className="object-cover"
+          src="/logo.svg"
+          alt="logo"
+          width={220}
+          height={48}
+          className="absolute left-10 top-14"
         />
       </div>
       <div className="flex-1 ">

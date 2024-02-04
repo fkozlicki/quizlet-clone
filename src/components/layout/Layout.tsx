@@ -8,10 +8,15 @@ import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
 import FlashcardModal from "./FlashcardModal";
 import { theme } from "antd";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  subsets: ["latin"],
+});
 
 const Layout = ({ children }: PropsWithChildren) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
-  const { pathname } = useRouter();
   const { data: session } = useSession();
   const { mutate: createActivity } = api.activity.create.useMutation();
   const {
@@ -33,7 +38,7 @@ const Layout = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <>
+    <div className={inter.className}>
       <Navbar openMobileMenu={openMobileMenu} />
       <main
         className="min-h-[calc(100vh-65px)]"
@@ -41,13 +46,7 @@ const Layout = ({ children }: PropsWithChildren) => {
           background: colorBgLayout,
         }}
       >
-        <div
-          className={`${
-            pathname === "/" ? "" : "m-auto max-w-6xl px-4 py-4 md:py-12"
-          }`}
-        >
-          {children}
-        </div>
+        <div className="m-auto max-w-6xl px-4 py-4 md:py-12">{children}</div>
       </main>
       <MobileMenu open={mobileMenuOpen} onClose={closeMobileMenu} />
       {!session && <AuthDropdown />}
@@ -57,7 +56,7 @@ const Layout = ({ children }: PropsWithChildren) => {
           <FlashcardModal />
         </>
       )}
-    </>
+    </div>
   );
 };
 

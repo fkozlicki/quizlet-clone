@@ -61,7 +61,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               <Image src="/logo.svg" alt="logo" width={110} height={24} />
             </Link>
             <Link
-              href="/"
+              href={session ? "/latest" : "/"}
               className="mx-3 hidden h-full text-sm font-medium leading-[4rem] md:block"
             >
               <Typography.Text>Home</Typography.Text>
