@@ -78,6 +78,17 @@ export const studySetRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      const starredFlashcards = ctx.session
+        ? await ctx.prisma.starredFlashcard.findMany({
+            where: {
+              flashcard: {
+                studySetId: input.id,
+              },
+              userId: ctx.session.user.id,
+            },
+          })
+        : [];
+
       const set = await ctx.prisma.studySet.findUnique({
         where: {
           id: input.id,
@@ -93,7 +104,11 @@ export const studySetRouter = createTRPCRouter({
                 },
                 include: {
                   user: true,
-                  cards: true,
+                  _count: {
+                    select: {
+                      cards: true,
+                    },
+                  },
                 },
               },
             },
@@ -113,7 +128,19 @@ export const studySetRouter = createTRPCRouter({
         });
       }
 
-      return set;
+      const modifiedSet = ctx.session
+        ? {
+            ...set,
+            cards: set.cards.map((card) => ({
+              ...card,
+              starred: starredFlashcards.some(
+                (starred) => starred.flashcardId === card.id
+              ),
+            })),
+          }
+        : set;
+
+      return modifiedSet;
     }),
 
   getLearnSet: publicProcedure

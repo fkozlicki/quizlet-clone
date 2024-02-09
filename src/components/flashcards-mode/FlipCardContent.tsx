@@ -10,7 +10,7 @@ interface FlipCardContentProps {
   title: string;
   editable: boolean;
   back?: boolean;
-  flashcard: Flashcard;
+  flashcard: Flashcard & { starred?: boolean };
 }
 
 const FlipCardContent = ({
@@ -24,45 +24,65 @@ const FlipCardContent = ({
   const {
     token: { colorBgContainer },
   } = theme.useToken();
-  const {
-    starredFlashcard: {
-      getSetCards: { setData, getData },
+  const utils = api.useUtils();
+  const { mutate: addToStarred } = api.starredFlashcard.create.useMutation({
+    onMutate({ flashcardId }) {
+      const prevData = utils.studySet.getById.getData({
+        id: flashcard.studySetId,
+      });
+
+      utils.studySet.getById.setData({ id: flashcard.studySetId }, (old) => {
+        if (!old) {
+          return;
+        }
+        return {
+          ...old,
+          cards: old.cards.map((oldCard) =>
+            oldCard.id === flashcardId ? { ...oldCard, starred: true } : oldCard
+          ),
+        };
+      });
+
+      return {
+        prevData,
+      };
     },
-  } = api.useUtils();
-  const { mutate: addToStarred, isLoading: addLoading } =
-    api.starredFlashcard.create.useMutation({
-      onSuccess(data) {
-        setData({ setId: flashcard.studySetId }, (oldData) => {
-          if (!oldData) {
+    onSettled: async () => {
+      return await utils.studySet.invalidate();
+    },
+    onError: () => {
+      void message.error("Couldn't add flashcard to starred");
+    },
+  });
+  const { mutate: removeFromStarred } = api.starredFlashcard.delete.useMutation(
+    {
+      onMutate({ flashcardId }) {
+        const prevData = utils.studySet.getById.getData({
+          id: flashcard.studySetId,
+        });
+
+        utils.studySet.getById.setData({ id: flashcard.studySetId }, (old) => {
+          if (!old) {
             return;
           }
-
-          return [...oldData, data];
+          return {
+            ...old,
+            cards: old.cards.map((oldCard) =>
+              oldCard.id === flashcardId
+                ? { ...oldCard, starred: false }
+                : oldCard
+            ),
+          };
         });
-      },
-      onError: () => {
-        void message.error("Couldn't add flashcard to starred");
-      },
-    });
-  const { mutate: removeFromStarred, isLoading: removeLoading } =
-    api.starredFlashcard.delete.useMutation({
-      onSuccess: (data) => {
-        setData({ setId: flashcard.studySetId }, (oldData) => {
-          if (!oldData) {
-            return;
-          }
 
-          return oldData.filter((card) => card.id !== data.id);
-        });
+        return {
+          prevData,
+        };
       },
       onError: () => {
         void message.error("Couldn't remove flashcard from starred");
       },
-    });
-  const starredFlashcards = getData({ setId: flashcard.studySetId });
-
-  const starredFlashcard = starredFlashcards?.find(
-    (card) => card.flashcardId === flashcard.id
+    }
   );
 
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
@@ -72,9 +92,9 @@ const FlipCardContent = ({
 
   const toggleStar: MouseEventHandler<HTMLElement> = (event) => {
     event.stopPropagation();
-    if (starredFlashcard) {
+    if (flashcard.starred) {
       removeFromStarred({
-        starredId: starredFlashcard.id,
+        flashcardId: flashcard.id,
       });
     } else {
       addToStarred({
@@ -112,13 +132,11 @@ const FlipCardContent = ({
               onClick={toggleStar}
               icon={
                 <StarFilled
-                  className={starredFlashcard ? "text-yellow-300" : undefined}
+                  className={flashcard.starred ? "text-yellow-300" : undefined}
                 />
               }
               type="text"
               shape="circle"
-              loading={addLoading || removeLoading}
-              disabled={addLoading || removeLoading}
             />
           </div>
         </div>

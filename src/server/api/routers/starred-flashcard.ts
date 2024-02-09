@@ -2,27 +2,6 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const starredFlashcardRouter = createTRPCRouter({
-  getSetCards: protectedProcedure
-    .input(
-      z.object({
-        setId: z.string(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      const starredFlashcards = await ctx.prisma.starredFlashcard.findMany({
-        where: {
-          flashcard: {
-            studySetId: input.setId,
-          },
-          userId: ctx.session.user.id,
-        },
-        include: {
-          flashcard: true,
-        },
-      });
-
-      return starredFlashcards;
-    }),
   create: protectedProcedure
     .input(
       z.object({
@@ -35,9 +14,6 @@ export const starredFlashcardRouter = createTRPCRouter({
           userId: ctx.session.user.id,
           flashcardId: input.flashcardId,
         },
-        include: {
-          flashcard: true,
-        },
       });
 
       return created;
@@ -45,13 +21,16 @@ export const starredFlashcardRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(
       z.object({
-        starredId: z.string(),
+        flashcardId: z.string(),
       })
     )
     .mutation(async ({ input, ctx }) => {
       const delted = await ctx.prisma.starredFlashcard.delete({
         where: {
-          id: input.starredId,
+          flashcardId_userId: {
+            userId: ctx.session.user.id,
+            flashcardId: input.flashcardId,
+          },
         },
       });
 

@@ -1,12 +1,11 @@
-import type { Flashcard, StudySet, User } from "@prisma/client";
-import React from "react";
-import StudySetPreview from "../shared/StudySetPreview";
+import type { StudySet, User } from "@prisma/client";
 import { Typography } from "antd";
+import StudySetPreview from "../shared/StudySetPreview";
 
 interface OtherSetsProps {
   otherSets: (StudySet & {
     user: User;
-    cards: Flashcard[];
+    _count: { cards: number };
   })[];
 }
 
@@ -22,7 +21,7 @@ const OtherSets = ({ otherSets }: OtherSetsProps) => {
             id,
             title,
             user: { image: userImage, name: userName, id: authorId },
-            cards,
+            _count: { cards: termsCount },
           }) => (
             <StudySetPreview
               key={id}
@@ -30,7 +29,7 @@ const OtherSets = ({ otherSets }: OtherSetsProps) => {
               authorImage={userImage}
               authorName={userName}
               id={id}
-              termsCount={cards.length}
+              termsCount={termsCount}
               authorId={authorId}
             />
           )

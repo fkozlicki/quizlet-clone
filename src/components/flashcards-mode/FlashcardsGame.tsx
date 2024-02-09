@@ -1,4 +1,4 @@
-import type { Flashcard, StarredFlashcard } from "@prisma/client";
+import type { Flashcard } from "@prisma/client";
 import { Progress } from "antd";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -12,11 +12,10 @@ import FlipCard from "./FlipCard";
 export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
 interface FlashcardsGameProps {
-  cards: Flashcard[];
+  cards: (Flashcard & { starred?: boolean })[];
   ownerId: string;
   setId: string;
   size?: "small" | "large";
-  starredFlashcards?: (StarredFlashcard & { flashcard: Flashcard })[];
 }
 
 const FlashcardsGame = ({
@@ -24,7 +23,6 @@ const FlashcardsGame = ({
   ownerId,
   setId,
   size = "small",
-  starredFlashcards,
 }: FlashcardsGameProps) => {
   const { push } = useRouter();
   const { data: session } = useSession();
@@ -38,19 +36,11 @@ const FlashcardsGame = ({
   const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
   const [sorting, setSorting] = useState<boolean>(false);
   const [starredOnly, setStarredOnly] = useState<boolean>(false);
+  const starredCards = cards.filter((card) => card.starred);
 
   useEffect(() => {
     setFlashcards(cards);
   }, [cards]);
-
-  useEffect(() => {
-    if (starredOnly && starredFlashcards && starredFlashcards.length > 0) {
-      setFlashcards(starredFlashcards.map((starred) => starred.flashcard));
-    } else {
-      setStarredOnly(false);
-      setFlashcards(cards);
-    }
-  }, [starredFlashcards]);
 
   useEffect(() => {
     const sorting = localStorage.getItem("flashcardSorting");
@@ -99,8 +89,8 @@ const FlashcardsGame = ({
 
   const resetFlashcards = () => {
     setHard([]);
-    if (starredOnly && starredFlashcards && starredFlashcards.length > 0) {
-      setFlashcards(starredFlashcards.map((starred) => starred.flashcard));
+    if (starredOnly) {
+      setFlashcards(starredCards);
     } else {
       setFlashcards(cards);
     }
@@ -173,8 +163,8 @@ const FlashcardsGame = ({
   const switchStarredOnly = (value: boolean) => {
     setStarredOnly(value);
 
-    if (value && starredFlashcards && starredFlashcards.length > 0) {
-      setFlashcards(starredFlashcards.map((starred) => starred.flashcard));
+    if (value) {
+      setFlashcards(starredCards);
     } else {
       setFlashcards(cards);
     }
@@ -254,7 +244,7 @@ const FlashcardsGame = ({
         resetFlashcards={resetFlashcards}
         starredOnly={starredOnly}
         switchStarredOnly={switchStarredOnly}
-        disableStarredOnly={starredFlashcards?.length === 0}
+        disableStarredOnly={starredCards.length === 0}
       />
     </>
   ) : (

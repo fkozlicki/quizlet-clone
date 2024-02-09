@@ -40,14 +40,6 @@ const StudySet = ({ setId }: { setId: string }) => {
       refetchOnWindowFocus: false,
     }
   );
-  const { data: starredFlashcards } = api.starredFlashcard.getSetCards.useQuery(
-    {
-      setId,
-    },
-    {
-      enabled: !!session,
-    }
-  );
 
   if (!studySet) {
     return <div>404</div>;
@@ -71,12 +63,7 @@ const StudySet = ({ setId }: { setId: string }) => {
           )}
         </div>
         <StudyModes setId={setId} />
-        <FlashcardsGame
-          starredFlashcards={starredFlashcards}
-          setId={setId}
-          cards={cards}
-          ownerId={userId}
-        />
+        <FlashcardsGame setId={setId} cards={cards} ownerId={userId} />
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CreatedBy user={user} />
           <StudySetCTA studySetName={title} userId={userId} setId={setId} />

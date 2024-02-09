@@ -80,11 +80,12 @@ model StudySet {
 }
 
 model StarredFlashcard {
-  id          String    @id @default(cuid())
   userId      String
   user        User      @relation(fields: [userId], references: [id])
   flashcardId String
   flashcard   Flashcard @relation(fields: [flashcardId], references: [id], onDelete: Cascade)
+
+  @@id([flashcardId, userId])
 }
 
 model Folder {
