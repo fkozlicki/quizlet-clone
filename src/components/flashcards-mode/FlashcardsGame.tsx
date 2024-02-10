@@ -3,7 +3,7 @@ import { Progress } from "antd";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import StudyModeResult from "../shared/StudyModeResult";
 import FlashcardButtons from "./FlashcardButtons";
 import FlashcardsSettingsModal from "./FlashcardsSettingsModal";
@@ -18,36 +18,208 @@ interface FlashcardsGameProps {
   size?: "small" | "large";
 }
 
+const initialState = {
+  flashcards: [] as (Flashcard & { starred?: boolean })[],
+  cardIndex: 0,
+  hard: [] as (Flashcard & { starred?: boolean })[],
+  sorting: false,
+  starredOnly: false,
+  settingsOpen: false,
+};
+
+type FlashcardsGameState = typeof initialState;
+type FlashcardsGameAction =
+  | { type: "setCards"; payload: FlashcardsGameState["flashcards"] }
+  | { type: "setSorting"; payload: FlashcardsGameState["sorting"] }
+  | { type: "nextCard" }
+  | { type: "prevCard" }
+  | { type: "reset"; payload: FlashcardsGameState["flashcards"] }
+  | { type: "reviewHard" }
+  | { type: "addHard"; payload: FlashcardsGameState["flashcards"][0] }
+  | { type: "setSorting"; payload: FlashcardsGameState["sorting"] }
+  | { type: "setSettingsOpen"; payload: FlashcardsGameState["settingsOpen"] }
+  | { type: "shuffle" }
+  | { type: "setStarredOnly"; payload: FlashcardsGameState["starredOnly"] };
+
+const gameReducer = (
+  state: FlashcardsGameState,
+  action: FlashcardsGameAction
+): FlashcardsGameState => {
+  if (action.type === "setCards") {
+    return { ...state, flashcards: action.payload };
+  }
+  if (action.type === "nextCard") {
+    return { ...state, cardIndex: state.cardIndex + 1 };
+  }
+  if (action.type === "prevCard") {
+    return { ...state, cardIndex: state.cardIndex - 1 };
+  }
+  if (action.type === "setSorting") {
+    return { ...state, sorting: action.payload };
+  }
+
+  if (action.type === "reviewHard") {
+    return {
+      ...state,
+      flashcards: state.hard,
+      hard: [],
+      cardIndex: 0,
+    };
+  }
+  if (action.type === "setSettingsOpen") {
+    return {
+      ...state,
+      settingsOpen: action.payload,
+    };
+  }
+  if (action.type === "shuffle") {
+    return {
+      ...state,
+      flashcards: state.flashcards.sort(() => 0.5 - Math.random()),
+    };
+  }
+  if (action.type === "addHard") {
+    return {
+      ...state,
+      hard: [...state.hard, action.payload],
+    };
+  }
+
+  const starredCards = state.flashcards.filter((card) => card.starred);
+
+  if (action.type === "reset") {
+    return {
+      ...initialState,
+      starredOnly: state.starredOnly,
+      sorting: state.sorting,
+      flashcards: state.starredOnly ? starredCards : action.payload,
+    };
+  }
+  if (action.type === "setStarredOnly") {
+    return {
+      ...state,
+      starredOnly: action.payload,
+      cardIndex: 0,
+    };
+  }
+
+  return state;
+};
+
 const FlashcardsGame = ({
   cards,
   ownerId,
   setId,
   size = "small",
 }: FlashcardsGameProps) => {
+  const [
+    { cardIndex, sorting, flashcards, hard, settingsOpen, starredOnly },
+    dispatch,
+  ] = useReducer(gameReducer, {
+    ...initialState,
+    flashcards: cards,
+  });
   const { push } = useRouter();
   const { data: session } = useSession();
-  const [flashcards, setFlashcards] = useState<Flashcard[]>(cards);
-  const [cardIndex, setCardIndex] = useState<number>(0);
+  const cardWrapper = useRef<HTMLDivElement>(null);
   const [moveAnimation, setMoveAnimation] =
     useState<FlashcardAnimation>("right");
-  const [hard, setHard] = useState<Flashcard[]>([]);
-  const cardWrapper = useRef<HTMLDivElement>(null);
   const animationCardWrapper = useRef<HTMLDivElement>(null);
-  const [settingsModalOpen, setSettingsModalOpen] = useState<boolean>(false);
-  const [sorting, setSorting] = useState<boolean>(false);
-  const [starredOnly, setStarredOnly] = useState<boolean>(false);
+
   const starredCards = cards.filter((card) => card.starred);
+  const currentCard = flashcards[cardIndex];
+  const hardCount = hard.length;
 
   useEffect(() => {
-    setFlashcards(cards);
+    const editedCard = cards.find((card) => card.id === currentCard?.id);
+    const newCards = flashcards.map((card) =>
+      card.id === editedCard?.id ? editedCard : card
+    );
+
+    dispatch({
+      type: "setCards",
+      payload: newCards,
+    });
+
+    if (starredOnly && starredCards.length === 0) {
+      dispatch({ type: "setStarredOnly", payload: false });
+    }
   }, [cards]);
 
   useEffect(() => {
-    const sorting = localStorage.getItem("flashcardSorting");
-    if (sorting) {
-      setSorting(JSON.parse(sorting) as boolean);
+    const sortingValue = localStorage.getItem("flashcardSorting");
+    if (sortingValue) {
+      dispatch({
+        type: "setSorting",
+        payload: JSON.parse(sortingValue) as boolean,
+      });
     }
   }, []);
+
+  const reviewToughTerms = () => {
+    dispatch({ type: "reviewHard" });
+  };
+
+  const learnFlashcards = async () => {
+    await push(`/study-set/${setId}/learn`);
+  };
+
+  const resetFlashcards = () => {
+    dispatch({ type: "reset", payload: cards });
+  };
+
+  const backToStudySet = async () => {
+    await push(`/study-set/${setId}`);
+  };
+
+  const firstButton = {
+    text:
+      hardCount > 0
+        ? "Review the tough terms"
+        : size === "small"
+        ? "Learn flashcards"
+        : "Back to set",
+    description:
+      hardCount > 0
+        ? `Review Flashcards again with the ${hardCount} terms you're still learing.`
+        : size === "small"
+        ? "Learn flashcards"
+        : "Get back to the study set.",
+    callback:
+      hardCount > 0
+        ? reviewToughTerms
+        : size === "small"
+        ? learnFlashcards
+        : backToStudySet,
+    Icon: (
+      <Image
+        src={size === "small" ? "/study.png" : "/back.svg"}
+        alt=""
+        width={48}
+        height={48}
+      />
+    ),
+  };
+
+  const secondButton = {
+    text: "Reset Flashcards",
+    description: `Study all ${
+      starredOnly ? starredCards.length : cards.length
+    } terms from the beginning.`,
+    callback: resetFlashcards,
+    Icon: <Image src="/back.svg" alt="" width={48} height={48} />,
+  };
+
+  if (!currentCard) {
+    return (
+      <StudyModeResult
+        hard={hardCount}
+        cardCount={flashcards.length}
+        firstButton={firstButton}
+        secondButton={secondButton}
+      />
+    );
+  }
 
   const animateScoreCard = (variant: "learning" | "know") => {
     const { current } = animationCardWrapper;
@@ -78,45 +250,11 @@ const FlashcardsGame = ({
   };
 
   const changeCard = (value: -1 | 1) => {
-    if (
-      (value === -1 && cardIndex === 0) ||
-      (value === 1 && cardIndex === cards.length)
-    ) {
-      return;
-    }
-    setCardIndex((prev) => prev + value);
-  };
-
-  const resetFlashcards = () => {
-    setHard([]);
-    if (starredOnly) {
-      setFlashcards(starredCards);
-    } else {
-      setFlashcards(cards);
-    }
-    setCardIndex(0);
-    setSettingsModalOpen(false);
-  };
-
-  const reviewToughTerms = () => {
-    setFlashcards(hard);
-    setHard([]);
-    setCardIndex(0);
-  };
-
-  const learnFlashcards = async () => {
-    await push(`/study-set/${setId}/learn`);
+    dispatch({ type: value === 1 ? "nextCard" : "prevCard" });
   };
 
   const addToHard = () => {
-    if (!currentCard) {
-      return;
-    }
-    setHard((prev) => [...prev, currentCard]);
-  };
-
-  const backToStudySet = async () => {
-    await push(`/study-set/${setId}`);
+    dispatch({ type: "addHard", payload: currentCard });
   };
 
   const handleLeft = () => {
@@ -144,73 +282,28 @@ const FlashcardsGame = ({
   };
 
   const openSettingsModal = () => {
-    setSettingsModalOpen(true);
+    dispatch({ type: "setSettingsOpen", payload: true });
   };
 
   const closeSettingsModal = () => {
-    setSettingsModalOpen(false);
+    dispatch({ type: "setSettingsOpen", payload: false });
   };
 
   const switchSorting = (value: boolean) => {
-    setSorting(value);
+    dispatch({ type: "setSorting", payload: value });
     localStorage.setItem("flashcardSorting", JSON.stringify(value));
   };
 
   const shuffle = () => {
-    setFlashcards((prev) => [...prev.sort(() => 0.5 - Math.random())]);
+    dispatch({ type: "shuffle" });
   };
 
   const switchStarredOnly = (value: boolean) => {
-    setStarredOnly(value);
-
-    if (value) {
-      setFlashcards(starredCards);
-    } else {
-      setFlashcards(cards);
-    }
-
-    setCardIndex(0);
+    dispatch({ type: "setStarredOnly", payload: value });
+    dispatch({ type: "setCards", payload: value ? starredCards : cards });
   };
 
-  const firstButton = {
-    text:
-      hard.length > 0
-        ? "Review the tough terms"
-        : size === "small"
-        ? "Learn flashcards"
-        : "Back to set",
-    description:
-      hard.length > 0
-        ? `Review Flashcards again with the ${hard.length} terms you're still learing.`
-        : size === "small"
-        ? "Learn flashcards"
-        : "Get back to the study set.",
-    callback:
-      hard.length > 0
-        ? reviewToughTerms
-        : size === "small"
-        ? learnFlashcards
-        : backToStudySet,
-    Icon: (
-      <Image
-        src={size === "small" ? "/study.png" : "/back.svg"}
-        alt=""
-        width={48}
-        height={48}
-      />
-    ),
-  };
-
-  const secondButton = {
-    text: "Reset Flashcards",
-    description: `Study all ${cards.length} terms from the beginning.`,
-    callback: resetFlashcards,
-    Icon: <Image src="/back.svg" alt="" width={48} height={48} />,
-  };
-
-  const currentCard = flashcards[cardIndex];
-
-  return currentCard ? (
+  return (
     <>
       <FlipCard
         size={size}
@@ -224,9 +317,9 @@ const FlashcardsGame = ({
         setId={setId}
         cardCount={flashcards.length}
         cardIndex={cardIndex}
+        sorting={sorting}
         handleLeft={handleLeft}
         handleRight={handleRight}
-        sorting={sorting}
         openSettingsModal={openSettingsModal}
         shuffle={shuffle}
       />
@@ -237,7 +330,7 @@ const FlashcardsGame = ({
         className="mb-6"
       />
       <FlashcardsSettingsModal
-        open={settingsModalOpen}
+        open={settingsOpen}
         onCancel={closeSettingsModal}
         sorting={sorting}
         switchSorting={switchSorting}
@@ -247,13 +340,6 @@ const FlashcardsGame = ({
         disableStarredOnly={starredCards.length === 0}
       />
     </>
-  ) : (
-    <StudyModeResult
-      hard={hard.length}
-      cardCount={flashcards.length}
-      firstButton={firstButton}
-      secondButton={secondButton}
-    />
   );
 };
 

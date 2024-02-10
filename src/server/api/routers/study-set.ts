@@ -78,6 +78,8 @@ export const studySetRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      console.log("QUERY", ctx.session);
+
       const starredFlashcards = ctx.session
         ? await ctx.prisma.starredFlashcard.findMany({
             where: {

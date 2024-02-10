@@ -13,21 +13,21 @@ import Link from "next/link";
 interface FlashcardButtonsProps {
   cardIndex: number;
   cardCount: number;
-  handleLeft: () => void;
-  handleRight: () => void;
   sorting: boolean;
   setId: string;
+  handleLeft: () => void;
+  handleRight: () => void;
   openSettingsModal: () => void;
   shuffle: () => void;
 }
 
 const FlashcardButtons = ({
-  handleLeft,
-  handleRight,
   sorting,
   cardIndex,
   cardCount,
   setId,
+  handleLeft,
+  handleRight,
   shuffle,
   openSettingsModal,
 }: FlashcardButtonsProps) => {

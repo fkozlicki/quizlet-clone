@@ -68,16 +68,6 @@ const StudyModeResult = ({
                 }
                 type="warning"
               />
-              <Alert
-                className="rounded-full border-0 py-1 font-medium"
-                message={
-                  <div className="flex justify-between">
-                    <span>Terms left</span>
-                    <span>{0}</span>
-                  </div>
-                }
-                type="info"
-              />
             </div>
           </div>
         </div>

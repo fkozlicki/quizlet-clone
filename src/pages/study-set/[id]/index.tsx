@@ -1,6 +1,6 @@
 import { Button, Typography } from "antd";
 import type { GetServerSideProps } from "next";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { NextSeo } from "next-seo";
 import Link from "next/link";
 import FlashcardsGame from "../../../components/flashcards-mode/FlashcardsGame";
@@ -13,7 +13,8 @@ import { generateSSGHelper } from "../../../server/helpers/ssgHelper";
 import { api } from "../../../utils/api";
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const ssg = generateSSGHelper();
+  const session = await getSession(context);
+  const ssg = generateSSGHelper(session);
   const setId = context.query?.id;
 
   if (typeof setId !== "string") {
