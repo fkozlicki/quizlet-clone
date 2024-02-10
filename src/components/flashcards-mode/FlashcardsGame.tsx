@@ -84,10 +84,8 @@ const gameReducer = (
       hard: [...state.hard, action.payload],
     };
   }
-
-  const starredCards = state.flashcards.filter((card) => card.starred);
-
   if (action.type === "reset") {
+    const starredCards = action.payload.filter((card) => card.starred);
     return {
       ...initialState,
       starredOnly: state.starredOnly,
