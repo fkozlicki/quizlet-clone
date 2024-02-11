@@ -25,9 +25,11 @@ const FolderModal = ({ session }: FolderModalProps) => {
   const router = useRouter();
   const { mutate: createFolder, isLoading: createLoading } =
     api.folder.create.useMutation({
-      onSuccess: ({ slug }) => {
+      onSuccess: async ({ slug }) => {
         void message.success("Created successfully");
         router.push(`/${session.user.id}/folders/${slug}`);
+        await fetch(`/api/revalidate?path=/${session.user.id}/folders`);
+        await fetch(`/api/revalidate?path=/${session.user.id}/folders/${slug}`);
         onClose();
       },
       onError: () => {

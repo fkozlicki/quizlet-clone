@@ -1,7 +1,10 @@
 "use client";
 
+import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Input, message } from "antd";
+import TextArea from "antd/es/input/TextArea";
+import { useRouter } from "next/navigation";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -15,9 +18,6 @@ import {
   editStudySetSchema,
 } from "../../schemas/study-set";
 import FlashcardDraggable from "./FlashcardDraggable";
-import { api } from "@/trpc/react";
-import { useRouter } from "next/navigation";
-import TextArea from "antd/es/input/TextArea";
 
 interface StudySetFormProps {
   initialData?: EditStudySetValues;
@@ -33,7 +33,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
   const router = useRouter();
   const { mutate: createSet, isLoading: createLoading } =
     api.studySet.create.useMutation({
-      onSuccess: ({ id }) => {
+      onSuccess: async ({ id }) => {
         router.push(`/study-set/${id}`);
         void message.success("Created set successfully");
       },
@@ -43,7 +43,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
     });
   const { mutate: editSet, isLoading: editLoading } =
     api.studySet.edit.useMutation({
-      onSuccess: ({ id }) => {
+      onSuccess: async ({ id }) => {
         router.push(`/study-set/${id}`);
         void message.success("Edited set successfully");
       },

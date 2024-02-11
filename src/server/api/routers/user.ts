@@ -74,14 +74,7 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Could not find user with id ${input.id}`,
-        });
-      }
-
-      return exclude(user, ["password"]);
+      return user;
     }),
 
   update: protectedProcedure

@@ -2,16 +2,18 @@
 
 import type { Flashcard } from "@prisma/client";
 import { Progress } from "antd";
+import { useAnimate } from "framer-motion";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useReducer } from "react";
 import StudyModeResult from "../shared/StudyModeResult";
 import FlashcardButtons from "./FlashcardButtons";
 import FlashcardsSettingsModal from "./FlashcardsSettingsModal";
 import FlipCard from "./FlipCard";
-import { useRouter } from "next/navigation";
+import MessageCard from "./MessageCard";
 
-export type FlashcardAnimation = "left" | "right" | "know" | "learning";
+export type FlashcardAnimation = "left" | "right" | "know" | "learning" | null;
 
 interface FlashcardsGameProps {
   cards: (Flashcard & { starred?: boolean })[];
@@ -27,6 +29,7 @@ const initialState = {
   sorting: false,
   starredOnly: false,
   settingsOpen: false,
+  know: false,
 };
 
 type FlashcardsGameState = typeof initialState;
@@ -40,7 +43,8 @@ type FlashcardsGameAction =
   | { type: "addHard"; payload: FlashcardsGameState["flashcards"][0] }
   | { type: "setSettingsOpen"; payload: FlashcardsGameState["settingsOpen"] }
   | { type: "shuffle" }
-  | { type: "setStarredOnly"; payload: FlashcardsGameState["starredOnly"] };
+  | { type: "setStarredOnly"; payload: FlashcardsGameState["starredOnly"] }
+  | { type: "setKnow"; payload: FlashcardsGameState["know"] };
 
 const gameReducer = (
   state: FlashcardsGameState,
@@ -58,7 +62,9 @@ const gameReducer = (
   if (action.type === "setSorting") {
     return { ...state, sorting: action.payload };
   }
-
+  if (action.type === "setKnow") {
+    return { ...state, know: action.payload };
+  }
   if (action.type === "reviewHard") {
     return {
       ...state,
@@ -112,7 +118,7 @@ const FlashcardsGame = ({
   size = "small",
 }: FlashcardsGameProps) => {
   const [
-    { cardIndex, sorting, flashcards, hard, settingsOpen, starredOnly },
+    { cardIndex, sorting, flashcards, hard, settingsOpen, starredOnly, know },
     dispatch,
   ] = useReducer(gameReducer, {
     ...initialState,
@@ -120,25 +126,27 @@ const FlashcardsGame = ({
   });
   const router = useRouter();
   const { data: session } = useSession();
-  const cardWrapper = useRef<HTMLDivElement>(null);
-  const [moveAnimation, setMoveAnimation] =
-    useState<FlashcardAnimation>("right");
-  const animationCardWrapper = useRef<HTMLDivElement>(null);
+  const [scope, animate] = useAnimate();
+  const [messageScope, messageAnimate] = useAnimate();
 
   const starredCards = cards.filter((card) => card.starred);
   const currentCard = flashcards[cardIndex];
   const hardCount = hard.length;
 
   useEffect(() => {
-    const editedCard = cards.find((card) => card.id === currentCard?.id);
-    const newCards = flashcards.map((card) =>
-      card.id === editedCard?.id ? editedCard : card,
-    );
-
-    dispatch({
-      type: "setCards",
-      payload: newCards,
-    });
+    if (starredOnly) {
+      const oldIds = flashcards.map((card) => card.id);
+      const editedCards = cards.filter((card) => oldIds.includes(card.id));
+      dispatch({
+        type: "setCards",
+        payload: editedCards,
+      });
+    } else {
+      dispatch({
+        type: "setCards",
+        payload: cards,
+      });
+    }
 
     if (starredOnly && starredCards.length === 0) {
       dispatch({ type: "setStarredOnly", payload: false });
@@ -220,34 +228,6 @@ const FlashcardsGame = ({
     );
   }
 
-  const animateScoreCard = (variant: "learning" | "know") => {
-    const { current } = animationCardWrapper;
-    if (!current) return;
-
-    const animationName =
-      variant === "learning" ? "animate-learning" : "animate-know";
-
-    current.classList.remove("animate-learning", "animate-know");
-    // -> triggering animation reflow
-    void current.offsetWidth;
-
-    current.classList.add(animationName);
-  };
-
-  const animateSlide = (variant: "left" | "right") => {
-    const { current } = cardWrapper;
-    if (!current) return;
-
-    const animationName =
-      variant === "left" ? "animate-slideLeft" : "animate-slideRight";
-
-    current.classList.remove("animate-slideLeft", "animate-slideRight");
-    // -> triggering animation reflow
-    void current.offsetWidth;
-
-    current.classList.add(animationName);
-  };
-
   const changeCard = (value: -1 | 1) => {
     dispatch({ type: value === 1 ? "nextCard" : "prevCard" });
   };
@@ -256,28 +236,65 @@ const FlashcardsGame = ({
     dispatch({ type: "addHard", payload: currentCard });
   };
 
-  const handleLeft = () => {
+  const handleLeft = async () => {
     if (sorting) {
-      setMoveAnimation("learning");
-      animateScoreCard("learning");
       addToHard();
       changeCard(1);
+      dispatch({ type: "setKnow", payload: false });
+      await messageAnimate(
+        messageScope.current,
+        {
+          opacity: [0, 1, 1, 0],
+          visibility: "visible",
+          rotate: [0, 2, 2, 0],
+          translateX: [0, 0, 0, -50],
+        },
+        {
+          ease: "linear",
+          duration: 0.5,
+        },
+      );
+      await messageAnimate(
+        messageScope.current,
+        { visibility: "hidden" },
+        { duration: 0 },
+      );
     } else {
-      setMoveAnimation("left");
-      animateSlide("left");
       changeCard(-1);
+      void animate(
+        scope.current,
+        { rotateY: [15, 0], translateX: [-60, 0] },
+        { duration: 0.15 },
+      );
     }
   };
 
-  const handleRight = () => {
-    if (sorting) {
-      setMoveAnimation("know");
-      animateScoreCard("know");
-    } else {
-      setMoveAnimation("right");
-      animateSlide("right");
-    }
+  const handleRight = async () => {
     changeCard(1);
+    if (sorting) {
+      dispatch({ type: "setKnow", payload: true });
+      await messageAnimate(
+        messageScope.current,
+        {
+          opacity: [0, 1, 1, 0],
+          visibility: "visible",
+          rotate: [0, -2, -2, 0],
+          translateX: [0, 0, 0, 50],
+        },
+        { ease: "linear", duration: 0.5 },
+      );
+      await messageAnimate(
+        messageScope.current,
+        { visibility: "hidden" },
+        { duration: 0 },
+      );
+    } else {
+      void animate(
+        scope.current,
+        { translateX: [60, 0], rotateY: [-15, 0] },
+        { duration: 0.15 },
+      );
+    }
   };
 
   const openSettingsModal = () => {
@@ -304,14 +321,15 @@ const FlashcardsGame = ({
 
   return (
     <>
-      <FlipCard
-        size={size}
-        flashcard={currentCard}
-        editable={ownerId === session?.user.id}
-        moveAnimation={moveAnimation}
-        cardWrapper={cardWrapper}
-        animationCardWrapper={animationCardWrapper}
-      />
+      <div className="relative flex [perspective:1000px]">
+        {sorting && <MessageCard know={know} animationScope={messageScope} />}
+        <FlipCard
+          size={size}
+          flashcard={currentCard}
+          editable={ownerId === session?.user.id}
+          animationScope={scope}
+        />
+      </div>
       <FlashcardButtons
         setId={setId}
         cardCount={flashcards.length}

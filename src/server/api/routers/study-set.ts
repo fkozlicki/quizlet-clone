@@ -2,11 +2,11 @@ import type { Flashcard } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import {
   createStudySetSchema,
   editStudySetSchema,
 } from "../../../schemas/study-set";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 type TrueOrFalse = Flashcard & {
   answer: string;
@@ -57,7 +57,7 @@ export const studySetRouter = createTRPCRouter({
   create: protectedProcedure
     .input(createStudySetSchema)
     .mutation(async ({ ctx, input }) => {
-      return await ctx.prisma.studySet.create({
+      const newSet = await ctx.prisma.studySet.create({
         data: {
           userId: ctx.session.user.id,
           title: input.title,
@@ -69,6 +69,8 @@ export const studySetRouter = createTRPCRouter({
           },
         },
       });
+
+      return newSet;
     }),
 
   getById: publicProcedure

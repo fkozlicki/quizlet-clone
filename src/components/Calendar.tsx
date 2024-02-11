@@ -8,6 +8,7 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import React from "react";
 import ReactCalendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 const Calendar = ({ activity }: { activity: Activity[] }) => {
   const today = dayjs().format("YYYY-MM-DD");

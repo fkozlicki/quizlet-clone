@@ -1,12 +1,12 @@
 "use client";
 
+import { api } from "@/trpc/react";
 import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
-import { Button, Typography, message, theme } from "antd";
+import { Button, message, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import type { MouseEventHandler } from "react";
 import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
-import { api } from "@/trpc/react";
-import Text from "antd/es/typography/Text";
 
 interface FlipCardContentProps {
   content: string;
