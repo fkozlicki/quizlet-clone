@@ -1,22 +1,66 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { unstable_getServerSession } from "next-auth";
-import { requestWrapper } from "../pages/api/auth/[...nextauth]";
+import { env } from "@/env";
+import { prisma } from "@/server/db";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import {
+  getServerSession,
+  type DefaultSession,
+  type NextAuthOptions,
+} from "next-auth";
+import FacebookProvider from "next-auth/providers/facebook";
+import GoogleProvider from "next-auth/providers/google";
 
 /**
- * Wrapper for unstable_getServerSession, used in trpc createContext and the
- * restricted API route
+ * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
+ * object and keep type safety.
  *
- * Don't worry too much about the "unstable", it's safe to use but the syntax
- * may change in future versions
+ * @see https://next-auth.js.org/getting-started/typescript#module-augmentation
+ */
+declare module "next-auth" {
+  interface Session extends DefaultSession {
+    user: DefaultSession["user"] & {
+      id: string;
+      // ...other properties
+      // role: UserRole;
+    };
+  }
+
+  // interface User {
+  //   // ...other properties
+  //   // role: UserRole;
+  // }
+}
+
+/**
+ * Options for NextAuth.js used to configure adapters, providers, callbacks, etc.
+ *
+ * @see https://next-auth.js.org/configuration/options
+ */
+export const authOptions: NextAuthOptions = {
+  callbacks: {
+    session: ({ session, user }) => ({
+      ...session,
+      user: {
+        ...session.user,
+        id: user.id,
+      },
+    }),
+  },
+  adapter: PrismaAdapter(prisma),
+  providers: [
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+    }),
+    FacebookProvider({
+      clientId: env.FACEBOOK_CLIENT_ID,
+      clientSecret: env.FACEBOOK_CLIENT_SECRET,
+    }),
+  ],
+};
+
+/**
+ * Wrapper for `getServerSession` so that you don't need to import the `authOptions` in every file.
  *
  * @see https://next-auth.js.org/configuration/nextjs
  */
-
-export const getServerAuthSession = async (ctx: {
-  // req: GetServerSidePropsContext["req"];
-  // res: GetServerSidePropsContext["res"];
-  req: NextApiRequest;
-  res: NextApiResponse;
-}) => {
-  return await unstable_getServerSession(...requestWrapper(ctx.req, ctx.res));
-};
+export const getServerAuthSession = () => getServerSession(authOptions);

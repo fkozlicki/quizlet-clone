@@ -1,9 +1,12 @@
+"use client";
+
 import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
 import { Button, Typography, message, theme } from "antd";
 import type { MouseEventHandler } from "react";
 import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
-import { api } from "../../utils/api";
+import { api } from "@/trpc/react";
+import Text from "antd/es/typography/Text";
 
 interface FlipCardContentProps {
   content: string;
@@ -38,7 +41,9 @@ const FlipCardContent = ({
         return {
           ...old,
           cards: old.cards.map((oldCard) =>
-            oldCard.id === flashcardId ? { ...oldCard, starred: true } : oldCard
+            oldCard.id === flashcardId
+              ? { ...oldCard, starred: true }
+              : oldCard,
           ),
         };
       });
@@ -70,7 +75,7 @@ const FlipCardContent = ({
             cards: old.cards.map((oldCard) =>
               oldCard.id === flashcardId
                 ? { ...oldCard, starred: false }
-                : oldCard
+                : oldCard,
             ),
           };
         });
@@ -82,7 +87,7 @@ const FlipCardContent = ({
       onError: () => {
         void message.error("Couldn't remove flashcard from starred");
       },
-    }
+    },
   );
 
   const handleOpenEdit: MouseEventHandler<HTMLElement> = (event) => {
@@ -116,9 +121,7 @@ const FlipCardContent = ({
         }}
       >
         <div className="flex items-center justify-between">
-          <Typography.Text className="select-none font-semibold">
-            {title}
-          </Typography.Text>
+          <Text className="select-none font-semibold">{title}</Text>
           <div className="flex justify-end gap-2">
             {editable && (
               <Button
@@ -141,9 +144,7 @@ const FlipCardContent = ({
           </div>
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <Typography.Text className="select-none text-3xl">
-            {content}
-          </Typography.Text>
+          <Text className="select-none text-3xl">{content}</Text>
         </div>
       </div>
     </div>

@@ -1,8 +1,8 @@
+import { api } from "@/trpc/react";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { Folder, StudySet } from "@prisma/client";
 import { Button, Card, message } from "antd";
 import React from "react";
-import { api } from "../../utils/api";
 
 type FolderWithSets = Folder & {
   studySets: StudySet[];

@@ -1,9 +1,12 @@
+"use client";
+
+import { api } from "@/trpc/react";
 import { EditOutlined, StarFilled } from "@ant-design/icons";
 import type { Flashcard } from "@prisma/client";
-import { Button, Typography, message, theme } from "antd";
+import { Button, message, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import { useSession } from "next-auth/react";
 import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
-import { api } from "../../utils/api";
 
 interface CardPreviewProps {
   flashcard: Flashcard & { starred?: boolean };
@@ -31,7 +34,9 @@ const FlashcardPreview = ({ flashcard, userId }: CardPreviewProps) => {
         return {
           ...old,
           cards: old.cards.map((oldCard) =>
-            oldCard.id === flashcardId ? { ...oldCard, starred: true } : oldCard
+            oldCard.id === flashcardId
+              ? { ...oldCard, starred: true }
+              : oldCard,
           ),
         };
       });
@@ -63,7 +68,7 @@ const FlashcardPreview = ({ flashcard, userId }: CardPreviewProps) => {
             cards: old.cards.map((oldCard) =>
               oldCard.id === flashcardId
                 ? { ...oldCard, starred: false }
-                : oldCard
+                : oldCard,
             ),
           };
         });
@@ -75,7 +80,7 @@ const FlashcardPreview = ({ flashcard, userId }: CardPreviewProps) => {
       onError: () => {
         void message.error("Couldn't remove flashcard from starred");
       },
-    }
+    },
   );
 
   const openEditModal = () => {
@@ -122,10 +127,10 @@ const FlashcardPreview = ({ flashcard, userId }: CardPreviewProps) => {
         />
       </div>
       <div className="border-slate-200 sm:basis-2/5 sm:border-r sm:pr-8">
-        <Typography.Text className="text-base">{term}</Typography.Text>
+        <Text className="text-base">{term}</Text>
       </div>
       <div className="sm:basis-3/5 sm:px-8">
-        <Typography.Text className="text-base">{definition}</Typography.Text>
+        <Text className="text-base">{definition}</Text>
       </div>
     </div>
   );

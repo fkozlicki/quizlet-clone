@@ -1,5 +1,5 @@
 import type { Flashcard } from "@prisma/client";
-import { Typography } from "antd";
+import Title from "antd/es/typography/Title";
 import FlashcardPreview from "../shared/FlashcardPreview";
 
 interface FlashcardsListProps {
@@ -10,9 +10,9 @@ interface FlashcardsListProps {
 const FlashcardsList = ({ cards, userId }: FlashcardsListProps) => {
   return (
     <div className="mb-8">
-      <Typography.Title level={2} className="mb-5 text-lg font-bold">
+      <Title level={2} className="mb-5 text-lg font-bold">
         Terms in this set ({cards.length})
-      </Typography.Title>
+      </Title>
       <div className="flex flex-col gap-3">
         {cards.map((flashcard, index) => (
           <FlashcardPreview userId={userId} key={index} flashcard={flashcard} />

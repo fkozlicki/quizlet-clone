@@ -1,4 +1,5 @@
-import { Alert, Card, Typography, theme } from "antd";
+import { Alert, Card, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 interface TrueOrFalseProps {
@@ -34,22 +35,16 @@ const TrueOrFalse = ({
               borderColor: colorBorder,
             }}
           >
-            <Typography.Text
-              className="mb-6 block font-semibold"
-              type="secondary"
-            >
+            <Text className="mb-6 block font-semibold" type="secondary">
               Term
-            </Typography.Text>
-            <Typography.Text className="text-xl">{term}</Typography.Text>
+            </Text>
+            <Text className="text-xl">{term}</Text>
           </div>
           <div className="flex-1 pt-4 sm:pl-6 sm:pt-0">
-            <Typography.Text
-              className="mb-6 block font-semibold"
-              type="secondary"
-            >
+            <Text className="mb-6 block font-semibold" type="secondary">
               Definition
-            </Typography.Text>
-            <Typography.Text className="text-xl">{answer}</Typography.Text>
+            </Text>
+            <Text className="text-xl">{answer}</Text>
           </div>
         </div>
         <div>
@@ -57,22 +52,22 @@ const TrueOrFalse = ({
           {result &&
             ((answer === definition && userAnswer === "true") ||
               (answer !== definition && userAnswer === "false")) && (
-              <Typography.Text
+              <Text
                 type="success"
                 className="mb-2 inline-block text-base font-medium"
               >
                 You&apos;ve got this
-              </Typography.Text>
+              </Text>
             )}
           {result &&
             ((answer === definition && userAnswer === "false") ||
               (answer !== definition && userAnswer === "true")) && (
-              <Typography.Text
+              <Text
                 type="danger"
                 className="mb-2 inline-block text-base font-medium"
               >
                 You are still learning
-              </Typography.Text>
+              </Text>
             )}
           <div className="flex gap-4">
             <label
@@ -96,14 +91,14 @@ const TrueOrFalse = ({
                     result && answer === definition
                       ? green5
                       : userAnswer === "true"
-                      ? red5
-                      : colorBorder,
+                        ? red5
+                        : colorBorder,
                   background:
                     result && answer === definition
                       ? green1
                       : userAnswer === "true"
-                      ? red1
-                      : "",
+                        ? red1
+                        : "",
                 }}
               >
                 True
@@ -127,14 +122,14 @@ const TrueOrFalse = ({
                     result && answer !== definition
                       ? green5
                       : userAnswer === "false"
-                      ? red5
-                      : colorBorder,
+                        ? red5
+                        : colorBorder,
                   background:
                     result && answer !== definition
                       ? green1
                       : userAnswer === "false"
-                      ? red1
-                      : "",
+                        ? red1
+                        : "",
                 }}
               >
                 False
@@ -143,12 +138,12 @@ const TrueOrFalse = ({
           </div>
           {result && definition !== answer && (
             <div className="mt-6 ">
-              <Typography.Text
+              <Text
                 type="secondary"
                 className="mb-2 inline-block text-base font-medium"
               >
                 Correct definition
-              </Typography.Text>
+              </Text>
               <Alert message={definition} type="success" />
             </div>
           )}

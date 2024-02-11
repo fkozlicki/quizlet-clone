@@ -1,26 +1,24 @@
+"use client";
+
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Tabs, Typography } from "antd";
+import { type User } from "@prisma/client";
+import { Avatar, Tabs } from "antd";
+import Text from "antd/es/typography/Text";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import type { ReactElement } from "react";
-import { api } from "../../utils/api";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 interface ProfileLayoutProps {
-  children: ReactElement;
-  userId: string;
+  children: ReactNode;
+  user: Omit<User, "password">;
 }
 
-const ProfileLayout = ({ children, userId }: ProfileLayoutProps) => {
+const ProfileLayout = ({ children, user }: ProfileLayoutProps) => {
   const { data: session } = useSession();
-  const { pathname } = useRouter();
-  const { data } = api.user.getById.useQuery({ id: userId });
+  const pathname = usePathname();
 
-  if (!data) {
-    return <div>404</div>;
-  }
-
-  const { id, name, image } = data;
+  const { id, name, image } = user;
 
   return (
     <>
@@ -32,21 +30,19 @@ const ProfileLayout = ({ children, userId }: ProfileLayoutProps) => {
           className="h-16 w-16"
         />
         <div>
-          <Typography.Text className="block text-2xl font-bold">
+          <Text className="block text-2xl font-bold">{name}</Text>
+          <Text className="block font-semibold" type="secondary">
             {name}
-          </Typography.Text>
-          <Typography.Text className="block font-semibold" type="secondary">
-            {name}
-          </Typography.Text>
+          </Text>
         </div>
       </div>
       <Tabs
         activeKey={
-          pathname === "/[id]"
+          pathname === `/${id}`
             ? "1"
-            : pathname === "/[id]/study-sets"
-            ? "2"
-            : "3"
+            : pathname === `/${id}/study-sets`
+              ? "2"
+              : "3"
         }
         items={(session?.user.id === id
           ? [

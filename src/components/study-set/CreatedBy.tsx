@@ -1,6 +1,7 @@
 import { UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import { Avatar, Typography } from "antd";
+import { Avatar } from "antd";
+import Text from "antd/es/typography/Text";
 import Link from "next/link";
 
 interface CreatedByProps {
@@ -12,12 +13,8 @@ const CreatedBy = ({ user }: CreatedByProps) => {
     <Link href={`/${user.id}`} className="flex items-center gap-4">
       <Avatar icon={<UserOutlined />} src={user.image} />
       <div className="flex flex-col">
-        <Typography.Text className="text-xs font-semibold">
-          Created by
-        </Typography.Text>
-        <Typography.Text className="text-sm font-medium">
-          {user.name}
-        </Typography.Text>
+        <Text className="text-xs font-semibold">Created by</Text>
+        <Text className="text-sm font-medium">{user.name}</Text>
       </div>
     </Link>
   );

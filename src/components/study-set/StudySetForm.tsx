@@ -1,6 +1,7 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Form, Input, message } from "antd";
-import { useRouter } from "next/router";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -13,8 +14,10 @@ import {
   createStudySetSchema,
   editStudySetSchema,
 } from "../../schemas/study-set";
-import { api } from "../../utils/api";
 import FlashcardDraggable from "./FlashcardDraggable";
+import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
+import TextArea from "antd/es/input/TextArea";
 
 interface StudySetFormProps {
   initialData?: EditStudySetValues;
@@ -27,11 +30,11 @@ const initialCards = Array.from({ length: 4 }, (_, index) => ({
 }));
 
 const StudySetForm = ({ initialData }: StudySetFormProps) => {
-  const { push } = useRouter();
+  const router = useRouter();
   const { mutate: createSet, isLoading: createLoading } =
     api.studySet.create.useMutation({
-      onSuccess: async ({ id }) => {
-        await push(`/study-set/${id}`);
+      onSuccess: ({ id }) => {
+        router.push(`/study-set/${id}`);
         void message.success("Created set successfully");
       },
       onError: () => {
@@ -40,8 +43,8 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
     });
   const { mutate: editSet, isLoading: editLoading } =
     api.studySet.edit.useMutation({
-      onSuccess: async ({ id }) => {
-        await push(`/study-set/${id}`);
+      onSuccess: ({ id }) => {
+        router.push(`/study-set/${id}`);
         void message.success("Edited set successfully");
       },
       onError: () => {
@@ -52,7 +55,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
     CreateStudySetValues | EditStudySetValues
   >({
     resolver: zodResolver(
-      initialData ? editStudySetSchema : createStudySetSchema
+      initialData ? editStudySetSchema : createStudySetSchema,
     ),
     defaultValues: initialData ?? {
       cards: initialCards,
@@ -99,7 +102,7 @@ const StudySetForm = ({ initialData }: StudySetFormProps) => {
         <Input size="large" />
       </FormItem>
       <FormItem control={control} label="Description" name="description">
-        <Input.TextArea size="large" />
+        <TextArea size="large" />
       </FormItem>
       <div className="pb-2">Flashcards</div>
       <DndProvider backend={HTML5Backend}>

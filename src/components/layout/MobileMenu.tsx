@@ -7,8 +7,8 @@ import Link from "next/link";
 import type { Key, ReactNode } from "react";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
-import { useRouter } from "next/router";
 import { useThemeContext } from "../../contexts/ThemeProvider";
+import { useRouter } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -19,7 +19,7 @@ interface MobileMenuProps {
 
 const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
   const { data: session } = useSession();
-  const { push } = useRouter();
+  const router = useRouter();
   const [, dispatchAuthDropdown] = useAuthDropdownContext();
   const [, dispatchFolderModal] = useFolderModalContext();
   const { switchDarkMode } = useThemeContext();
@@ -38,7 +38,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
 
   const handleCreateStudySet = async () => {
     if (session) {
-      await push("/create-set");
+      router.push("/create-set");
     } else {
       dispatchAuthDropdown("openLogin");
     }
@@ -49,7 +49,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
     label: ReactNode,
     key?: Key | null,
     icon?: ReactNode,
-    children?: MenuItem[]
+    children?: MenuItem[],
   ): MenuItem {
     return {
       key,
@@ -116,7 +116,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                       </div>
                     </div>
                   </div>,
-                  "4"
+                  "4",
                 ),
                 getItem(<Link href={`/${session.user.id}`}>Profile</Link>, "5"),
                 getItem(<Link href="/settings">Settings</Link>, "6"),
@@ -127,7 +127,7 @@ const MobileMenu = ({ open, onClose }: MobileMenuProps) => {
                   onClick: () => void signOut(),
                 },
               ]
-            : []
+            : [],
         )}
       />
     </Drawer>

@@ -39,7 +39,7 @@ export const studySetRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       return await ctx.prisma.studySet.findMany({
@@ -75,11 +75,9 @@ export const studySetRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
-      console.log("QUERY", ctx.session);
-
       const starredFlashcards = ctx.session
         ? await ctx.prisma.starredFlashcard.findMany({
             where: {
@@ -136,7 +134,7 @@ export const studySetRouter = createTRPCRouter({
             cards: set.cards.map((card) => ({
               ...card,
               starred: starredFlashcards.some(
-                (starred) => starred.flashcardId === card.id
+                (starred) => starred.flashcardId === card.id,
               ),
             })),
           }
@@ -163,8 +161,8 @@ export const studySetRouter = createTRPCRouter({
           ...cards
             .filter((card) => card.id !== multipleChoice.id)
             .sort(() => 0.5 - Math.random())
-            .slice(0)
-            .map((card) => card.definition),
+            .map((card) => card.definition)
+            .slice(0, 3),
           multipleChoice.definition,
         ].sort(() => 0.5 - Math.random());
 
@@ -211,7 +209,7 @@ export const studySetRouter = createTRPCRouter({
             ...multipleChoice,
             answers,
           };
-        }
+        },
       );
       // written
       const written = cardsCopy.splice(0, count);
@@ -239,7 +237,7 @@ export const studySetRouter = createTRPCRouter({
     .input(
       z.object({
         setId: z.string(),
-      })
+      }),
     )
     .query(async ({ ctx, input }) => {
       const cards = await ctx.prisma.flashcard.findMany({

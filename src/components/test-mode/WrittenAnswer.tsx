@@ -1,4 +1,5 @@
-import { Alert, Card, Input, Typography } from "antd";
+import { Alert, Card, Input } from "antd";
+import Text from "antd/es/typography/Text";
 import type { Control, FieldPath } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
 import type { TestInputs } from "./TestForm";
@@ -25,10 +26,10 @@ const WrittenAnswer = ({
       <div className="flex min-h-[30rem] flex-col">
         <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
           <div className={`flex-1 pb-4`}>
-            <Typography.Text className="mb-6 block font-bold" type="secondary">
+            <Text className="mb-6 block font-bold" type="secondary">
               Term
-            </Typography.Text>
-            <Typography.Text className="text-2xl">{term}</Typography.Text>
+            </Text>
+            <Text className="text-2xl">{term}</Text>
           </div>
         </div>
         <div>
@@ -46,24 +47,22 @@ const WrittenAnswer = ({
             <>
               {userAnswer !== definition ? (
                 <>
-                  <Typography.Text
+                  <Text
                     className="mb-2 inline-block text-base font-medium"
                     type="danger"
                   >
                     You are still learning
-                  </Typography.Text>
+                  </Text>
                   <Alert message={userAnswer} type="error" className="mb-6" />
-                  <Typography.Text
+                  <Text
                     type="secondary"
                     className="mb-2 inline-block text-base font-medium"
                   >
                     Correct answer
-                  </Typography.Text>
+                  </Text>
                 </>
               ) : (
-                <Typography.Text type="success">
-                  You&apos;ve got this
-                </Typography.Text>
+                <Text type="success">You&apos;ve got this</Text>
               )}
               <Alert message={definition} type="success" />
             </>

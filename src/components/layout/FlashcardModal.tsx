@@ -1,3 +1,5 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, Input, Modal, message } from "antd";
 import { useEffect } from "react";
@@ -9,7 +11,7 @@ import {
   editFlashcardSchema,
   type EditFlashcardValues,
 } from "../../schemas/flashcard";
-import { api } from "../../utils/api";
+import { api } from "@/trpc/react";
 
 const FlashcardModal = () => {
   const [{ flashcard }, dispatch] = useFlashcardModalContext();
@@ -29,7 +31,7 @@ const FlashcardModal = () => {
           return;
         }
         const newCards = oldData.cards.map((card) =>
-          card.id === data.id ? data : card
+          card.id === data.id ? data : card,
         );
         return {
           ...oldData,

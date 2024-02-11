@@ -1,13 +1,15 @@
+"use client";
+
 import type { Flashcard } from "@prisma/client";
 import { Progress } from "antd";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useRouter } from "next/router";
 import { useEffect, useReducer, useRef, useState } from "react";
 import StudyModeResult from "../shared/StudyModeResult";
 import FlashcardButtons from "./FlashcardButtons";
 import FlashcardsSettingsModal from "./FlashcardsSettingsModal";
 import FlipCard from "./FlipCard";
+import { useRouter } from "next/navigation";
 
 export type FlashcardAnimation = "left" | "right" | "know" | "learning";
 
@@ -36,14 +38,13 @@ type FlashcardsGameAction =
   | { type: "reset"; payload: FlashcardsGameState["flashcards"] }
   | { type: "reviewHard" }
   | { type: "addHard"; payload: FlashcardsGameState["flashcards"][0] }
-  | { type: "setSorting"; payload: FlashcardsGameState["sorting"] }
   | { type: "setSettingsOpen"; payload: FlashcardsGameState["settingsOpen"] }
   | { type: "shuffle" }
   | { type: "setStarredOnly"; payload: FlashcardsGameState["starredOnly"] };
 
 const gameReducer = (
   state: FlashcardsGameState,
-  action: FlashcardsGameAction
+  action: FlashcardsGameAction,
 ): FlashcardsGameState => {
   if (action.type === "setCards") {
     return { ...state, flashcards: action.payload };
@@ -117,7 +118,7 @@ const FlashcardsGame = ({
     ...initialState,
     flashcards: cards,
   });
-  const { push } = useRouter();
+  const router = useRouter();
   const { data: session } = useSession();
   const cardWrapper = useRef<HTMLDivElement>(null);
   const [moveAnimation, setMoveAnimation] =
@@ -131,7 +132,7 @@ const FlashcardsGame = ({
   useEffect(() => {
     const editedCard = cards.find((card) => card.id === currentCard?.id);
     const newCards = flashcards.map((card) =>
-      card.id === editedCard?.id ? editedCard : card
+      card.id === editedCard?.id ? editedCard : card,
     );
 
     dispatch({
@@ -158,16 +159,16 @@ const FlashcardsGame = ({
     dispatch({ type: "reviewHard" });
   };
 
-  const learnFlashcards = async () => {
-    await push(`/study-set/${setId}/learn`);
+  const learnFlashcards = () => {
+    router.push(`/study-set/${setId}/learn`);
   };
 
   const resetFlashcards = () => {
     dispatch({ type: "reset", payload: cards });
   };
 
-  const backToStudySet = async () => {
-    await push(`/study-set/${setId}`);
+  const backToStudySet = () => {
+    router.push(`/study-set/${setId}`);
   };
 
   const firstButton = {
@@ -175,20 +176,20 @@ const FlashcardsGame = ({
       hardCount > 0
         ? "Review the tough terms"
         : size === "small"
-        ? "Learn flashcards"
-        : "Back to set",
+          ? "Learn flashcards"
+          : "Back to set",
     description:
       hardCount > 0
         ? `Review Flashcards again with the ${hardCount} terms you're still learing.`
         : size === "small"
-        ? "Learn flashcards"
-        : "Get back to the study set.",
+          ? "Learn flashcards"
+          : "Get back to the study set.",
     callback:
       hardCount > 0
         ? reviewToughTerms
         : size === "small"
-        ? learnFlashcards
-        : backToStudySet,
+          ? learnFlashcards
+          : backToStudySet,
     Icon: (
       <Image
         src={size === "small" ? "/study.png" : "/back.svg"}

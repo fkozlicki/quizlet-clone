@@ -1,6 +1,8 @@
 import { UserOutlined } from "@ant-design/icons";
 import type { StudySet, User } from "@prisma/client";
-import { Avatar, Card, Tag, Typography } from "antd";
+import { Avatar, Card, Tag } from "antd";
+import Meta from "antd/es/card/Meta";
+import Text from "antd/es/typography/Text";
 import Link from "next/link";
 
 interface StudySetPreviewProps {
@@ -26,7 +28,7 @@ const StudySetPreview = ({
         href={`/study-set/${id}`}
         className="absolute left-0 top-0 h-full w-full"
       ></Link>
-      <Card.Meta title={title} />
+      <Meta title={title} />
       <Tag className="mt-2">{termsCount} terms</Tag>
       <Link
         href={`/${authorId}`}
@@ -38,9 +40,7 @@ const StudySetPreview = ({
           src={authorImage}
           alt="set author avatar"
         />
-        <Typography.Text className="group-hover:underline">
-          {authorName}
-        </Typography.Text>
+        <Text className="group-hover:underline">{authorName}</Text>
       </Link>
     </Card>
   );

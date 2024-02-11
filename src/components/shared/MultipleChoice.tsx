@@ -1,6 +1,6 @@
-import { Typography, theme } from "antd";
+import { theme } from "antd";
+import Text from "antd/es/typography/Text";
 import type { MouseEvent } from "react";
-import React from "react";
 import type { UseFormRegisterReturn } from "react-hook-form";
 
 interface MultipleChoiceProps {
@@ -39,37 +39,30 @@ const MultipleChoice = ({
     >
       <div className="flex flex-1 flex-col sm:mb-12 sm:flex-row">
         <div className={`flex-1 pb-4`}>
-          <Typography.Text
-            className="mb-6 block font-semibold"
-            type="secondary"
-          >
+          <Text className="mb-6 block font-semibold" type="secondary">
             Term
-          </Typography.Text>
-          <Typography.Text className="text-2xl">{term}</Typography.Text>
+          </Text>
+          <Text className="text-2xl">{term}</Text>
         </div>
       </div>
       <div>
-        {!result && (
-          <Typography.Text className="mb-4 block">
-            Choose answer
-          </Typography.Text>
-        )}
+        {!result && <Text className="mb-4 block">Choose answer</Text>}
         {result && (
           <>
             {userAnswer === definition ? (
-              <Typography.Text
+              <Text
                 type="success"
                 className="mb-2 inline-block text-base font-medium"
               >
                 You&apos;ve got this
-              </Typography.Text>
+              </Text>
             ) : (
-              <Typography.Text
+              <Text
                 type="danger"
                 className="mb-2 inline-block text-base font-medium"
               >
                 You are still learning
-              </Typography.Text>
+              </Text>
             )}
           </>
         )}
@@ -99,17 +92,17 @@ const MultipleChoice = ({
                     answer === definition
                       ? green1
                       : userAnswer === answer
-                      ? red1
-                      : "",
+                        ? red1
+                        : "",
                   borderColor:
                     answer === definition
                       ? green5
                       : userAnswer === answer
-                      ? red5
-                      : colorBorder,
+                        ? red5
+                        : colorBorder,
                 }}
               >
-                <Typography.Text>{answer}</Typography.Text>
+                <Text>{answer}</Text>
               </div>
             </label>
           ))}

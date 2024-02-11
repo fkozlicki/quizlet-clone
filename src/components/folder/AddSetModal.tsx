@@ -2,8 +2,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Empty, Modal } from "antd";
 import Link from "next/link";
-import { api } from "../../utils/api";
 import FolderStudySet from "./FolderStudySet";
+import { api } from "@/trpc/react";
 
 interface AddSetModalProps {
   open: boolean;

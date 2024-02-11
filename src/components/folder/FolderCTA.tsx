@@ -1,3 +1,5 @@
+"use client";
+
 import {
   DeleteOutlined,
   EditOutlined,
@@ -8,8 +10,8 @@ import { Button, Dropdown, Modal, Tag, Tooltip, message } from "antd";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
 import type { EditFolderValues } from "../../schemas/folder";
 import { useState } from "react";
-import { api } from "../../utils/api";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 
 interface FolderCTAProps {
   userId: string;
@@ -22,14 +24,14 @@ const FolderCTA = ({
   openAddSetModal,
   userId,
 }: FolderCTAProps) => {
-  const { push } = useRouter();
+  const router = useRouter();
   const [, dispatch] = useFolderModalContext();
   const [deleteFolderModalOpen, setDeleteFolderModalOpen] =
     useState<boolean>(false);
   const { mutate: deleteFolder, isLoading } = api.folder.delete.useMutation({
-    onSuccess: async () => {
+    onSuccess: () => {
       void message.success("Deleted successfully");
-      await push(`/${userId}/folders`);
+      router.push(`/${userId}/folders`);
     },
     onError: () => {
       void message.error("Couldn't delete folder");

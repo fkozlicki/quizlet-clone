@@ -1,7 +1,9 @@
-import { Typography, theme } from "antd";
+"use client";
+
+import { theme } from "antd";
+import Text from "antd/es/typography/Text";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 import type { UrlObject } from "url";
 
 interface IconCardProps {
@@ -26,7 +28,7 @@ const IconCard = ({ icon, text, link }: IconCardProps) => {
     >
       <div className="flex items-center gap-3">
         <Image src={icon} alt="" width={32} height={32} />
-        <Typography.Text className="font-semibold">{text}</Typography.Text>
+        <Text className="font-semibold">{text}</Text>
       </div>
     </Link>
   );

@@ -1,7 +1,7 @@
+import { api } from "@/trpc/react";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Card, message } from "antd";
-import { api } from "../../utils/api";
 
 interface FolderStudySetProps {
   folderId: string;
