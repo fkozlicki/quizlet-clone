@@ -26,9 +26,9 @@ export default function RootLayout({
     <html id="app" lang="en">
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider>
-          <Providers>
-            <AntdRegistry>{children}</AntdRegistry>
-          </Providers>
+          <AntdRegistry>
+            <Providers>{children}</Providers>
+          </AntdRegistry>
         </TRPCReactProvider>
       </body>
     </html>

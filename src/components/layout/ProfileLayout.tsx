@@ -4,7 +4,7 @@ import { UserOutlined } from "@ant-design/icons";
 import { type User } from "@prisma/client";
 import { Avatar, Tabs } from "antd";
 import Text from "antd/es/typography/Text";
-import { useSession } from "next-auth/react";
+import { type Session } from "next-auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -12,10 +12,10 @@ import type { ReactNode } from "react";
 interface ProfileLayoutProps {
   children: ReactNode;
   user: Omit<User, "password">;
+  session: Session | null;
 }
 
-const ProfileLayout = ({ children, user }: ProfileLayoutProps) => {
-  const { data: session } = useSession();
+const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
   const pathname = usePathname();
 
   const { id, name, image } = user;

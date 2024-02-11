@@ -2,7 +2,7 @@ import React from "react";
 import IconCard from "./IconCard";
 
 interface StudyModesProps {
-  setId: string;
+  setId?: string;
 }
 
 const StudyModes = ({ setId }: StudyModesProps) => {

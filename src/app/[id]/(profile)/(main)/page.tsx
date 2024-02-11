@@ -1,9 +1,7 @@
 import Calendar from "@/components/Calendar";
 import { api } from "@/trpc/server";
 import Title from "antd/es/typography/Title";
-import dayjs from "dayjs";
 import { notFound } from "next/navigation";
-import React from "react";
 import "react-calendar/dist/Calendar.css";
 
 export default async function Profile({
