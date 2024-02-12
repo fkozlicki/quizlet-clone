@@ -1,4 +1,4 @@
-import TestGame from "@/components/TestGame";
+import TestMode from "@/components/test-mode/TestMode";
 import { api } from "@/trpc/server";
 import { notFound } from "next/navigation";
 import React from "react";
@@ -14,5 +14,5 @@ export default async function Test({
     notFound();
   }
 
-  return <TestGame test={test} setId={id} />;
+  return <TestMode test={test} setId={id} />;
 }

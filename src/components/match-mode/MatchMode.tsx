@@ -4,9 +4,9 @@ import { api } from "@/trpc/react";
 import { Button } from "antd";
 import Link from "next/link";
 import React, { useEffect, useReducer } from "react";
-import StartScreen from "./match-mode/StartScreen";
-import MemoryCard from "./match-mode/MemoryCard";
-import EndScreen from "./match-mode/EndScreen";
+import StartScreen from "./StartScreen";
+import MemoryCard from "./MemoryCard";
+import EndScreen from "./EndScreen";
 import Text from "antd/es/typography/Text";
 
 export interface GameCard {
@@ -69,18 +69,20 @@ const initialGameState: GameState = {
   ellapsedTime: 0,
 };
 
-const MatchGame = ({
-  cards: initialCards,
-  setId,
-}: {
-  cards: GameCard[];
-  setId: string;
-}) => {
+const MatchMode = ({ setId }: { setId: string }) => {
   const [
     { cards, matched, mismatch, selected, stage, ellapsedTime },
     dispatch,
-  ] = useReducer(gameReducer, { ...initialGameState, cards: initialCards });
+  ] = useReducer(gameReducer, initialGameState);
   const utils = api.useUtils();
+  api.studySet.getMatchCards.useQuery(
+    { setId },
+    {
+      onSuccess(data) {
+        dispatch({ type: "setCards", payload: data });
+      },
+    },
+  );
 
   useEffect(() => {
     if (matched.length > 0 && matched.length === cards.length) {
@@ -173,4 +175,4 @@ const MatchGame = ({
   );
 };
 
-export default MatchGame;
+export default MatchMode;

@@ -5,9 +5,9 @@ import { Divider, Progress, theme } from "antd";
 import Title from "antd/es/typography/Title";
 import { useRouter } from "next/navigation";
 import { type MouseEvent, useState } from "react";
-import FlashcardPreview from "./shared/FlashcardPreview";
-import MultipleChoice from "./shared/MultipleChoice";
-import StudyModeResult from "./shared/StudyModeResult";
+import FlashcardPreview from "../shared/FlashcardPreview";
+import MultipleChoice from "../shared/MultipleChoice";
+import StudyModeResult from "../shared/StudyModeResult";
 import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
 import { type Flashcard, type StarredFlashcard } from "@prisma/client";
 
@@ -20,7 +20,7 @@ type LearnCard = {
   position: number;
 };
 
-const LearnGame = ({
+const LearnMode = ({
   cards,
   starredFlashcards,
   setId,
@@ -135,4 +135,4 @@ const LearnGame = ({
   );
 };
 
-export default LearnGame;
+export default LearnMode;

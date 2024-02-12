@@ -1,20 +1,19 @@
-import FolderPage from "@/components/FolderPage";
-import { api } from "@/trpc/server";
-import { notFound } from "next/navigation";
+import Folder from "@/components/folder/Folder";
+import { createSSRHelper } from "@/server/helpers/ssgHelper";
+import { Hydrate, dehydrate } from "@tanstack/react-query";
 
-export default async function Folder({
+export default async function FolderPage({
   params: { slug, id: userId },
 }: {
   params: { slug: string; id: string };
 }) {
-  const folder = await api.folder.getByTitle.query({
-    userId,
-    slug,
-  });
+  const helpers = await createSSRHelper();
+  await helpers.folder.getByTitle.prefetch({ userId, slug });
+  const dehydrateState = dehydrate(helpers.queryClient);
 
-  if (!folder) {
-    notFound();
-  }
-
-  return <FolderPage folder={folder} userId={userId} slug={slug} />;
+  return (
+    <Hydrate state={dehydrateState}>
+      <Folder userId={userId} slug={slug} />
+    </Hydrate>
+  );
 }

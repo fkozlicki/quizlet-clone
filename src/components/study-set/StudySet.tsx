@@ -14,7 +14,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-const StudySetPage = ({ id }: { id: string }) => {
+const StudySet = ({ id }: { id: string }) => {
   const { data: session } = useSession();
   const { data: studySet } = api.studySet.getById.useQuery({
     id,
@@ -56,4 +56,4 @@ const StudySetPage = ({ id }: { id: string }) => {
   );
 };
 
-export default StudySetPage;
+export default StudySet;

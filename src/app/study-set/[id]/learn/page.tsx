@@ -1,4 +1,4 @@
-import LearnGame from "@/components/LearnGame";
+import LearnMode from "@/components/learn-mode/LearnMode";
 import { api } from "@/trpc/server";
 import React from "react";
 
@@ -15,6 +15,6 @@ export default async function Learn({
   });
 
   return (
-    <LearnGame cards={cards} starredFlashcards={starredCards} setId={id} />
+    <LearnMode cards={cards} starredFlashcards={starredCards} setId={id} />
   );
 }

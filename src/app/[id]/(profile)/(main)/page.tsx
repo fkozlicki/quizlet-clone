@@ -1,4 +1,4 @@
-import Calendar from "@/components/Calendar";
+import Calendar from "@/components/profile/Calendar";
 import { api } from "@/trpc/server";
 import Title from "antd/es/typography/Title";
 

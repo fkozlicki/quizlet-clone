@@ -1,9 +1,9 @@
-import StudySetPage from "@/components/StudySetPage";
+import StudySet from "@/components/study-set/StudySet";
 import { createSSRHelper } from "@/server/helpers/ssgHelper";
 import { dehydrate, Hydrate } from "@tanstack/react-query";
 import React from "react";
 
-export default async function StudySet({
+export default async function StudySetPage({
   params: { id },
 }: {
   params: { id: string };
@@ -14,7 +14,7 @@ export default async function StudySet({
 
   return (
     <Hydrate state={dehydrateState}>
-      <StudySetPage id={id} />
+      <StudySet id={id} />
     </Hydrate>
   );
 }

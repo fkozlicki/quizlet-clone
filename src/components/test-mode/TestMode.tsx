@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import StudyModeResult from "./shared/StudyModeResult";
-import TestForm, { type TestInputs } from "./test-mode/TestForm";
-import TestResult from "./test-mode/TestResult";
+import StudyModeResult from "../shared/StudyModeResult";
+import TestForm, { type TestInputs } from "./TestForm";
+import TestResult from "./TestResult";
 import { type StudySetTest } from "@/server/api/routers/study-set";
 import { ReloadOutlined, RollbackOutlined } from "@ant-design/icons";
 
-const TestGame = ({ test, setId }: { test: StudySetTest; setId: string }) => {
+const TestMode = ({ test, setId }: { test: StudySetTest; setId: string }) => {
   const router = useRouter();
   const [result, setResult] = useState<TestInputs>();
   const [hard, setHard] = useState<number>();
@@ -84,4 +84,4 @@ const TestGame = ({ test, setId }: { test: StudySetTest; setId: string }) => {
   );
 };
 
-export default TestGame;
+export default TestMode;

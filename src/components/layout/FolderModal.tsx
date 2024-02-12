@@ -23,13 +23,13 @@ interface FolderModalProps {
 const FolderModal = ({ session }: FolderModalProps) => {
   const [{ open, defaultData }, dispatch] = useFolderModalContext();
   const router = useRouter();
+  const utils = api.useUtils();
   const { mutate: createFolder, isLoading: createLoading } =
     api.folder.create.useMutation({
       onSuccess: async ({ slug }) => {
         void message.success("Created successfully");
+        await utils.folder.getAll.invalidate({ userId: session.user.id });
         router.push(`/${session.user.id}/folders/${slug}`);
-        await fetch(`/api/revalidate?path=/${session.user.id}/folders`);
-        await fetch(`/api/revalidate?path=/${session.user.id}/folders/${slug}`);
         onClose();
       },
       onError: () => {

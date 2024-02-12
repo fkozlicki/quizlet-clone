@@ -1,18 +1,19 @@
-import MatchGame from "@/components/MatchGame";
-import { api } from "@/trpc/server";
-import { notFound } from "next/navigation";
-import React from "react";
+import MatchMode from "@/components/match-mode/MatchMode";
+import { createSSRHelper } from "@/server/helpers/ssgHelper";
+import { Hydrate, dehydrate } from "@tanstack/react-query";
 
 export default async function Match({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const cards = await api.studySet.getMatchCards.query({ setId: id });
+  const helpers = await createSSRHelper();
+  await helpers.studySet.getMatchCards.prefetch({ setId: id });
+  const dehydrateState = dehydrate(helpers.queryClient);
 
-  if (!cards) {
-    notFound();
-  }
-
-  return <MatchGame cards={cards} setId={id} />;
+  return (
+    <Hydrate state={dehydrateState}>
+      <MatchMode setId={id} />
+    </Hydrate>
+  );
 }

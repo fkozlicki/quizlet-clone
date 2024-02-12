@@ -1,6 +1,6 @@
 import React from "react";
 import MemoryCard from "./MemoryCard";
-import { type GameCard } from "../MatchGame";
+import { type GameCard } from "./MatchMode";
 
 interface GameScreenProps {
   time: number;

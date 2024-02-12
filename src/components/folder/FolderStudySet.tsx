@@ -2,6 +2,7 @@ import { api } from "@/trpc/react";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Card, message } from "antd";
+import Text from "antd/es/typography/Text";
 
 interface FolderStudySetProps {
   folderId: string;
@@ -63,9 +64,10 @@ const FolderStudySet = ({
 
   return (
     <Card>
-      <div className="flex items-center justify-between">
-        <div className="text-xl font-bold">{title}</div>
+      <div className="flex items-center justify-between gap-4">
+        <Text className="text-xl font-bold">{title}</Text>
         <Button
+          className="shrink-0"
           disabled={addLoading || removeLoading}
           loading={addLoading || removeLoading}
           onClick={present ? handleRemoveSet : handleAddSet}

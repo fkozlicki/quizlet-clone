@@ -7,28 +7,18 @@ import {
   type User,
 } from "@prisma/client";
 import React, { useState } from "react";
-import FolderAuthor from "./folder/FolderAuthor";
+import FolderAuthor from "./FolderAuthor";
 import { useSession } from "next-auth/react";
-import FolderCTA from "./folder/FolderCTA";
-import AddSetModal from "./folder/AddSetModal";
-import FolderInfo from "./folder/FolderInfo";
-import StudySetPreview from "./shared/StudySetPreview";
+import FolderCTA from "./FolderCTA";
+import AddSetModal from "./AddSetModal";
+import FolderInfo from "./FolderInfo";
+import StudySetPreview from "../shared/StudySetPreview";
 import { Button, Empty } from "antd";
+import { api } from "@/trpc/react";
+import { notFound } from "next/navigation";
 
-type FolderData = Folder & {
-  studySets: (StudySet & { cards: Flashcard[]; user: User })[];
-  user: User;
-};
-
-const FolderPage = ({
-  folder,
-  userId,
-  slug,
-}: {
-  folder: FolderData;
-  userId: string;
-  slug: string;
-}) => {
+const Folder = ({ userId, slug }: { userId: string; slug: string }) => {
+  const { data: folder } = api.folder.getByTitle.useQuery({ userId, slug });
   const [addSetModalOpen, setAddSetModalOpen] = useState<boolean>(false);
   const { data: session } = useSession();
 
@@ -39,6 +29,10 @@ const FolderPage = ({
   const closeAddSetModal = () => {
     setAddSetModalOpen(false);
   };
+
+  if (!folder) {
+    notFound();
+  }
 
   const { studySets, user, title, description, id } = folder;
 
@@ -97,4 +91,4 @@ const FolderPage = ({
   );
 };
 
-export default FolderPage;
+export default Folder;
