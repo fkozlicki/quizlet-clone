@@ -5,6 +5,7 @@ import { type User } from "@prisma/client";
 import { Avatar, Tabs } from "antd";
 import Text from "antd/es/typography/Text";
 import { type Session } from "next-auth";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -25,7 +26,11 @@ const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
       <div className="mb-8 flex items-start gap-5">
         <Avatar
           icon={<UserOutlined />}
-          src={image}
+          src={
+            image ? (
+              <Image src={image} alt="" width={64} height={64} />
+            ) : undefined
+          }
           alt=""
           className="h-16 w-16"
         />

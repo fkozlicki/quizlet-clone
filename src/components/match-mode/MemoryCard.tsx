@@ -1,55 +1,24 @@
 import { Card, theme } from "antd";
-import React from "react";
 
 interface MemoryCardProps {
+  index: number;
   content: string;
   selectCallback: () => void;
-  isSelected: boolean;
-  isMatched: boolean;
-  isMismatch: boolean;
 }
 
-const MemoryCard = ({
-  content,
-  selectCallback,
-  isSelected,
-  isMatched,
-  isMismatch,
-}: MemoryCardProps) => {
+const MemoryCard = ({ index, content, selectCallback }: MemoryCardProps) => {
   const {
-    token: {
-      red1,
-      red5,
-      green1,
-      green5,
-      colorBorder,
-      colorBgContainer,
-      blue4,
-      blue3,
-    },
+    token: { colorBorder },
   } = theme.useToken();
 
   return (
     <Card
+      id={`card-${index}`}
       onClick={selectCallback}
-      className={`flex min-h-[10rem] cursor-pointer items-center justify-center rounded border-2 border-gray-300 font-medium transition-transform duration-300 ${
-        isMatched ? "scale-0" : ""
-      } ${isMismatch ? "animate-shake" : ""}`}
-      style={{
-        borderColor: isMatched
-          ? green5
-          : isMismatch
-          ? red5
-          : isSelected
-          ? blue3
-          : colorBorder,
-        background: isMatched
-          ? green1
-          : isMismatch
-          ? red1
-          : isSelected
-          ? blue4
-          : colorBgContainer,
+      className="cursor-pointer rounded border-2"
+      style={{ borderColor: colorBorder }}
+      classNames={{
+        body: "flex min-h-[10rem] items-center justify-center font-medium",
       }}
     >
       {content}

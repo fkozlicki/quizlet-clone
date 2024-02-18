@@ -69,10 +69,7 @@ const AddToFolderModal = ({
               ))}
             </div>
           ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="You have not sets yet"
-            />
+            <Empty description="You have not sets yet" />
           )}
         </>
       )}

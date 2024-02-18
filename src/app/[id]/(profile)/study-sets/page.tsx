@@ -30,7 +30,7 @@ export default async function ProfileStudySets({
           ))}
         </div>
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}>
+        <Empty>
           <Link href="/create-set">
             <Button type="primary">Create Now</Button>
           </Link>

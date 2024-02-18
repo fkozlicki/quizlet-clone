@@ -16,7 +16,7 @@ const HomeCta = () => {
   };
 
   return (
-    <div className="flex justify-center gap-2">
+    <div className="mb-12 flex justify-center gap-2">
       <Button onClick={getStarted} type="primary" size="large">
         Get started
       </Button>

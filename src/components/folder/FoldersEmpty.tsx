@@ -15,7 +15,6 @@ const FoldersEmpty = ({ userId }: { userId: string }) => {
 
   return (
     <Empty
-      image={Empty.PRESENTED_IMAGE_SIMPLE}
       description={`${
         userId === session?.user.id ? "You have" : "User has"
       } no folders yet`}

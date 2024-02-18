@@ -1,13 +1,14 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { Button } from "antd";
+import { Button, theme } from "antd";
 import Link from "next/link";
 import React, { useEffect, useReducer } from "react";
 import StartScreen from "./StartScreen";
 import MemoryCard from "./MemoryCard";
 import EndScreen from "./EndScreen";
 import Text from "antd/es/typography/Text";
+import { useAnimate } from "framer-motion";
 
 export interface GameCard {
   flashcardId: string;
@@ -16,10 +17,8 @@ export interface GameCard {
 
 type GameState = {
   cards: GameCard[];
-  selected: number[];
+  selected?: number;
   matched: number[];
-  // storing mismatch for animation (1000ms)
-  mismatch: number[];
   ellapsedTime: number;
   stage: "initial" | "start" | "finished";
 };
@@ -27,7 +26,7 @@ type GameState = {
 type GameAction =
   | { type: "setMatched"; payload: number[] }
   | { type: "setCards"; payload: GameCard[] }
-  | { type: "setSelected"; payload: number[] }
+  | { type: "setSelected"; payload: GameState["selected"] }
   | { type: "setMismatch"; payload: number[] }
   | { type: "startTimer" }
   | { type: "setStage"; payload: "initial" | "start" | "finished" }
@@ -40,9 +39,6 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
   }
   if (type === "setMatched") {
     return { ...state, matched: action.payload };
-  }
-  if (type === "setMismatch") {
-    return { ...state, mismatch: action.payload };
   }
   if (type === "setCards") {
     return { ...state, cards: action.payload };
@@ -62,18 +58,15 @@ const gameReducer = (state: GameState, action: GameAction): GameState => {
 
 const initialGameState: GameState = {
   cards: [],
-  selected: [],
+  selected: undefined,
   matched: [],
-  mismatch: [],
   stage: "initial",
   ellapsedTime: 0,
 };
 
 const MatchMode = ({ setId }: { setId: string }) => {
-  const [
-    { cards, matched, mismatch, selected, stage, ellapsedTime },
-    dispatch,
-  ] = useReducer(gameReducer, initialGameState);
+  const [{ cards, matched, selected, stage, ellapsedTime }, dispatch] =
+    useReducer(gameReducer, initialGameState);
   const utils = api.useUtils();
   api.studySet.getMatchCards.useQuery(
     { setId },
@@ -81,8 +74,23 @@ const MatchMode = ({ setId }: { setId: string }) => {
       onSuccess(data) {
         dispatch({ type: "setCards", payload: data });
       },
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
     },
   );
+  const [scope, animate] = useAnimate();
+  const {
+    token: {
+      red1,
+      red5,
+      green1,
+      green5,
+      colorBorder,
+      colorBgContainer,
+      blue1,
+      blue5,
+    },
+  } = theme.useToken();
 
   useEffect(() => {
     if (matched.length > 0 && matched.length === cards.length) {
@@ -90,23 +98,7 @@ const MatchMode = ({ setId }: { setId: string }) => {
         dispatch({ type: "setStage", payload: "finished" });
       }, 300);
     }
-  }, [matched, cards]);
-
-  useEffect(() => {
-    if (selected.length === 2) {
-      const [first, second] = selected;
-      if (cards[first!]?.flashcardId === cards[second!]?.flashcardId) {
-        dispatch({ type: "setMatched", payload: [...matched, ...selected] });
-        dispatch({ type: "setSelected", payload: [] });
-      } else {
-        dispatch({ type: "setMismatch", payload: selected });
-        dispatch({ type: "setSelected", payload: [] });
-        setTimeout(() => {
-          dispatch({ type: "setMismatch", payload: [] });
-        }, 300);
-      }
-    }
-  }, [selected, cards, matched]);
+  }, [matched]);
 
   useEffect(() => {
     const interval =
@@ -123,9 +115,65 @@ const MatchMode = ({ setId }: { setId: string }) => {
     return () => clearInterval(interval);
   }, [stage]);
 
-  const selectCard = (index: number) => {
-    if (selected.length < 2 && !selected.includes(index)) {
-      dispatch({ type: "setSelected", payload: [...selected, index] });
+  const matchAnimation = (selector: string) => {
+    void animate([
+      [
+        selector,
+        { backgroundColor: green1, borderColor: green5 },
+        { duration: 0 },
+      ],
+      [selector, { scale: 0 }, { duration: 0.2, ease: "linear" }],
+    ]);
+  };
+
+  const missmatchAnimation = async (selector: string) => {
+    await animate([
+      [selector, { backgroundColor: red1, borderColor: red5 }, { duration: 0 }],
+      [selector, { rotate: [-2, 0, -2, 0, -2, 0] }, { duration: 0.3 }],
+    ]);
+
+    void animate(
+      selector,
+      { backgroundColor: colorBgContainer, borderColor: colorBorder },
+      { duration: 0 },
+    );
+  };
+
+  const selectCard = async (index: number) => {
+    if (selected === undefined) {
+      dispatch({ type: "setSelected", payload: index });
+      void animate(
+        `#card-${index}`,
+        {
+          backgroundColor: blue1,
+          borderColor: blue5,
+        },
+        { duration: 0 },
+      );
+    } else {
+      dispatch({ type: "setSelected", payload: undefined });
+      if (selected === index) {
+        void animate(
+          `#card-${index}`,
+          {
+            backgroundColor: colorBgContainer,
+            borderColor: colorBorder,
+          },
+          { duration: 0 },
+        );
+      } else {
+        if (cards[selected]?.flashcardId === cards[index]?.flashcardId) {
+          matchAnimation(`#card-${selected}`);
+          matchAnimation(`#card-${index}`);
+          dispatch({
+            type: "setMatched",
+            payload: [...matched, index, selected],
+          });
+        } else {
+          void missmatchAnimation(`#card-${selected}`);
+          void missmatchAnimation(`#card-${index}`);
+        }
+      }
     }
   };
 
@@ -154,15 +202,13 @@ const MatchMode = ({ setId }: { setId: string }) => {
           <Text className="mb-4 inline-block text-xl">
             {ellapsedTime.toFixed(1)} sec.
           </Text>
-          <div className="grid h-full grid-cols-3 gap-4">
+          <div ref={scope} className="grid h-full grid-cols-3 gap-4">
             {cards.map((card, index) => (
               <MemoryCard
                 key={index}
+                index={index}
                 content={card.content}
                 selectCallback={() => selectCard(index)}
-                isSelected={selected.includes(index)}
-                isMatched={matched.includes(index)}
-                isMismatch={mismatch.includes(index)}
               />
             ))}
           </div>

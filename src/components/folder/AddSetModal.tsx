@@ -65,10 +65,7 @@ const AddSetModal = ({
             />
           ))}
           {studySets.length === 0 && (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="You have not sets yet"
-            >
+            <Empty description="You have not sets yet">
               <Link href="/create-set">
                 <Button type="primary">Create set</Button>
               </Link>
