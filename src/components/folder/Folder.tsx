@@ -74,7 +74,7 @@ const Folder = ({ userId, slug }: { userId: string; slug: string }) => {
         <Empty description="This folder has no sets yet">
           {session?.user.id === userId && (
             <Button type="primary" onClick={openAddSetModal}>
-              Create now
+              Add now
             </Button>
           )}
         </Empty>
