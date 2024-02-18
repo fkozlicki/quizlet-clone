@@ -2,6 +2,27 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const starredFlashcardRouter = createTRPCRouter({
+  getSetCards: protectedProcedure
+    .input(
+      z.object({
+        setId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const starredFlashcards = await ctx.prisma.starredFlashcard.findMany({
+        where: {
+          flashcard: {
+            studySetId: input.setId,
+          },
+          userId: ctx.session.user.id,
+        },
+        include: {
+          flashcard: true,
+        },
+      });
+
+      return starredFlashcards;
+    }),
   create: protectedProcedure
     .input(
       z.object({
