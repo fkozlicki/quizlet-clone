@@ -24,11 +24,11 @@ const Layout = ({ children }: PropsWithChildren) => {
     token: { colorBgLayout },
   } = theme.useToken();
 
-  // useEffect(() => {
-  //   if (session) {
-  //     createActivity();
-  //   }
-  // }, [session]);
+  useEffect(() => {
+    if (session) {
+      createActivity();
+    }
+  }, [session]);
 
   const openMobileMenu = () => {
     setMobileMenuOpen(true);

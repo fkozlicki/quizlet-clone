@@ -1,7 +1,12 @@
+import { Skeleton } from "antd";
 import React from "react";
 
 const loading = () => {
-  return <div>loading</div>;
+  return (
+    <div>
+      <Skeleton />
+    </div>
+  );
 };
 
 export default loading;

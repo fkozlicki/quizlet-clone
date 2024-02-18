@@ -21,6 +21,25 @@ const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
 
   const { id, name, image } = user;
 
+  const items = [
+    ...(session?.user.id === id
+      ? [
+          {
+            key: "1",
+            label: <Link href={`/${id}`}>Achivements</Link>,
+          },
+        ]
+      : []),
+    {
+      key: "2",
+      label: <Link href={`/${id}/study-sets`}>Study sets</Link>,
+    },
+    {
+      key: "3",
+      label: <Link href={`/${id}/folders`}>Folders</Link>,
+    },
+  ];
+
   return (
     <>
       <div className="mb-8 flex items-start gap-5">
@@ -49,24 +68,7 @@ const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
               ? "2"
               : "3"
         }
-        items={(session?.user.id === id
-          ? [
-              {
-                key: "1",
-                label: <Link href={`/${id}`}>Achivements</Link>,
-              },
-            ]
-          : []
-        ).concat([
-          {
-            key: "2",
-            label: <Link href={`/${id}/study-sets`}>Study sets</Link>,
-          },
-          {
-            key: "3",
-            label: <Link href={`/${id}/folders`}>Folders</Link>,
-          },
-        ])}
+        items={items}
       />
       <div className="py-4">{children}</div>
     </>

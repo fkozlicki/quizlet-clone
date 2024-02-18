@@ -1,21 +1,16 @@
 "use client";
 
-import {
-  type Flashcard,
-  type Folder,
-  type StudySet,
-  type User,
-} from "@prisma/client";
-import React, { useState } from "react";
-import FolderAuthor from "./FolderAuthor";
-import { useSession } from "next-auth/react";
-import FolderCTA from "./FolderCTA";
-import AddSetModal from "./AddSetModal";
-import FolderInfo from "./FolderInfo";
-import StudySetPreview from "../shared/StudySetPreview";
-import { Button, Empty } from "antd";
 import { api } from "@/trpc/react";
+import { type Folder } from "@prisma/client";
+import { Button, Empty } from "antd";
+import { useSession } from "next-auth/react";
 import { notFound } from "next/navigation";
+import { useState } from "react";
+import StudySetPreview from "../shared/StudySetPreview";
+import AddSetModal from "./AddSetModal";
+import FolderAuthor from "./FolderAuthor";
+import FolderCTA from "./FolderCTA";
+import FolderInfo from "./FolderInfo";
 
 const Folder = ({ userId, slug }: { userId: string; slug: string }) => {
   const { data: folder } = api.folder.getByTitle.useQuery({ userId, slug });

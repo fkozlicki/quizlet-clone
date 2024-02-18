@@ -15,42 +15,77 @@ interface StudySetFolderProps {
 }
 
 const StudySetFolder = ({ folder, setId, userId }: StudySetFolderProps) => {
-  const {
-    folder: {
-      getAll: { setData },
-    },
-  } = api.useUtils();
-  const { mutate: addSet, isLoading: addLoading } =
-    api.folder.addSet.useMutation({
-      onSuccess: (data) => {
-        updateFolder(data);
-        void message.success("Added successfully");
-      },
-      onError: () => {
-        void message.error("Couldn't add to folder");
-      },
-    });
-  const { mutate: removeSet, isLoading: removeLoading } =
-    api.folder.removeSet.useMutation({
-      onSuccess: (data) => {
-        updateFolder(data);
-        void message.success("Removed successfully");
-      },
-      onError: () => {
-        void message.error("Couldn't remove from folder");
-      },
-    });
-  const isIn = folder.studySets.map((set) => set.id).includes(setId);
+  const utils = api.useUtils();
+  const { mutate: addSet } = api.folder.addSet.useMutation({
+    onMutate({ folderId, setId }) {
+      const prevData = utils.folder.getAll.getData({
+        userId,
+      });
+      const studySet = utils.studySet.getById.getData({ id: setId });
 
-  const updateFolder = (data: FolderWithSets) => {
-    setData({ userId }, (oldData) => {
-      if (!oldData) {
+      if (!studySet) {
         return;
       }
 
-      return oldData.map((folder) => (folder.id === data.id ? data : folder));
-    });
-  };
+      utils.folder.getAll.setData({ userId }, (old) => {
+        if (!old) {
+          return;
+        }
+
+        return old.map((folder) =>
+          folder.id === folderId
+            ? { ...folder, studySets: [...folder.studySets, studySet] }
+            : folder,
+        );
+      });
+
+      return {
+        prevData,
+      };
+    },
+    onSettled,
+    onError: () => {
+      void message.error("Couldn't add to folder");
+    },
+  });
+  const { mutate: removeSet } = api.folder.removeSet.useMutation({
+    onMutate({ folderId, setId }: { folderId: string; setId: string }) {
+      const prevData = utils.folder.getAll.getData({
+        userId,
+      });
+      const studySet = utils.studySet.getById.getData({ id: setId });
+
+      if (!studySet) {
+        return;
+      }
+
+      utils.folder.getAll.setData({ userId }, (old) => {
+        if (!old) {
+          return;
+        }
+
+        return old.map((folder) =>
+          folder.id === folderId
+            ? {
+                ...folder,
+                studySets: folder.studySets.filter(
+                  (folder) => folder.id !== folderId,
+                ),
+              }
+            : folder,
+        );
+      });
+
+      return {
+        prevData,
+      };
+    },
+    onSettled,
+    onError: () => {
+      void message.error("Couldn't remove from folder");
+    },
+  });
+  const isIn = folder.studySets.map((set) => set.id).includes(setId);
 
   const handleAddSet = () => {
     addSet({
@@ -66,6 +101,10 @@ const StudySetFolder = ({ folder, setId, userId }: StudySetFolderProps) => {
     });
   };
 
+  async function onSettled() {
+    return await utils.folder.getAll.invalidate();
+  }
+
   return (
     <Card>
       <div className="flex items-center justify-between">
@@ -73,8 +112,6 @@ const StudySetFolder = ({ folder, setId, userId }: StudySetFolderProps) => {
         <Button
           onClick={isIn ? handleRemoveSet : handleAddSet}
           icon={isIn ? <MinusOutlined /> : <PlusOutlined />}
-          disabled={addLoading || removeLoading}
-          loading={addLoading || removeLoading}
           type={isIn ? "primary" : "default"}
         />
       </div>

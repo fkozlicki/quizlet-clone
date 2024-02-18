@@ -53,11 +53,10 @@ const AddSetModal = ({
           <Link href="/create-set">
             <Button className="w-full">Create a new set</Button>
           </Link>
-          {studySets.map(({ title, id }) => (
+          {studySets.map((studySet) => (
             <FolderStudySet
-              key={id}
-              setId={id}
-              title={title}
+              key={studySet.id}
+              studySet={studySet}
               folderId={folderId}
               setsInFolder={setsInFolder}
               userId={userId}
