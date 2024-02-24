@@ -6,7 +6,7 @@ import type { Flashcard } from "@prisma/client";
 import { Button, message, theme } from "antd";
 import Text from "antd/es/typography/Text";
 import { useSession } from "next-auth/react";
-import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
+import { useFlashcardModalContext } from "../../../contexts/FlashcardModalContext";
 
 interface CardPreviewProps {
   flashcard: Flashcard & { starred?: boolean };
