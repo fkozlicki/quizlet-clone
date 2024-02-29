@@ -5,6 +5,7 @@ import { Inter } from "next/font/google";
 import Providers from "@/components/Providers";
 import { TRPCReactProvider } from "@/trpc/react";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
+import Layout from "@/components/layout/Layout";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -27,7 +28,9 @@ export default function RootLayout({
       <body className={`font-sans ${inter.variable}`}>
         <TRPCReactProvider>
           <AntdRegistry>
-            <Providers>{children}</Providers>
+            <Providers>
+              <Layout>{children}</Layout>
+            </Providers>
           </AntdRegistry>
         </TRPCReactProvider>
       </body>
