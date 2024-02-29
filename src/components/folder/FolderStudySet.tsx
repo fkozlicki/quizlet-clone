@@ -5,7 +5,7 @@ import { Button, Card, message } from "antd";
 import Text from "antd/es/typography/Text";
 
 interface FolderStudySetProps {
-  studySet: StudySet & { user: User; cards: Flashcard[] };
+  studySet: StudySet & { user: User; _count: { cards: number } };
   folderId: string;
   setsInFolder: StudySet[];
   userId: string;

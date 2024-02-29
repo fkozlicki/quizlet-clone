@@ -2,11 +2,12 @@ import { Alert, Card, Input } from "antd";
 import Text from "antd/es/typography/Text";
 import type { Control, FieldPath } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
+import { TestInputs } from "../TestForm";
 
 interface WrittenAnswerProps {
   term: string;
-  control?: Control<any>;
-  name?: FieldPath<any>;
+  control?: Control<TestInputs>;
+  name?: FieldPath<TestInputs>;
   result?: boolean;
   definition?: string;
   userAnswer?: string;

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 
 import WrittenAnswer from ".";
 import { useFieldArray, useForm } from "react-hook-form";
+import { TestInputs } from "../TestForm";
 
 const meta: Meta<typeof WrittenAnswer> = {
   component: WrittenAnswer,
@@ -12,14 +13,14 @@ type Story = StoryObj<typeof WrittenAnswer>;
 
 export const Default: Story = {
   render: () => {
-    const { control } = useForm();
+    const { control } = useForm<TestInputs>();
 
     return (
       <WrittenAnswer
         term="2+2"
         definition="4"
         control={control}
-        name="written-0-userAnswer"
+        name="written.0.userAnswer"
       />
     );
   },
