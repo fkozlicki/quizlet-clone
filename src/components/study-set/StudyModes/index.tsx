@@ -1,5 +1,5 @@
 import React from "react";
-import IconCard from "./IconCard";
+import IconCard from "../IconCard";
 
 interface StudyModesProps {
   setId?: string;
@@ -11,11 +11,11 @@ const StudyModes = ({ setId }: StudyModesProps) => {
       <IconCard
         icon="/cards.png"
         text="Flashcards"
-        link={`${setId}/flashcards`}
+        href={`${setId}/flashcards`}
       />
-      <IconCard icon="/study.png" text="Learn" link={`${setId}/learn`} />
-      <IconCard icon="/file.png" text="Test" link={`${setId}/test`} />
-      <IconCard icon="/puzzle.png" text="Match" link={`${setId}/match`} />
+      <IconCard icon="/study.png" text="Learn" href={`${setId}/learn`} />
+      <IconCard icon="/file.png" text="Test" href={`${setId}/test`} />
+      <IconCard icon="/puzzle.png" text="Match" href={`${setId}/match`} />
     </div>
   );
 };

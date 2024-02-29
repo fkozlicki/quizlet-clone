@@ -1,7 +1,6 @@
 "use client";
 
 import FlashcardsGame from "@/components/flashcards-mode/FlashcardsGame";
-import CreatedBy from "@/components/study-set/CreatedBy";
 import FlashcardsList from "@/components/study-set/FlashcardsList";
 import OtherSets from "@/components/study-set/OtherSets";
 import StudyModes from "@/components/study-set/StudyModes";
@@ -13,6 +12,7 @@ import Title from "antd/es/typography/Title";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import CreatedBy from "./CreatedBy";
 
 const StudySet = ({ id }: { id: string }) => {
   const { data: session } = useSession();

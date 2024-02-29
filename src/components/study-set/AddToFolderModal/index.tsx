@@ -1,9 +1,10 @@
-import { Button, Empty, Modal } from "antd";
+import { Button, Empty, Modal, Skeleton } from "antd";
 import React from "react";
 import { LoadingOutlined } from "@ant-design/icons";
-import StudySetFolder from "./StudySetFolder";
-import { useFolderModalContext } from "../../contexts/FolderModalContext";
+import StudySetFolder from "../StudySetFolder";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 import { api } from "@/trpc/react";
+import Text from "antd/es/typography/Text";
 
 interface AddToFolderModalProps {
   open: boolean;
@@ -42,16 +43,16 @@ const AddToFolderModal = ({
       title="Add to folder"
       classNames={{
         footer: "hidden",
-        header: "[&>div]:text-2xl mb-6",
+        header: "[&>div]:text-2xl mb-2",
       }}
     >
       <Button onClick={handleFolderCreate} className="my-4 w-full">
         Create new folder
       </Button>
-      {isLoading && <LoadingOutlined />}
+      {isLoading && <Skeleton active title={false} />}
       {isError && (
-        <div>
-          <div>Couldn&apos;t load sets</div>
+        <div className="flex flex-col items-center py-4">
+          <Text className="mb-2">Couldn&apos;t load sets</Text>
           <Button onClick={() => refetch()}>Try again</Button>
         </div>
       )}

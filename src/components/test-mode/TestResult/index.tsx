@@ -1,8 +1,8 @@
 import React from "react";
-import MultipleChoice from "../shared/MultipleChoice";
-import TrueOrFalse from "./TrueOrFalse";
-import Written from "./WrittenAnswer";
-import type { TestInputs } from "./TestForm";
+import MultipleChoice from "../../shared/MultipleChoice";
+import TrueOrFalse from "../TrueOrFalse";
+import Written from "../WrittenAnswer";
+import type { TestInputs } from "../TestForm";
 
 interface TestResultProps {
   result: TestInputs;

@@ -2,12 +2,11 @@ import { Alert, Card, Input } from "antd";
 import Text from "antd/es/typography/Text";
 import type { Control, FieldPath } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
-import type { TestInputs } from "./TestForm";
 
 interface WrittenAnswerProps {
   term: string;
-  control?: Control<TestInputs>;
-  name?: FieldPath<TestInputs>;
+  control?: Control<any>;
+  name?: FieldPath<any>;
   result?: boolean;
   definition?: string;
   userAnswer?: string;
@@ -38,7 +37,7 @@ const WrittenAnswer = ({
               control={control}
               name={name}
               label="Your answer"
-              className="mb-0"
+              className="mb-0 [&>div]:items-center"
             >
               <Input size="large" />
             </FormItem>
@@ -62,7 +61,12 @@ const WrittenAnswer = ({
                   </Text>
                 </>
               ) : (
-                <Text type="success">You&apos;ve got this</Text>
+                <Text
+                  type="success"
+                  className="mb-2 inline-block text-base font-medium"
+                >
+                  You&apos;ve got this
+                </Text>
               )}
               <Alert message={definition} type="success" />
             </>

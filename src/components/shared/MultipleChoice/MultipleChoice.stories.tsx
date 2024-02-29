@@ -3,6 +3,7 @@ import MultipleChoice from ".";
 
 const meta: Meta<typeof MultipleChoice> = {
   component: MultipleChoice,
+  tags: ["autodocs"],
 };
 
 export default meta;

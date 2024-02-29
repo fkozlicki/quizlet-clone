@@ -4,32 +4,29 @@ import { theme } from "antd";
 import Text from "antd/es/typography/Text";
 import Image from "next/image";
 import Link from "next/link";
-import type { UrlObject } from "url";
 
 interface IconCardProps {
   icon: string;
   text: string;
-  link: string | UrlObject;
+  href: string;
 }
 
-const IconCard = ({ icon, text, link }: IconCardProps) => {
+const IconCard = ({ icon, text, href }: IconCardProps) => {
   const {
     token: { colorBorder, colorBgContainer },
   } = theme.useToken();
 
   return (
     <Link
-      href={link}
-      className={`rounded-md border-b-4 px-3 py-2 shadow-sm hover:!border-cyan-300/50`}
+      href={href}
+      className="flex items-center gap-3 rounded-md border-b-4 px-3 py-2 shadow-sm hover:!border-cyan-300/50"
       style={{
         background: colorBgContainer,
         borderColor: colorBorder,
       }}
     >
-      <div className="flex items-center gap-3">
-        <Image src={icon} alt="" width={32} height={32} />
-        <Text className="font-semibold">{text}</Text>
-      </div>
+      <Image src={icon} alt="" width={32} height={32} />
+      <Text className="font-semibold">{text}</Text>
     </Link>
   );
 };

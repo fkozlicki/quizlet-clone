@@ -15,8 +15,8 @@ import { Button, Dropdown, Tooltip } from "antd";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
-import AddToFolderModal from "./AddToFolderModal";
-import DeleteStudySetModal from "./DeleteStudySetModal";
+import AddToFolderModal from "../AddToFolderModal";
+import DeleteStudySetModal from "../DeleteStudySetModal";
 
 interface StudySetCTAProps {
   userId: string;

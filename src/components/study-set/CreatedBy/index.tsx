@@ -6,23 +6,25 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface CreatedByProps {
-  user: User;
+  user: Pick<User, "id" | "image" | "name">;
 }
 
 const CreatedBy = ({ user }: CreatedByProps) => {
+  const { id, image, name } = user;
+
   return (
-    <Link href={`/${user.id}`} className="flex items-center gap-4">
+    <Link href={`/${id}`} className="flex items-center gap-4">
       <Avatar
         icon={<UserOutlined />}
         src={
-          user.image ? (
-            <Image src={user.image} alt="" width={30} height={30} />
+          image ? (
+            <Image src={image} alt="" width={30} height={30} />
           ) : undefined
         }
       />
       <div className="flex flex-col">
         <Text className="text-xs font-semibold">Created by</Text>
-        <Text className="text-sm font-medium">{user.name}</Text>
+        <Text className="text-sm font-medium">{name}</Text>
       </div>
     </Link>
   );

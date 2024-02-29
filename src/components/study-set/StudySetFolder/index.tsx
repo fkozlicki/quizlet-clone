@@ -106,7 +106,11 @@ const StudySetFolder = ({ folder, setId, userId }: StudySetFolderProps) => {
   }
 
   return (
-    <Card>
+    <Card
+      classNames={{
+        body: "p-4",
+      }}
+    >
       <div className="flex items-center justify-between">
         <div className="text-base font-medium">{folder.title}</div>
         <Button

@@ -84,7 +84,6 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
           answers={answers}
           register={register(`multipleChoice.${index}.userAnswer`)}
           index={index}
-          type="radio"
         />
       ))}
       {written.map(({ term }, index) => (

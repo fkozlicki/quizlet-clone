@@ -75,12 +75,13 @@ const TrueOrFalse = ({
               className="flex-1"
             >
               <input
-                {...register}
                 type="radio"
                 className="peer hidden"
                 id={`${result ? "result-card" : "card"}-${index}-true`}
-                value={"true"}
+                value="true"
                 disabled={!!result}
+                name="trueOrFalse"
+                {...register}
               />
               <div
                 className={`peer-checked:bg-blue-50" rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
@@ -106,12 +107,13 @@ const TrueOrFalse = ({
             </label>
             <label htmlFor={`card-${index}-false`} className="flex-1">
               <input
-                {...register}
                 type="radio"
                 className="peer hidden"
                 value="false"
                 id={`card-${index}-false`}
                 disabled={!!result}
+                name="trueOrFalse"
+                {...register}
               />
               <div
                 className={`rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
