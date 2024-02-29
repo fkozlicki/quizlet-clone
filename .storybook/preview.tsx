@@ -1,5 +1,5 @@
-import React from "react";
 import type { Preview } from "@storybook/react";
+import React from "react";
 import "../src/styles/globals.css";
 import { TRPCReactProvider } from "../src/trpc/react";
 
@@ -12,14 +12,15 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    nextjs: {
+      appDirectory: true,
+    },
   },
   decorators: [
     (Story) => (
-      <div id="app">
-        <TRPCReactProvider>
-          <Story />
-        </TRPCReactProvider>
-      </div>
+      <TRPCReactProvider>
+        <Story />
+      </TRPCReactProvider>
     ),
   ],
 };
