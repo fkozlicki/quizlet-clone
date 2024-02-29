@@ -56,19 +56,9 @@ const Folder = ({ userId, slug }: { userId: string; slug: string }) => {
       <FolderInfo title={title} description={description} />
       {studySets.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-          {studySets.map(
-            ({ title, id, cards, user: { image, name }, userId }, index) => (
-              <StudySetPreview
-                key={index}
-                title={title}
-                id={id}
-                termsCount={cards.length}
-                authorImage={image}
-                authorName={name}
-                authorId={userId}
-              />
-            ),
-          )}
+          {studySets.map((set, index) => (
+            <StudySetPreview key={index} studySet={set} />
+          ))}
         </div>
       ) : (
         <Empty description="This folder has no sets yet">

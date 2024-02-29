@@ -5,7 +5,7 @@ import { Button, Empty } from "antd";
 import Image from "next/image";
 import StudySetPreview from "@/components/shared/StudySetPreview";
 import Title from "antd/es/typography/Title";
-import HomeCta from "@/components/HomeCta";
+import HomeCta from "@/components/home/HomeCta";
 
 export default async function Home() {
   noStore();
@@ -28,15 +28,7 @@ export default async function Home() {
       {sets.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           {sets.map((set) => (
-            <StudySetPreview
-              key={set.id}
-              authorImage={set.user.image}
-              authorName={set.user.name}
-              title={set.title}
-              termsCount={set.cards.length}
-              id={set.id}
-              authorId={set.user.id}
-            />
+            <StudySetPreview key={set.id} studySet={set} />
           ))}
         </div>
       ) : (

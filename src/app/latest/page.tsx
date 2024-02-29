@@ -24,19 +24,10 @@ export default async function Latest() {
       <Title level={2} className="mb-6 text-2xl font-bold">
         Your study sets
       </Title>
-
       {studySets.length > 0 ? (
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
           {studySets.map((set) => (
-            <StudySetPreview
-              key={set.id}
-              authorImage={set.user.image}
-              authorName={set.user.name}
-              title={set.title}
-              termsCount={set.cards.length}
-              id={set.id}
-              authorId={set.user.id}
-            />
+            <StudySetPreview key={set.id} studySet={set} />
           ))}
         </div>
       ) : (

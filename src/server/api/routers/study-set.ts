@@ -30,7 +30,7 @@ export const studySetRouter = createTRPCRouter({
       },
       include: {
         user: true,
-        cards: true,
+        _count: { select: { cards: true } },
       },
       take: 6,
     });
@@ -48,7 +48,7 @@ export const studySetRouter = createTRPCRouter({
         },
         include: {
           user: true,
-          cards: true,
+          _count: { select: { cards: true } },
         },
         take: 6,
       });

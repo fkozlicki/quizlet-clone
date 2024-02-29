@@ -7,22 +7,20 @@ import Image from "next/image";
 import Link from "next/link";
 
 interface StudySetPreviewProps {
-  id: StudySet["id"];
-  title: StudySet["title"];
-  termsCount: number;
-  authorImage: User["image"];
-  authorName: User["name"];
-  authorId: User["id"];
+  studySet: StudySet & {
+    user: Pick<User, "id" | "image" | "name">;
+    _count: { cards: number };
+  };
 }
 
-const StudySetPreview = ({
-  id,
-  title,
-  termsCount,
-  authorImage,
-  authorName,
-  authorId,
-}: StudySetPreviewProps) => {
+const StudySetPreview = ({ studySet }: StudySetPreviewProps) => {
+  const {
+    id,
+    title,
+    _count: { cards: termsCount },
+    user: { id: authorId, image: authorImage, name: authorName },
+  } = studySet;
+
   return (
     <Card hoverable className="relative">
       <Link

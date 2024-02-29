@@ -84,7 +84,7 @@ export const folderRouter = createTRPCRouter({
         include: {
           studySets: {
             include: {
-              cards: true,
+              _count: { select: { cards: true } },
               user: true,
             },
           },
