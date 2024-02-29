@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
+import { useForm } from "react-hook-form";
 import WrittenAnswer from ".";
-import { useFieldArray, useForm } from "react-hook-form";
 import { TestInputs } from "../TestForm";
 
 const meta: Meta<typeof WrittenAnswer> = {

@@ -6,7 +6,6 @@ import {
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import FacebookProvider from "next-auth/providers/facebook";
 import GoogleProvider from "next-auth/providers/google";
 
 /**

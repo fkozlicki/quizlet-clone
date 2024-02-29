@@ -1,10 +1,8 @@
-import { Button, Empty, Modal, Skeleton } from "antd";
-import React from "react";
-import { LoadingOutlined } from "@ant-design/icons";
-import StudySetFolder from "../StudySetFolder";
-import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 import { api } from "@/trpc/react";
+import { Button, Empty, Modal, Skeleton } from "antd";
 import Text from "antd/es/typography/Text";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
+import StudySetFolder from "../StudySetFolder";
 
 interface AddToFolderModalProps {
   open: boolean;

@@ -1,16 +1,12 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
 import { hash } from "bcrypt";
+import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
-import { createUserSchema } from "../../../schemas/user";
-import {
-  GetObjectCommand,
-  PutObjectAclCommand,
-  S3Client,
-} from "@aws-sdk/client-s3";
 import { env } from "@/env";
+import { PutObjectAclCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { createUserSchema } from "../../../schemas/user";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
 function exclude<User, Key extends keyof User>(
   user: User,

@@ -1,6 +1,6 @@
 import { api } from "@/trpc/react";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
-import type { Flashcard, StudySet, User } from "@prisma/client";
+import type { StudySet, User } from "@prisma/client";
 import { Button, Card, message } from "antd";
 import Text from "antd/es/typography/Text";
 
