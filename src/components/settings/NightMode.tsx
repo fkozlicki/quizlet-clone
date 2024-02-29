@@ -1,5 +1,8 @@
+"use client";
+
 import { BgColorsOutlined } from "@ant-design/icons";
-import { Card, Switch, Typography, theme } from "antd";
+import { Card, Switch, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import { useThemeContext } from "../../contexts/ThemeProvider";
 
 const NightMode = () => {
@@ -17,9 +20,7 @@ const NightMode = () => {
             color: colorText,
           }}
         />
-        <Typography.Text className="text-xl font-semibold">
-          Night Mode
-        </Typography.Text>
+        <Text className="text-xl font-semibold">Night Mode</Text>
       </div>
       <Card className="flex-1">
         <Switch value={darkMode} onChange={switchDarkMode} />

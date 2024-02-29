@@ -1,3 +1,5 @@
+"use client";
+
 import { GithubOutlined, GoogleOutlined } from "@ant-design/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,7 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
 import { z } from "zod";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import { api } from "../../utils/api";
+import { api } from "@/trpc/react";
 
 dayjs.extend(customParseFormat);
 

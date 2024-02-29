@@ -4,12 +4,17 @@ import { hash } from "bcrypt";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
 import { createUserSchema } from "../../../schemas/user";
-import { S3 } from "aws-sdk";
-import { env } from "../../../env/server.mjs";
+import {
+  GetObjectCommand,
+  PutObjectAclCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
+import { env } from "@/env";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 function exclude<User, Key extends keyof User>(
   user: User,
-  keys: Key[]
+  keys: Key[],
 ): Omit<User, Key> {
   for (const key of keys) {
     delete user[key];
@@ -69,21 +74,14 @@ export const userRouter = createTRPCRouter({
         },
       });
 
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: `Could not find user with id ${input.id}`,
-        });
-      }
-
-      return exclude(user, ["password"]);
+      return user;
     }),
 
   update: protectedProcedure
     .input(
       z.object({
         image: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       const user = await ctx.prisma.user.update({
@@ -108,19 +106,22 @@ export const userRouter = createTRPCRouter({
 
   presignedUrl: protectedProcedure
     .input(z.object({ filename: z.string(), filetype: z.string() }))
-    .mutation(({ input, ctx }) => {
-      const s3 = new S3({
-        signatureVersion: "v4",
+    .mutation(async ({ input, ctx }) => {
+      const client = new S3Client({
         region: env._AWS_REGION,
-        accessKeyId: env._AWS_ACCESS_KEY,
-        secretAccessKey: env._AWS_SECRET_KEY,
+        credentials: {
+          accessKeyId: env._AWS_ACCESS_KEY,
+          secretAccessKey: env._AWS_SECRET_KEY,
+        },
       });
 
-      const preSignedUrl = s3.getSignedUrl("putObject", {
+      const command = new PutObjectAclCommand({
         Bucket: `${env._AWS_BUCKET_NAME}/users/${ctx.session.user.id}`,
         Key: input.filename,
-        ContentType: input.filetype,
-        Expires: 60,
+      });
+
+      const preSignedUrl = await getSignedUrl(client, command, {
+        expiresIn: 60,
       });
 
       return {

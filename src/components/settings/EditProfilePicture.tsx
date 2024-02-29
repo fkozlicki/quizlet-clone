@@ -1,3 +1,7 @@
+"use client";
+
+import { env } from "@/env";
+import { api } from "@/trpc/react";
 import {
   InboxOutlined,
   LoadingOutlined,
@@ -5,16 +9,15 @@ import {
 } from "@ant-design/icons";
 import type { User } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import { Avatar, Card, Divider, Typography, Upload, message } from "antd";
 import type { UploadFile } from "antd";
+import { Avatar, Card, Divider, Upload, message } from "antd";
+import ImgCrop from "antd-img-crop";
+import Text from "antd/es/typography/Text";
 import type { RcFile } from "antd/es/upload";
+import { randomBytes } from "crypto";
 import NextImage from "next/image";
 import { useState } from "react";
 import pictures from "../../data/pictures.json";
-import { api } from "../../utils/api";
-import ImgCrop from "antd-img-crop";
-import { randomBytes } from "crypto";
-import { env } from "../../env/client.mjs";
 
 interface EditProfilePictureProps {
   image: User["image"];
@@ -57,7 +60,7 @@ const EditProfilePicture = ({ image, userId }: EditProfilePictureProps) => {
         headers: { "Content-Type": file.type },
       });
 
-      const imageUrl = `https://${env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.eu-central-1.amazonaws.com/users/${userId}/${filename}`;
+      const imageUrl = `https://${env._AWS_BUCKET_NAME}.s3.eu-central-1.amazonaws.com/users/${userId}/${filename}`;
 
       return imageUrl;
     },
@@ -67,7 +70,7 @@ const EditProfilePicture = ({ image, userId }: EditProfilePictureProps) => {
   });
 
   const onPreview = async (file: UploadFile) => {
-    let src = file.url as string;
+    let src = file.url!;
     if (!src) {
       src = await new Promise((resolve) => {
         const reader = new FileReader();
@@ -90,15 +93,13 @@ const EditProfilePicture = ({ image, userId }: EditProfilePictureProps) => {
           alt=""
           className="h-16 w-16"
         />
-        <Typography.Text className="text-xl font-semibold">
-          Profile Picture
-        </Typography.Text>
+        <Text className="text-xl font-semibold">Profile Picture</Text>
       </div>
       <Card className="flex-1">
         <div>
-          <Typography.Text className="mb-4 inline-block text-base font-bold">
+          <Text className="mb-4 inline-block text-base font-bold">
             Choose your profile picture
-          </Typography.Text>
+          </Text>
           <div className="flex flex-wrap gap-2">
             {pictures.map((picture, index) => (
               <NextImage

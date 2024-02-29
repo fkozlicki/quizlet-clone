@@ -1,5 +1,7 @@
 import { FolderOutlined } from "@ant-design/icons";
 import type { Folder } from "@prisma/client";
+import { Typography } from "antd";
+const { Title, Text } = Typography;
 
 interface FolderInfoProps {
   title: Folder["title"];
@@ -11,9 +13,9 @@ const FolderInfo = ({ title, description }: FolderInfoProps) => {
     <div className="mb-8">
       <div className="flex items-center gap-4">
         <FolderOutlined className="text-5xl" />
-        <div className="text-4xl font-bold">{title}</div>
+        <Title className="mb-0 text-4xl font-bold">{title}</Title>
       </div>
-      {description && <div>{description}</div>}
+      {description && <Text>{description}</Text>}
     </div>
   );
 };

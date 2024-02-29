@@ -1,18 +1,12 @@
+"use client";
+
+import { api } from "@/trpc/react";
 import { CloseOutlined, UserOutlined } from "@ant-design/icons";
 import type { User } from "@prisma/client";
-import {
-  Alert,
-  Avatar,
-  Button,
-  Card,
-  Modal,
-  Typography,
-  message,
-  theme,
-} from "antd";
+import { Alert, Avatar, Button, Card, Modal, message, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import { signOut } from "next-auth/react";
 import { useState } from "react";
-import { api } from "../../utils/api";
 
 interface DeleteAccountProps {
   image: User["image"];
@@ -51,9 +45,7 @@ const DeleteAccount = ({ userName, image }: DeleteAccountProps) => {
             color: colorText,
           }}
         />
-        <Typography.Text className="text-xl font-semibold">
-          Delete Account
-        </Typography.Text>
+        <Text className="text-xl font-semibold">Delete Account</Text>
       </div>
       <Card className="flex-1">
         <div className="mb-4 text-xl font-semibold">

@@ -2,8 +2,8 @@ import { LoadingOutlined } from "@ant-design/icons";
 import type { StudySet } from "@prisma/client";
 import { Button, Empty, Modal } from "antd";
 import Link from "next/link";
-import { api } from "../../utils/api";
 import FolderStudySet from "./FolderStudySet";
+import { api } from "@/trpc/react";
 
 interface AddSetModalProps {
   open: boolean;
@@ -53,11 +53,10 @@ const AddSetModal = ({
           <Link href="/create-set">
             <Button className="w-full">Create a new set</Button>
           </Link>
-          {studySets.map(({ title, id }) => (
+          {studySets.map((studySet) => (
             <FolderStudySet
-              key={id}
-              setId={id}
-              title={title}
+              key={studySet.id}
+              studySet={studySet}
               folderId={folderId}
               setsInFolder={setsInFolder}
               userId={userId}
@@ -65,10 +64,7 @@ const AddSetModal = ({
             />
           ))}
           {studySets.length === 0 && (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="You have not sets yet"
-            >
+            <Empty description="You have not sets yet">
               <Link href="/create-set">
                 <Button type="primary">Create set</Button>
               </Link>

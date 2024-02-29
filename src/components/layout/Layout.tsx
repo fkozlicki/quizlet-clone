@@ -1,7 +1,7 @@
+"use client";
+
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { useEffect, useState, type PropsWithChildren } from "react";
-import { api } from "../../utils/api";
 import AuthDropdown from "./AuthDropdown";
 import FolderModal from "./FolderModal";
 import MobileMenu from "./MobileMenu";
@@ -9,6 +9,7 @@ import Navbar from "./Navbar";
 import FlashcardModal from "./FlashcardModal";
 import { theme } from "antd";
 import { Inter } from "next/font/google";
+import { api } from "@/trpc/react";
 
 const inter = Inter({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],

@@ -1,10 +1,10 @@
+"use client";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, Input, Modal, message } from "antd";
 import type { Session } from "next-auth";
-import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
-import { api } from "../../utils/api";
 import { FormItem } from "react-hook-form-antd";
 import type {
   CreateFolderValues,
@@ -12,6 +12,9 @@ import type {
 } from "../../schemas/folder";
 import { createFolderSchema, editFolderSchema } from "../../schemas/folder";
 import { useEffect } from "react";
+import { api } from "@/trpc/react";
+import { useRouter } from "next/navigation";
+import TextArea from "antd/es/input/TextArea";
 
 interface FolderModalProps {
   session: Session;
@@ -19,12 +22,14 @@ interface FolderModalProps {
 
 const FolderModal = ({ session }: FolderModalProps) => {
   const [{ open, defaultData }, dispatch] = useFolderModalContext();
-  const { push } = useRouter();
+  const router = useRouter();
+  const utils = api.useUtils();
   const { mutate: createFolder, isLoading: createLoading } =
     api.folder.create.useMutation({
       onSuccess: async ({ slug }) => {
         void message.success("Created successfully");
-        await push(`/${session.user.id}/folders/${slug}`);
+        await utils.folder.getAll.invalidate({ userId: session.user.id });
+        router.push(`/${session.user.id}/folders/${slug}`);
         onClose();
       },
       onError: () => {
@@ -92,7 +97,7 @@ const FolderModal = ({ session }: FolderModalProps) => {
           <Input placeholder="Title" />
         </FormItem>
         <FormItem control={control} name="description" label="Description">
-          <Input.TextArea placeholder="Description" />
+          <TextArea placeholder="Description" />
         </FormItem>
       </Form>
     </Modal>

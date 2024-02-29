@@ -1,5 +1,5 @@
-import { Button, Typography } from "antd";
-import React from "react";
+import { Button } from "antd";
+import Text from "antd/es/typography/Text";
 
 interface StartScreenProps {
   startGame: () => void;
@@ -8,12 +8,12 @@ interface StartScreenProps {
 const StartScreen = ({ startGame }: StartScreenProps) => {
   return (
     <div>
-      <Typography.Text className="mb-2 block text-center text-2xl font-semibold">
+      <Text className="mb-2 block text-center text-2xl font-semibold">
         Are you ready?
-      </Typography.Text>
-      <Typography.Text className="mb-5 block text-center text-lg">
+      </Text>
+      <Text className="mb-5 block text-center text-lg">
         Match all terms with definitions
-      </Typography.Text>
+      </Text>
       <Button
         type="primary"
         size="large"

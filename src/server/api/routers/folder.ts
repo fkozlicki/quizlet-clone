@@ -45,7 +45,7 @@ export const folderRouter = createTRPCRouter({
     .input(
       z.object({
         userId: z.string(),
-      })
+      }),
     )
     .query(async ({ input, ctx }) => {
       const folders = await ctx.prisma.folder.findMany({
@@ -71,7 +71,7 @@ export const folderRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         slug: z.string(),
-      })
+      }),
     )
     .query(async ({ input, ctx }) => {
       const { userId, slug } = input;
@@ -84,20 +84,13 @@ export const folderRouter = createTRPCRouter({
         include: {
           studySets: {
             include: {
-              cards: true,
+              _count: { select: { cards: true } },
               user: true,
             },
           },
           user: true,
         },
       });
-
-      if (!folder) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Couldn't find folder",
-        });
-      }
 
       return folder;
     }),
@@ -180,7 +173,7 @@ export const folderRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string(),
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       return await ctx.prisma.folder.delete({

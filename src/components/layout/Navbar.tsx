@@ -1,9 +1,12 @@
+"use client";
+
 import { DownOutlined, MenuOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Button, Dropdown, Typography, theme } from "antd";
+import { Avatar, Button, Dropdown, theme } from "antd";
+import Text from "antd/es/typography/Text";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
 import { useFolderModalContext } from "../../contexts/FolderModalContext";
 import { useThemeContext } from "../../contexts/ThemeProvider";
@@ -14,7 +17,7 @@ interface NavbarProps {
 
 const Navbar = ({ openMobileMenu }: NavbarProps) => {
   const { data: session } = useSession();
-  const { push } = useRouter();
+  const router = useRouter();
   const [, dispatchAuthDropdown] = useAuthDropdownContext();
   const [, dispatchFolderModal] = useFolderModalContext();
   const { switchDarkMode } = useThemeContext();
@@ -32,7 +35,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
 
   const handleCreateStudySet = async () => {
     if (session) {
-      await push("/create-set");
+      router.push("/create-set");
     } else {
       dispatchAuthDropdown("openLogin");
     }
@@ -64,7 +67,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               href={session ? "/latest" : "/"}
               className="mx-3 hidden h-full text-sm font-medium leading-[4rem] md:block"
             >
-              <Typography.Text>Home</Typography.Text>
+              <Text>Home</Text>
             </Link>
             <Dropdown
               className="hidden md:block"

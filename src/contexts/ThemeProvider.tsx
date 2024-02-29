@@ -23,7 +23,7 @@ const ThemeProvider = ({ children }: PropsWithChildren) => {
     if (session) {
       const savedMode = localStorage.getItem("darkMode");
       if (savedMode) {
-        setDarkMode(Boolean(savedMode));
+        setDarkMode(JSON.parse(savedMode) as boolean);
       }
     } else {
       setDarkMode(false);

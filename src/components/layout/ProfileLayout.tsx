@@ -1,71 +1,74 @@
+"use client";
+
 import { UserOutlined } from "@ant-design/icons";
-import { Avatar, Tabs, Typography } from "antd";
-import { useSession } from "next-auth/react";
+import { type User } from "@prisma/client";
+import { Avatar, Tabs } from "antd";
+import Text from "antd/es/typography/Text";
+import { type Session } from "next-auth";
+import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import type { ReactElement } from "react";
-import { api } from "../../utils/api";
+import { usePathname } from "next/navigation";
+import type { ReactNode } from "react";
 
 interface ProfileLayoutProps {
-  children: ReactElement;
-  userId: string;
+  children: ReactNode;
+  user: Omit<User, "password">;
+  session: Session | null;
 }
 
-const ProfileLayout = ({ children, userId }: ProfileLayoutProps) => {
-  const { data: session } = useSession();
-  const { pathname } = useRouter();
-  const { data } = api.user.getById.useQuery({ id: userId });
+const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
+  const pathname = usePathname();
 
-  if (!data) {
-    return <div>404</div>;
-  }
+  const { id, name, image } = user;
 
-  const { id, name, image } = data;
+  const items = [
+    ...(session?.user.id === id
+      ? [
+          {
+            key: "1",
+            label: <Link href={`/${id}`}>Achivements</Link>,
+          },
+        ]
+      : []),
+    {
+      key: "2",
+      label: <Link href={`/${id}/study-sets`}>Study sets</Link>,
+    },
+    {
+      key: "3",
+      label: <Link href={`/${id}/folders`}>Folders</Link>,
+    },
+  ];
 
   return (
     <>
       <div className="mb-8 flex items-start gap-5">
         <Avatar
           icon={<UserOutlined />}
-          src={image}
+          src={
+            image ? (
+              <Image src={image} alt="" width={64} height={64} />
+            ) : undefined
+          }
           alt=""
           className="h-16 w-16"
         />
         <div>
-          <Typography.Text className="block text-2xl font-bold">
+          <Text className="block text-2xl font-bold">{name}</Text>
+          <Text className="block font-semibold" type="secondary">
             {name}
-          </Typography.Text>
-          <Typography.Text className="block font-semibold" type="secondary">
-            {name}
-          </Typography.Text>
+          </Text>
         </div>
       </div>
       <Tabs
         activeKey={
-          pathname === "/[id]"
+          pathname === `/${id}`
             ? "1"
-            : pathname === "/[id]/study-sets"
-            ? "2"
-            : "3"
+            : pathname === `/${id}/study-sets`
+              ? "2"
+              : "3"
         }
-        items={(session?.user.id === id
-          ? [
-              {
-                key: "1",
-                label: <Link href={`/${id}`}>Achivements</Link>,
-              },
-            ]
-          : []
-        ).concat([
-          {
-            key: "2",
-            label: <Link href={`/${id}/study-sets`}>Study sets</Link>,
-          },
-          {
-            key: "3",
-            label: <Link href={`/${id}/folders`}>Folders</Link>,
-          },
-        ])}
+        items={items}
       />
       <div className="py-4">{children}</div>
     </>
