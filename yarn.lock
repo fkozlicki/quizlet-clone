@@ -3302,13 +3302,6 @@
     "@storybook/global" "^5.0.0"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-styling-webpack@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-styling-webpack/-/addon-styling-webpack-0.0.6.tgz#6e974c7498c8cfe6a8f98344e9ef4c54c1980e95"
-  integrity sha512-JjM2FXFiHpjbJsp7nRUEMhYBRpK6ukBKsbtWzCrAGOfUgoElcGwPY8KhSKSnRknIhebonGK1bxalh3u8bGZ/dw==
-  dependencies:
-    "@storybook/node-logger" "^7.0.12"
-
 "@storybook/addon-toolbars@7.6.16":
   version "7.6.16"
   resolved "https://registry.yarnpkg.com/@storybook/addon-toolbars/-/addon-toolbars-7.6.16.tgz#a3c81400e0b54ad77a4b2980aaef3f977a170793"
@@ -3769,7 +3762,7 @@
     tsconfig-paths "^4.0.0"
     tsconfig-paths-webpack-plugin "^4.0.1"
 
-"@storybook/node-logger@7.6.16", "@storybook/node-logger@^7.0.12":
+"@storybook/node-logger@7.6.16":
   version "7.6.16"
   resolved "https://registry.yarnpkg.com/@storybook/node-logger/-/node-logger-7.6.16.tgz#6ae9380b52dba770d669f293c79a161c7d450237"
   integrity sha512-s18wgtLynLWnunz47lkVIpjk8J6LxT/OmfzkggieU8cG2XYRbf//t7/EOUpOqK77+Xqm3epSwgDAxOXGfjOjAA==
@@ -4076,6 +4069,11 @@
   version "14.3.0"
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.3.0.tgz#0a6750b94b40e4739706d41e8efc2ccf64d2aad9"
   integrity sha512-P02xtBBa8yMaLhK8CzJCIns8rqwnF6FxhR9zs810flHOBXUYCFjLd8Io1rQrAkQRWEmW2PGdZIEdMxf/KLsqFA==
+
+"@tomfreudenberg/next-auth-mock@^0.5.6":
+  version "0.5.6"
+  resolved "https://registry.yarnpkg.com/@tomfreudenberg/next-auth-mock/-/next-auth-mock-0.5.6.tgz#d4490f2408b6d7e8f471463c006fb990563a0311"
+  integrity sha512-fSZJY5rUyj8GIcJI450ZV7FV/CMzpjUUGhPiaRyQo9l7l5mLvrnNe1MymzOnLpgXIkFja+CF/UHFGW807QcwmA==
 
 "@trpc/client@^10.43.6":
   version "10.45.1"

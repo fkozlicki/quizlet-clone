@@ -46,7 +46,7 @@ const TestForm = ({ studySetTest, formCallack }: TestFormProps) => {
     Object.entries(studySetTest).map((entry) => [
       entry[0],
       entry[1].map((question) => ({ ...question, userAnswer: "" })),
-    ])
+    ]),
   );
   const { control, register, handleSubmit } = useForm<TestInputs>({
     resolver: zodResolver(testInputs),

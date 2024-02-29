@@ -11,7 +11,6 @@ interface MultipleChoiceProps {
   result?: boolean;
   userAnswer?: string;
   definition?: string;
-  type: "button" | "radio";
   callback?: (index: number, event: MouseEvent) => void;
 }
 
@@ -24,7 +23,6 @@ const MultipleChoice = ({
   userAnswer,
   definition,
   callback,
-  type,
 }: MultipleChoiceProps) => {
   const {
     token: { colorBgContainer, green1, red1, green5, red5, colorBorder },
@@ -73,12 +71,13 @@ const MultipleChoice = ({
               htmlFor={`card-${index}-choice-${answerIndex}`}
             >
               <input
-                {...register}
-                type={type}
-                value={answer}
                 id={`card-${index}-choice-${answerIndex}`}
+                name="multipleChoice"
+                type="radio"
+                value={answer}
                 className="peer hidden"
                 disabled={!!result}
+                {...register}
               />
               <div
                 onClick={

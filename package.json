@@ -57,6 +57,7 @@
     "@storybook/nextjs": "^7.6.16",
     "@storybook/react": "^7.6.16",
     "@storybook/test": "^7.6.16",
+    "@tomfreudenberg/next-auth-mock": "^0.5.6",
     "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.44.7",
     "@types/node": "^18.17.0",

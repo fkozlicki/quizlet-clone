@@ -94,7 +94,6 @@ const LearnMode = ({
           answers={currentCard.answers}
           index={cardIndex}
           callback={chooseAnswer}
-          type="button"
         />
       )}
       {cards && cardIndex === cards.length && (

@@ -31,14 +31,13 @@ const TestResult = ({ result }: TestResultProps) => {
             <MultipleChoice
               key={index}
               term={term}
-              answers={answers}
-              index={index}
-              result
-              userAnswer={userAnswer}
               definition={definition}
-              type="radio"
+              answers={answers}
+              userAnswer={userAnswer}
+              result
+              index={index}
             />
-          )
+          ),
         )}
         {written.map(({ term, userAnswer, definition }, index) => (
           <Written
