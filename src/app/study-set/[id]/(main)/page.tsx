@@ -1,20 +1,14 @@
 import StudySet from "@/components/study-set/StudySet";
-import { createSSRHelper } from "@/server/helpers/ssgHelper";
-import { dehydrate, Hydrate } from "@tanstack/react-query";
-import React from "react";
+import { api } from "@/trpc/server";
 
 export default async function StudySetPage({
   params: { id },
 }: {
   params: { id: string };
 }) {
-  const helpers = await createSSRHelper();
-  await helpers.studySet.getById.prefetch({ id });
-  const dehydrateState = dehydrate(helpers.queryClient);
+  const data = await api.studySet.getById.query({
+    id,
+  });
 
-  return (
-    <Hydrate state={dehydrateState}>
-      <StudySet id={id} />
-    </Hydrate>
-  );
+  return <StudySet initialData={data} />;
 }
