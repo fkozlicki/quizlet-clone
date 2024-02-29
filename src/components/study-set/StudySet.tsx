@@ -13,29 +13,18 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import CreatedBy from "./CreatedBy";
-import { AppRouter } from "@/server/api/root";
-import { inferRouterOutputs } from "@trpc/server";
 
-const StudySet = ({
-  initialData,
-}: {
-  initialData: inferRouterOutputs<AppRouter>["studySet"]["getById"];
-}) => {
+const StudySet = ({ id }: { id: string }) => {
   const { data: session } = useSession();
-  const { data: studySet, isLoading } = api.studySet.getById.useQuery(
-    {
-      id: initialData.id,
-    },
-    {
-      initialData,
-    },
-  );
+  const { data: studySet } = api.studySet.getById.useQuery({
+    id,
+  });
 
   if (!studySet) {
     notFound();
   }
 
-  const { title, cards, userId, user, description, id } = studySet;
+  const { title, cards, userId, user, description } = studySet;
   const { studySets: otherSets } = user;
 
   return (
