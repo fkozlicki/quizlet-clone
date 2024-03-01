@@ -12,7 +12,7 @@ import type { ReactNode } from "react";
 
 interface ProfileLayoutProps {
   children: ReactNode;
-  user: Omit<User, "password">;
+  user: Pick<User, "id" | "name" | "image">;
   session: Session | null;
 }
 
@@ -66,7 +66,9 @@ const ProfileLayout = ({ children, user, session }: ProfileLayoutProps) => {
             ? "1"
             : pathname === `/${id}/study-sets`
               ? "2"
-              : "3"
+              : pathname === `/${id}/folders`
+                ? "3"
+                : undefined
         }
         items={items}
       />

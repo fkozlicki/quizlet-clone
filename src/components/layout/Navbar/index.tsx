@@ -7,9 +7,9 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import { useFolderModalContext } from "../../contexts/FolderModalContext";
-import { useThemeContext } from "../../contexts/ThemeProvider";
+import { useAuthDropdownContext } from "../../../contexts/AuthDropdownContext";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
+import { useThemeContext } from "../../../contexts/ThemeProvider";
 
 interface NavbarProps {
   openMobileMenu: () => void;
@@ -67,7 +67,7 @@ const Navbar = ({ openMobileMenu }: NavbarProps) => {
               href={session ? "/latest" : "/"}
               className="mx-3 hidden h-full text-sm font-medium leading-[4rem] md:block"
             >
-              <Text>Home</Text>
+              <Text className="">Home</Text>
             </Link>
             <Dropdown
               className="hidden md:block"

@@ -19,9 +19,4 @@ export const Default: Story = {
       }}
     />
   ),
-  parameters: {
-    nextAuthMock: {
-      session: "unknown",
-    },
-  },
 };

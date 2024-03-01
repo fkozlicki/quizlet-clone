@@ -4,13 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, Input, Modal, message } from "antd";
 import type { Session } from "next-auth";
 import { useForm } from "react-hook-form";
-import { useFolderModalContext } from "../../contexts/FolderModalContext";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
 import { FormItem } from "react-hook-form-antd";
 import type {
   CreateFolderValues,
   EditFolderValues,
-} from "../../schemas/folder";
-import { createFolderSchema, editFolderSchema } from "../../schemas/folder";
+} from "../../../schemas/folder";
+import { createFolderSchema, editFolderSchema } from "../../../schemas/folder";
 import { useEffect } from "react";
 import { api } from "@/trpc/react";
 import { useRouter } from "next/navigation";

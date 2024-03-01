@@ -5,9 +5,9 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import type { Key, ReactNode } from "react";
-import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import { useFolderModalContext } from "../../contexts/FolderModalContext";
-import { useThemeContext } from "../../contexts/ThemeProvider";
+import { useAuthDropdownContext } from "../../../contexts/AuthDropdownContext";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
+import { useThemeContext } from "../../../contexts/ThemeProvider";
 import { useRouter } from "next/navigation";
 
 type MenuItem = Required<MenuProps>["items"][number];

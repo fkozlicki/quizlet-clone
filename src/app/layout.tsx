@@ -6,6 +6,7 @@ import Providers from "@/components/Providers";
 import { TRPCReactProvider } from "@/trpc/react";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import Layout from "@/components/layout/Layout";
+import "antd/dist/reset.css";
 
 const inter = Inter({
   subsets: ["latin"],

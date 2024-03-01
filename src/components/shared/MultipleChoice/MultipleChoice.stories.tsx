@@ -24,6 +24,7 @@ export const GoodAnswer: Story = {
       term="2+2"
       definition="4"
       userAnswer="4"
+      result
     />
   ),
 };
@@ -36,6 +37,7 @@ export const WrongAnswer: Story = {
       term="2+2"
       definition="4"
       userAnswer="3"
+      result
     />
   ),
 };

@@ -1,9 +1,9 @@
 import { CloseOutlined } from "@ant-design/icons";
 import { Button, Drawer, Tabs } from "antd";
 import Image from "next/image";
-import { useAuthDropdownContext } from "../../contexts/AuthDropdownContext";
-import LoginForm from "./LoginForm";
-import SignupForm from "./SignupForm";
+import { useAuthDropdownContext } from "../../../contexts/AuthDropdownContext";
+import LoginForm from "../LoginForm";
+import SignupForm from "../SignupForm";
 
 const AuthDropdown = () => {
   const [state, dispatch] = useAuthDropdownContext();

@@ -1,7 +1,8 @@
 import type { Preview } from "@storybook/react";
 import React from "react";
-import "../src/styles/globals.css";
 import { TRPCReactProvider } from "../src/trpc/react";
+import "@/styles/globals.css";
+import "antd/dist/reset.css";
 
 const preview: Preview = {
   parameters: {

@@ -84,7 +84,7 @@ const TrueOrFalse = ({
                 {...register}
               />
               <div
-                className={`peer-checked:bg-blue-50" rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
+                className={`peer-checked:bg-blue-50" rounded-md border-2 border-solid px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
                   !result ? "cursor-pointer" : ""
                 }`}
                 style={{
@@ -116,7 +116,7 @@ const TrueOrFalse = ({
                 {...register}
               />
               <div
-                className={`rounded-md border-2 px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
+                className={`rounded-md border-2 border-solid px-4 py-2 text-center peer-checked:!border-blue-600 peer-checked:!bg-blue-600/10 ${
                   !result ? "cursor-pointer" : ""
                 }`}
                 style={{

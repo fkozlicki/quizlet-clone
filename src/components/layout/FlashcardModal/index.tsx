@@ -6,11 +6,11 @@ import { useEffect } from "react";
 import type { SubmitHandler } from "react-hook-form";
 import { useForm } from "react-hook-form";
 import { FormItem } from "react-hook-form-antd";
-import { useFlashcardModalContext } from "../../contexts/FlashcardModalContext";
+import { useFlashcardModalContext } from "../../../contexts/FlashcardModalContext";
 import {
   editFlashcardSchema,
   type EditFlashcardValues,
-} from "../../schemas/flashcard";
+} from "../../../schemas/flashcard";
 import { api } from "@/trpc/react";
 
 const FlashcardModal = () => {
