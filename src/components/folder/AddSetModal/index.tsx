@@ -1,9 +1,9 @@
-import { LoadingOutlined } from "@ant-design/icons";
-import type { StudySet } from "@prisma/client";
-import { Button, Empty, Modal } from "antd";
-import Link from "next/link";
-import FolderStudySet from "./FolderStudySet";
 import { api } from "@/trpc/react";
+import type { StudySet } from "@prisma/client";
+import { Button, Empty, Modal, Skeleton } from "antd";
+import Text from "antd/es/typography/Text";
+import Link from "next/link";
+import FolderStudySet from "../FolderStudySet";
 
 interface AddSetModalProps {
   open: boolean;
@@ -41,10 +41,10 @@ const AddSetModal = ({
         footer: "hidden",
       }}
     >
-      {status === "loading" && <LoadingOutlined />}
+      {status === "loading" && <Skeleton active title={false} />}
       {status === "error" && (
-        <div>
-          <div>Couldn&apos;t load sets</div>
+        <div className="flex flex-col items-center py-4">
+          <Text className="mb-2">Couldn&apos;t load sets</Text>
           <Button onClick={() => refetch()}>Try again</Button>
         </div>
       )}

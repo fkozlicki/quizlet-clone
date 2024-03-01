@@ -6,7 +6,7 @@ import Link from "next/link";
 
 interface FolderInfoProps {
   setsCount: number;
-  user: User;
+  user: Pick<User, "id" | "name" | "image">;
 }
 
 const FolderAuthor = ({ setsCount, user }: FolderInfoProps) => {

@@ -36,9 +36,6 @@ export const Owner: Story = {
         },
       },
     },
-    nextjs: {
-      appDirectory: true,
-    },
   },
   decorators: [
     (Story) => {

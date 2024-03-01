@@ -7,8 +7,8 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { Button, Dropdown, Modal, Tag, Tooltip, message } from "antd";
-import { useFolderModalContext } from "../../contexts/FolderModalContext";
-import type { EditFolderValues } from "../../schemas/folder";
+import { useFolderModalContext } from "../../../contexts/FolderModalContext";
+import type { EditFolderValues } from "../../../schemas/folder";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
