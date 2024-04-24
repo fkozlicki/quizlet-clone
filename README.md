@@ -8,15 +8,15 @@ Clone application of [Quizlet](https://quizlet.com) built with [create-t3-turbo]
 
 ### Features
 
-- Create/read/update/delete user
-- Create/read/update/delete study set
-- Edit flashcard
-- Create/read/update/delete folder
-- Learn study set in 4 ways
+- User CRUD
+- Study set CRUD
+- Folder CRUD
+- 4 learning modes
   - Reviewing flashcards
   - Resolving learn set
   - Resolving test
   - Playing memory game
+- Flashcard animations (Framer motion)
 
 ## Preview
 | Study set | Test mode |
@@ -27,11 +27,11 @@ Clone application of [Quizlet](https://quizlet.com) built with [create-t3-turbo]
 ## Tech stack
 
 - Next.js 14 (App dir)
-- Typescrpt
+- Typescript
 - Drizzle ORM
 - PostgreSQL
 - Next-auth
 - tRPC
 - TailwindCSS
 - Shadcn UI
-
+- Zod
