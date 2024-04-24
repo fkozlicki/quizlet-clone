@@ -1,0 +1,89 @@
+{
+  "name": "@acme/ui",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./button": "./src/button.tsx",
+    "./form": "./src/form.tsx",
+    "./input": "./src/input.tsx",
+    "./textarea": "./src/textarea.tsx",
+    "./label": "./src/label.tsx",
+    "./theme": "./src/theme.tsx",
+    "./toast": "./src/toast.tsx",
+    "./dropdown-menu": "./src/dropdown-menu.tsx",
+    "./avatar": "./src/avatar.tsx",
+    "./sheet": "./src/sheet.tsx",
+    "./card": "./src/card.tsx",
+    "./badge": "./src/badge.tsx",
+    "./tooltip": "./src/tooltip.tsx",
+    "./progress": "./src/progress.tsx",
+    "./dialog": "./src/dialog.tsx",
+    "./switch": "./src/switch.tsx",
+    "./separator": "./src/separator.tsx",
+    "./alert": "./src/alert.tsx",
+    "./radial-progress": "./src/radial-progress.tsx",
+    "./tabs": "./src/tabs.tsx",
+    "./dropzone": "./src/dropzone.tsx",
+    "./slider": "./src/slider.tsx",
+    "./cropper": "./src/cropper.tsx",
+    "./skeleton": "./src/skeleton.tsx"
+  },
+  "license": "MIT",
+  "scripts": {
+    "add": "pnpm dlx shadcn-ui add",
+    "clean": "rm -rf .turbo node_modules",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^3.3.4",
+    "@radix-ui/react-avatar": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-progress": "^1.0.3",
+    "@radix-ui/react-separator": "^1.0.3",
+    "@radix-ui/react-slider": "^1.1.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-tooltip": "^1.0.7",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "next-themes": "^0.2.1",
+    "react-dropzone": "^14.2.3",
+    "react-easy-crop": "^5.0.6",
+    "react-hook-form": "^7.51.2",
+    "sonner": "^1.4.41",
+    "tailwind-merge": "^2.2.2",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@acme/eslint-config": "workspace:*",
+    "@acme/prettier-config": "workspace:*",
+    "@acme/tailwind-config": "workspace:*",
+    "@acme/tsconfig": "workspace:*",
+    "@types/react": "^18.2.69",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5",
+    "react": "18.2.0",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.4.3",
+    "zod": "^3.22.4"
+  },
+  "peerDependencies": {
+    "react": "18.2.0",
+    "zod": "^3.22.4"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@acme/eslint-config/base",
+      "@acme/eslint-config/react"
+    ]
+  },
+  "prettier": "@acme/prettier-config"
+}

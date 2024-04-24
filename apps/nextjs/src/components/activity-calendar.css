@@ -1,0 +1,25 @@
+.react-calendar {
+  border: unset !important;
+  background: unset !important;
+}
+.react-calendar__month-view__weekdays {
+  color: hsla(var(--muted-foreground));
+  font-weight: 600 !important;
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  text-decoration: none !important;
+  cursor: default !important;
+}
+.react-calendar__tile {
+  pointer-events: none !important;
+  position: relative;
+}
+.react-calendar__tile--now {
+  background: unset;
+}
+.react-calendar__month-view__days__day--weekend {
+  color: unset !important;
+}
+.react-calendar__month-view__days__day--neighboringMonth {
+  color: hsla(var(--muted-foreground)) !important;
+}
