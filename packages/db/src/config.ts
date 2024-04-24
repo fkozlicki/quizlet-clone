@@ -1,6 +1,6 @@
 import type { Config } from "drizzle-kit";
 
-const connectionString = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}:5432/${process.env.DB_NAME}?schema=public`;
+const connectionString = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?sslmode=require`
 
 export default {
   schema: "./src/schema",
