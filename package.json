@@ -18,8 +18,7 @@
     "lint:fix": "turbo lint --continue -- --fix --cache --cache-location node_modules/.cache/.eslintcache",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
-    "typecheck": "turbo typecheck",
-    "vercel-build": "pnpm db:push && pnpm build"
+    "typecheck": "turbo typecheck"
   },
   "devDependencies": {
     "@acme/prettier-config": "workspace:*",
