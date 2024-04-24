@@ -23,11 +23,10 @@ export { pgTable as tableCreator } from "./schema/_table";
 
 export * from "drizzle-orm";
 
+const connectionString = `postgresql://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@${process.env.DB_HOST}/${process.env.DB_NAME}?sslmode=require`
+
 const pool = new pg.Pool({
-  host: process.env.DB_HOST!,
-  user: process.env.DB_USERNAME!,
-  password: process.env.DB_PASSWORD!,
-  database: process.env.DB_NAME,
+  connectionString
 });
 
 export const db = drizzle(pool, { schema });
