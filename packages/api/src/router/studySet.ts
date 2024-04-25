@@ -206,10 +206,6 @@ export const studySetRouter = {
         ]);
       }
 
-      console.log("toUpdate", toUpdate);
-      console.log("toDelete", toDeleteIds);
-      console.log("toCreate", toCreate);
-
       return updated;
     }),
   delete: protectedProcedure
