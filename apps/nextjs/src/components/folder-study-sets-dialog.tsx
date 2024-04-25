@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Plus } from "lucide-react";
 
@@ -13,7 +14,6 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
-import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 import { api } from "~/trpc/react";
 import AddStudySetCard from "./add-study-set-card";
 
@@ -25,11 +25,6 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
   const { slug }: { slug: string } = useParams();
   const { data: studySets } = api.studySet.allByUser.useQuery({ userId });
   const { data: folder } = api.folder.bySlug.useQuery({ slug });
-  const [, dispatch] = useFolderDialogContext();
-
-  const openFolderDialog = () => {
-    dispatch({ type: "open" });
-  };
 
   if (!folder) {
     return null;
@@ -49,7 +44,9 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
             Manage study sets within your folder.
           </DialogDescription>
         </DialogHeader>
-        <Button onClick={openFolderDialog}>Create new folder</Button>
+        <Link href="/create-set">
+          <Button className="w-full">Create new study set</Button>
+        </Link>
         <div className="flex flex-col gap-4">
           {studySets?.map((set) => (
             <AddStudySetCard
