@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Trash2, Trash2Icon } from "lucide-react";
+import { Loader2Icon, Trash2, Trash2Icon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -19,22 +19,21 @@ import { toast } from "@acme/ui/toast";
 import { api } from "~/trpc/react";
 
 const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
-  const { mutate } = api.folder.delete.useMutation();
+  const utils = api.useUtils();
+  const { mutate, isPending } = api.folder.delete.useMutation({
+    async onSuccess() {
+      await utils.folder.invalidate();
+      toast.success("Successfully deleted folder");
+      router.push(`/users/${userId}/folders`);
+    },
+    onError() {
+      toast.error("Couldn't delete folder, try again");
+    },
+  });
   const router = useRouter();
 
   const deleteFolder = () => {
-    mutate(
-      { id },
-      {
-        onSuccess() {
-          toast.success("Successfully deleted folder");
-          router.push(`/users/${userId}/folders`);
-        },
-        onError() {
-          toast.error("Couldn't delete folder, try again");
-        },
-      },
-    );
+    mutate({ id });
   };
 
   return (
@@ -53,11 +52,21 @@ const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose>
-            <Button>Cancel</Button>
+          <DialogClose asChild>
+            <Button disabled={isPending}>Cancel</Button>
           </DialogClose>
-          <Button onClick={deleteFolder} variant="destructive">
-            Delete <Trash2Icon size={16} className="ml-2" />
+          <Button
+            disabled={isPending}
+            onClick={deleteFolder}
+            variant="destructive"
+          >
+            {isPending ? (
+              <Loader2Icon size={16} className="animate-spin" />
+            ) : (
+              <>
+                Delete <Trash2Icon size={16} className="ml-2" />
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
