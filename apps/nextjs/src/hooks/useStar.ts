@@ -11,15 +11,40 @@ export default function useStar(
   const utils = api.useUtils();
   const { id }: { id: string } = useParams();
   const createStarred = api.starredFlashcard.create.useMutation({
-    async onSuccess() {
-      await utils.studySet.byId.invalidate({ id });
-    },
+    onMutate: ({ flashcardId }) => updateStudySet(flashcardId, true),
+    onSettled,
   });
   const deleteStarred = api.starredFlashcard.delete.useMutation({
-    async onSuccess() {
-      await utils.studySet.byId.invalidate({ id });
-    },
+    onMutate: ({ flashcardId }) => updateStudySet(flashcardId, false),
+    onSettled,
   });
+
+  async function onSettled() {
+    await utils.studySet.byId.invalidate({ id });
+  }
+
+  function updateStudySet(flashcardId: number, starred: boolean) {
+    const prevData = utils.studySet.byId.getData({
+      id,
+    });
+
+    utils.studySet.byId.setData({ id }, (old) => {
+      if (!old) {
+        return;
+      }
+
+      return {
+        ...old,
+        flashcards: old.flashcards.map((card) =>
+          card.id === flashcardId ? { ...card, starred } : card,
+        ),
+      };
+    });
+
+    return {
+      prevData,
+    };
+  }
 
   const toggleStar = (event: MouseEvent) => {
     event.stopPropagation();
