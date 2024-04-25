@@ -51,6 +51,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const { fields, replace, append, remove } = useFieldArray({
     name: "flashcards",
     control: form.control,
+    keyName: "fieldId",
   });
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -68,8 +69,6 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
       router.push(`/study-sets/${data?.id}`);
     },
   });
-
-  const isPending = create.isPending || edit.isPending;
 
   const onSubmit = (values: EditStudySetValues | CreateStudySetValues) => {
     const flashcards = values.flashcards.map((flashcard, index) => ({
@@ -102,10 +101,15 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
     });
   };
 
+  const isPending = create.isPending || edit.isPending;
+
   return (
     <div ref={ref} className="m-auto max-w-xl py-8">
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form
+          onSubmit={form.handleSubmit(onSubmit, console.log)}
+          className="space-y-8"
+        >
           <FormField
             control={form.control}
             name="title"
