@@ -1,22 +1,46 @@
-import React from "react";
-import { Trash2 } from "lucide-react";
+"use client";
 
-import { Badge } from "@acme/ui/badge";
+import { useRouter } from "next/navigation";
+import { Trash2, Trash2Icon } from "lucide-react";
+
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
+import { toast } from "@acme/ui/toast";
 
-const DeleteFolderDialog = () => {
+import { api } from "~/trpc/react";
+
+const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
+  const { mutate } = api.folder.delete.useMutation();
+  const router = useRouter();
+
+  const deleteFolder = () => {
+    mutate(
+      { id },
+      {
+        onSuccess() {
+          toast.success("Successfully deleted folder");
+          router.push(`/users/${userId}/folders`);
+        },
+        onError() {
+          toast.error("Couldn't delete folder, try again");
+        },
+      },
+    );
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button size="icon" variant="outline">
+        <Button size="icon" variant="destructive">
           <Trash2 size={16} />
         </Button>
       </DialogTrigger>
@@ -25,20 +49,17 @@ const DeleteFolderDialog = () => {
           <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
             This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+            folder and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-5">
-          <div className="mb-4 flex items-center text-base">
-            Are you sure you want to delete
-            <Badge className="mx-2">folder_name</Badge>
-            folder
-          </div>
-          <div>
-            Deleting folder cannot be undone. Sets in this folder will not be
-            deleted.
-          </div>
-        </div>
+        <DialogFooter>
+          <DialogClose>
+            <Button>Cancel</Button>
+          </DialogClose>
+          <Button onClick={deleteFolder} variant="destructive">
+            Delete <Trash2Icon size={16} className="ml-2" />
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

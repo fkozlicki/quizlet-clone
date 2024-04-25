@@ -26,7 +26,7 @@ const FolderCTA = async ({ userId, defaultValues }: FolderCTAProps) => {
               <Edit size={16} />
             </Button>
           </FolderDialog>
-          <DeleteFolderDialog />
+          <DeleteFolderDialog id={defaultValues.id} userId={session.user.id} />
         </>
       )}
     </div>
