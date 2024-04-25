@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
+import { auth } from "@acme/auth";
 
 import StudySetForm from "~/components/study-set-form";
 import { api } from "~/trpc/server";
@@ -20,7 +23,12 @@ export async function generateMetadata({
 export default async function EditStudySet({
   params: { id },
 }: EditStudySetProps) {
+  const session = await auth();
   const studySet = await api.studySet.byId({ id });
+
+  if (!session || session.user.id !== studySet.userId) {
+    redirect(`/study-sets/${studySet.id}`);
+  }
 
   return (
     <StudySetForm
