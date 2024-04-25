@@ -10,10 +10,10 @@ export const foldersToStudySets = pgTable(
   {
     folderId: uuid("folder_id")
       .notNull()
-      .references(() => folders.id),
+      .references(() => folders.id, { onDelete: "cascade" }),
     studySetId: uuid("study_set_id")
       .notNull()
-      .references(() => studySets.id),
+      .references(() => studySets.id, { onDelete: "cascade" }),
   },
   (t) => ({
     pk: primaryKey({ columns: [t.folderId, t.studySetId] }),
