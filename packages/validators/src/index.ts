@@ -7,6 +7,12 @@ export const CreateUserSchema = z.object({
   password: z.string(),
 });
 
+const FlashcardSchema = z.object({
+  term: z.string(),
+  definition: z.string(),
+  position: z.number(),
+});
+
 export const CreateStudySetSchema = z.object({
   title: z
     .string()
@@ -14,23 +20,22 @@ export const CreateStudySetSchema = z.object({
     .min(3, "Title must be at least 3 characters long"),
   description: z.string().optional(),
   flashcards: z
-    .array(
-      z.object({
-        term: z.string(),
-        definition: z.string(),
-        position: z.number(),
-      }),
-    )
+    .array(FlashcardSchema)
     .min(2, "You have to create at least 2 flashcards"),
 });
 
 export type CreateStudySetValues = z.infer<typeof CreateStudySetSchema>;
 
-export const EditStudySetSchema = CreateStudySetSchema.merge(
-  z.object({
-    id: z.string().min(1, "Id is required"),
-  }),
-);
+export const EditStudySetSchema = CreateStudySetSchema.extend({
+  id: z.string().min(1, "Id is required"),
+  flashcards: z
+    .array(
+      FlashcardSchema.extend({
+        id: z.number(),
+      }),
+    )
+    .min(2, "You have to create at least 2 flashcards"),
+});
 
 export type EditStudySetValues = z.infer<typeof EditStudySetSchema>;
 

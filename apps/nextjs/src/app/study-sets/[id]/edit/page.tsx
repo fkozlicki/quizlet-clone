@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
-import StudySetForm from "~/components/study-set-form";
+import EditStudySet from "~/components/edit-study-set";
 import { api } from "~/trpc/server";
 
 interface EditStudySetProps {
@@ -20,9 +20,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function EditStudySet({
-  params: { id },
-}: EditStudySetProps) {
+export default async function Page({ params: { id } }: EditStudySetProps) {
   const session = await auth();
   const studySet = await api.studySet.byId({ id });
 
@@ -30,12 +28,5 @@ export default async function EditStudySet({
     redirect(`/study-sets/${studySet.id}`);
   }
 
-  return (
-    <StudySetForm
-      defaultValues={{
-        ...studySet,
-        description: studySet.description ?? undefined,
-      }}
-    />
-  );
+  return <EditStudySet studySet={studySet} />;
 }

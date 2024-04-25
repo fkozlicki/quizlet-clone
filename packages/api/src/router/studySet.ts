@@ -3,7 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 import type { Database } from "@acme/db";
-import { and, asc, count, desc, eq, not, schema } from "@acme/db";
+import { and, asc, count, desc, eq, inArray, not, schema } from "@acme/db";
 import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
 
 import type { TRPCContext } from "../trpc";
@@ -164,15 +164,36 @@ export const studySetRouter = {
         });
       }
 
-      await ctx.db
-        .delete(schema.flashcards)
-        .where(eq(schema.flashcards.studySetId, id));
-      await ctx.db.insert(schema.flashcards).values([
-        ...flashcards.map((flashcard) => ({
-          ...flashcard,
-          studySetId: id,
-        })),
-      ]);
+      const currentFlashcards = (
+        await ctx.db.query.flashcards.findMany({
+          where: eq(schema.flashcards.studySetId, id),
+        })
+      ).map((card) => card.id);
+
+      const toDeleteIds = flashcards
+        .filter((card) => currentFlashcards.indexOf(card.id) < 0)
+        .map((card) => card.id);
+
+      const toUpdate = flashcards.filter(
+        (card) => currentFlashcards.indexOf(card.id) >= 0,
+      );
+
+      if (toDeleteIds.length > 0) {
+        await ctx.db
+          .delete(schema.flashcards)
+          .where(inArray(schema.flashcards.id, toDeleteIds));
+      }
+
+      const promises = toUpdate.map((card) =>
+        ctx.db
+          .update(schema.flashcards)
+          .set(card)
+          .where(eq(schema.flashcards.id, card.id)),
+      );
+
+      if (promises.length > 0) {
+        await Promise.all(promises);
+      }
 
       return updated;
     }),
