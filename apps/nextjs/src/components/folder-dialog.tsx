@@ -1,11 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { z } from "zod";
 import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 
-import type { EditFolderValues } from "@acme/validators";
+import type { CreateFolderValues, EditFolderValues } from "@acme/validators";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
@@ -28,7 +27,7 @@ import {
 import { Input } from "@acme/ui/input";
 import { Textarea } from "@acme/ui/textarea";
 import { toast } from "@acme/ui/toast";
-import { CreateFolderSchema } from "@acme/validators";
+import { CreateFolderSchema, EditFolderSchema } from "@acme/validators";
 
 import { api } from "~/trpc/react";
 
@@ -47,13 +46,13 @@ const FolderDialog = ({
 }: FolderDialogProps) => {
   const utils = api.useUtils();
   const form = useForm({
-    schema: CreateFolderSchema,
+    schema: defaultValues ? EditFolderSchema : CreateFolderSchema,
     defaultValues: defaultValues ?? {
       name: "",
       description: "",
     },
   });
-  const { mutate, isPending } = api.folder.create.useMutation({
+  const create = api.folder.create.useMutation({
     async onSuccess(data) {
       form.reset();
       await utils.folder.invalidate();
@@ -74,10 +73,31 @@ const FolderDialog = ({
       toast.error("Couldn't create folder, try again");
     },
   });
+  const edit = api.folder.edit.useMutation({
+    async onSuccess(data) {
+      form.reset({
+        name: data.name,
+        description: data.description ?? undefined,
+      });
+      await utils.folder.invalidate();
+      onOpenChange && onOpenChange(false);
 
-  function onSubmit(values: z.infer<typeof CreateFolderSchema>) {
-    mutate(values);
+      toast.success("Successfully edited folder");
+    },
+    onError() {
+      toast.error("Couldn't edit folder, try again");
+    },
+  });
+
+  function onSubmit(values: EditFolderValues | CreateFolderValues) {
+    if ("id" in values) {
+      edit.mutate(values);
+    } else {
+      create.mutate(values);
+    }
   }
+
+  const isPending = create.isPending || edit.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

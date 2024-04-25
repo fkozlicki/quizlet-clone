@@ -108,10 +108,20 @@ export const folderRouter = {
     .input(EditFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, ...values } = input;
-      return await ctx.db
+      const [editedFolder] = await ctx.db
         .update(schema.folders)
         .set(values)
-        .where(eq(schema.folders.id, id));
+        .where(eq(schema.folders.id, id))
+        .returning();
+
+      if (!editedFolder) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Server error",
+        });
+      }
+
+      return editedFolder;
     }),
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
