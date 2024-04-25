@@ -31,7 +31,7 @@ export const EditStudySetSchema = CreateStudySetSchema.extend({
   flashcards: z
     .array(
       FlashcardSchema.extend({
-        id: z.number(),
+        id: z.number().optional(),
       }),
     )
     .min(2, "You have to create at least 2 flashcards"),

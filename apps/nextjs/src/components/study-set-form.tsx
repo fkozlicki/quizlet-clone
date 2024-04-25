@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder } from "framer-motion";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Trash2Icon } from "lucide-react";
 
 import type {
   CreateStudySetValues,
@@ -48,7 +48,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
       flashcards: initialFlashcards,
     },
   });
-  const { fields, replace, append } = useFieldArray({
+  const { fields, replace, append, remove } = useFieldArray({
     name: "flashcards",
     control: form.control,
   });
@@ -156,7 +156,17 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                 <Reorder.Item key={field.position} value={field}>
                   <Card>
                     <CardHeader className="pb-4">
-                      <span>{index + 1}</span>
+                      <div className="flex items-center justify-between ">
+                        <span>{index + 1}</span>
+                        <Button
+                          type="button"
+                          onClick={() => remove(index)}
+                          size="icon"
+                          variant="ghost"
+                        >
+                          <Trash2Icon size={16} />
+                        </Button>
+                      </div>
                     </CardHeader>
                     <CardContent className="flex gap-4">
                       <FormField

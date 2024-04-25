@@ -170,12 +170,8 @@ export const studySetRouter = {
         })
       ).map((card) => card.id);
 
-      const toDeleteIds = flashcards
-        .filter((card) => currentFlashcards.indexOf(card.id) < 0)
-        .map((card) => card.id);
-
-      const toUpdate = flashcards.filter(
-        (card) => currentFlashcards.indexOf(card.id) >= 0,
+      const toDeleteIds = currentFlashcards.filter(
+        (card) => !flashcards.map((card) => card.id).includes(card),
       );
 
       if (toDeleteIds.length > 0) {
@@ -184,16 +180,35 @@ export const studySetRouter = {
           .where(inArray(schema.flashcards.id, toDeleteIds));
       }
 
+      const toUpdate = flashcards.filter(
+        (card) => card.id && currentFlashcards.indexOf(card.id) >= 0,
+      );
+
       const promises = toUpdate.map((card) =>
         ctx.db
           .update(schema.flashcards)
           .set(card)
-          .where(eq(schema.flashcards.id, card.id)),
+          .where(eq(schema.flashcards.id, card.id!)),
       );
 
       if (promises.length > 0) {
         await Promise.all(promises);
       }
+
+      const toCreate = flashcards.filter((card) => card.id === undefined);
+
+      if (toCreate.length > 0) {
+        await ctx.db.insert(schema.flashcards).values([
+          ...toCreate.map((flashcard) => ({
+            ...flashcard,
+            studySetId: id,
+          })),
+        ]);
+      }
+
+      console.log("toUpdate", toUpdate);
+      console.log("toDelete", toDeleteIds);
+      console.log("toCreate", toCreate);
 
       return updated;
     }),
