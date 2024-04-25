@@ -24,9 +24,7 @@ export default function useStar(
   }
 
   function updateStudySet(flashcardId: number, starred: boolean) {
-    const prevData = utils.studySet.byId.getData({
-      id,
-    });
+    const prevData = utils.studySet.byId.getData({ id });
 
     utils.studySet.byId.setData({ id }, (old) => {
       if (!old) {
