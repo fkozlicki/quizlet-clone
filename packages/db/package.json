@@ -33,7 +33,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/pg": "^8.11.4",
     "dotenv-cli": "^7.4.1",
-    "drizzle-kit": "^0.20.14",
+    "drizzle-kit": "^0.20.17",
     "eslint": "^8.57.0",
     "mysql2": "^3.9.2",
     "prettier": "^3.2.5",
