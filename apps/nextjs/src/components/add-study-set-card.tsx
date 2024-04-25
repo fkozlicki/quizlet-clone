@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-import { useParams } from "next/navigation";
 import { LoaderCircle, Minus, Plus } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
@@ -11,31 +9,26 @@ import { api } from "~/trpc/react";
 
 interface AddStudySetCardProps {
   studySetId: string;
-  isIn: boolean;
   folderId: string;
-  revalidate: "folder" | "studySet";
   name: string;
+  isIn: boolean;
+  onMutate: () => void;
+  onSettled: () => Promise<void>;
 }
 
 const AddStudySetCard = ({
   studySetId,
-  isIn,
   folderId,
-  revalidate,
   name,
+  isIn,
+  onMutate,
+  onSettled,
 }: AddStudySetCardProps) => {
-  const { slug }: { slug: string } = useParams();
-  const utils = api.useUtils();
   const { mutate, isPending } = api.folder[
     isIn ? "removeSet" : "addSet"
   ].useMutation({
-    async onSuccess() {
-      if (revalidate === "folder") {
-        await utils.folder.bySlug.invalidate({ slug });
-      } else {
-        await utils.studySet.byId.invalidate({ id: studySetId });
-      }
-    },
+    onSettled,
+    onMutate,
   });
 
   const onClick = () => {

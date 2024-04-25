@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { Plus } from "lucide-react";
 
+import type { RouterOutputs } from "@acme/api";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
@@ -22,9 +23,40 @@ interface FolderStudySetsDialogProps {
 }
 
 const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
+  const utils = api.useUtils();
   const { slug }: { slug: string } = useParams();
   const { data: studySets } = api.studySet.allByUser.useQuery({ userId });
   const { data: folder } = api.folder.bySlug.useQuery({ slug });
+
+  const onMutate = (
+    studySet: RouterOutputs["folder"]["bySlug"]["studySets"][0],
+    isIn: boolean,
+  ) => {
+    const prevData = utils.folder.bySlug.getData({ slug });
+
+    utils.folder.bySlug.setData({ slug }, (old) => {
+      if (!old) {
+        return;
+      }
+
+      return {
+        ...old,
+        studySets: isIn
+          ? old.studySets.filter((set) => set.id !== studySet.id)
+          : [...old.studySets, studySet].sort((a, b) =>
+              a.title.localeCompare(b.title),
+            ),
+      };
+    });
+
+    return {
+      prevData,
+    };
+  };
+
+  const onSettled = async () => {
+    await utils.folder.bySlug.invalidate({ slug });
+  };
 
   if (!folder) {
     return null;
@@ -48,16 +80,21 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
           <Button className="w-full">Create new study set</Button>
         </Link>
         <div className="flex flex-col gap-4">
-          {studySets?.map((set) => (
-            <AddStudySetCard
-              studySetId={set.id}
-              key={set.id}
-              isIn={folder.studySets.some(({ id }) => id === set.id)}
-              folderId={folder.id}
-              revalidate="folder"
-              name={set.title}
-            />
-          ))}
+          {studySets?.map((set) => {
+            const isIn = folder.studySets.some(({ id }) => id === set.id);
+
+            return (
+              <AddStudySetCard
+                key={set.id}
+                folderId={folder.id}
+                studySetId={set.id}
+                name={set.title}
+                isIn={isIn}
+                onMutate={() => onMutate(set, isIn)}
+                onSettled={onSettled}
+              />
+            );
+          })}
         </div>
       </DialogContent>
     </Dialog>

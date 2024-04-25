@@ -80,7 +80,8 @@ export const folderRouter = {
           schema.foldersToStudySets,
           eq(schema.studySets.id, schema.foldersToStudySets.studySetId),
         )
-        .where(eq(schema.foldersToStudySets.folderId, folder.id));
+        .where(eq(schema.foldersToStudySets.folderId, folder.id))
+        .orderBy(schema.studySets.title);
 
       return { ...folder, studySets };
     }),

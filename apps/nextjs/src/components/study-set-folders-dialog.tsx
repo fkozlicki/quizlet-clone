@@ -31,6 +31,7 @@ interface StudySetFoldersDialogProps {
 }
 
 const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
+  const utils = api.useUtils();
   const { id }: { id: string } = useParams();
   const { data: folders } = api.folder.allByUser.useQuery({
     userId: session.user.id,
@@ -41,6 +42,35 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
   const openFolderDialog = () => {
     dispatch({ type: "open" });
   };
+
+  const onMutate = (folderId: string, isIn: boolean) => {
+    const prevData = utils.studySet.byId.getData({ id });
+
+    utils.studySet.byId.setData({ id }, (old) => {
+      if (!old) {
+        return;
+      }
+
+      return {
+        ...old,
+        folders: isIn
+          ? old.folders.filter((folder) => folder.id !== folderId)
+          : [...old.folders, { id: folderId }],
+      };
+    });
+
+    return {
+      prevData,
+    };
+  };
+
+  const onSettled = async () => {
+    await utils.studySet.byId.invalidate({ id });
+  };
+
+  if (!studySet) {
+    return null;
+  }
 
   return (
     <Dialog>
@@ -68,20 +98,23 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
           </DialogDescription>
         </DialogHeader>
         <Button onClick={openFolderDialog}>Create new folder</Button>
-        {folders && (
-          <div className="flex flex-col gap-4">
-            {folders.map((folder) => (
+        <div className="flex flex-col gap-4">
+          {folders?.map((folder) => {
+            const isIn = studySet.folders.some((f) => f.id === folder.id);
+
+            return (
               <AddStudySetCard
                 key={folder.id}
                 folderId={folder.id}
                 studySetId={id}
-                isIn={(studySet?.folders ?? []).some((f) => f.id === folder.id)}
-                revalidate="studySet"
                 name={folder.name}
+                isIn={isIn}
+                onMutate={() => onMutate(folder.id, isIn)}
+                onSettled={onSettled}
               />
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
         <DialogFooter>
           <Button type="submit">Confirm</Button>
         </DialogFooter>
