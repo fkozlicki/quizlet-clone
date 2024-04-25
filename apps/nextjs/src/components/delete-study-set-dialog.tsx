@@ -1,66 +1,76 @@
-"use clinet";
+"use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { Loader2Icon, Trash2Icon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@acme/ui/dialog";
+import { toast } from "@acme/ui/toast";
 
 import { api } from "~/trpc/react";
 
 interface DeleteStudySetDialogProps {
   id: string;
-  name: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-const DeleteStudySetDialog = ({ id, name }: DeleteStudySetDialogProps) => {
+const DeleteStudySetDialog = ({
+  id,
+  open,
+  onOpenChange,
+}: DeleteStudySetDialogProps) => {
   const utils = api.useUtils();
   const router = useRouter();
-  const { mutate } = api.studySet.delete.useMutation({
+  const { mutate, isPending } = api.studySet.delete.useMutation({
     async onSuccess() {
       await utils.studySet.invalidate();
+      toast.success("Successfully deleted study set");
       router.push("/latest");
+    },
+    onError() {
+      toast.error("Couldn't delete study set, try again");
     },
   });
 
-  const handleDelete = () => {
+  const deleteStudySet = () => {
     mutate({ id });
   };
 
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Trash2 size={16} />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete {name}</DialogTitle>
+          <DialogTitle>Are you absolutely sure?</DialogTitle>
           <DialogDescription>
-            Deleting study set will remove all flashcards in this study set.
-            This action cannot be undone.
+            This action cannot be undone. This will permanently delete your
+            study set and remove your data from our servers.
           </DialogDescription>
         </DialogHeader>
-        <div>
-          <div>Are you sure you want to delete ... study set</div>
-          <div>
-            Deleting study set will remove all flashcards in this study set.
-            This action cannot be undone.
-          </div>
-        </div>
         <DialogFooter>
-          <Button onClick={handleDelete} variant="destructive" type="submit">
-            Confirm
+          <DialogClose asChild>
+            <Button disabled={isPending}>Cancel</Button>
+          </DialogClose>
+          <Button
+            disabled={isPending}
+            onClick={deleteStudySet}
+            variant="destructive"
+          >
+            {isPending ? (
+              <Loader2Icon size={16} className="animate-spin" />
+            ) : (
+              <>
+                Delete <Trash2Icon size={16} className="ml-2" />
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

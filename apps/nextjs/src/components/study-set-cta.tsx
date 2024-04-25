@@ -42,7 +42,7 @@ const StudySetCTA = ({ session, id, userId }: StudySetCTAProps) => {
         </TooltipProvider>
       )}
       <StudySetShareDialog id={id} />
-      <StudySetOptionsDropdown isOwner={session?.user.id === userId} />
+      <StudySetOptionsDropdown id={id} isOwner={session?.user.id === userId} />
     </div>
   );
 };
