@@ -39,6 +39,8 @@ export const CreateFolderSchema = z.object({
   description: z.string().optional(),
 });
 
+export type CreateFolderValues = z.infer<typeof CreateFolderSchema>;
+
 export const EditFolderSchema = CreateFolderSchema.merge(
   z.object({
     id: z.string().min(1, "Folder id is required"),
