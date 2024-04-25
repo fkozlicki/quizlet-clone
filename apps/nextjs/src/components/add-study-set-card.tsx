@@ -14,6 +14,7 @@ interface AddStudySetCardProps {
   isIn: boolean;
   folderId: string;
   revalidate: "folder" | "studySet";
+  name: string;
 }
 
 const AddStudySetCard = ({
@@ -21,6 +22,7 @@ const AddStudySetCard = ({
   isIn,
   folderId,
   revalidate,
+  name,
 }: AddStudySetCardProps) => {
   const { slug }: { slug: string } = useParams();
   const utils = api.useUtils();
@@ -46,7 +48,7 @@ const AddStudySetCard = ({
   return (
     <Card>
       <CardContent className="flex items-center justify-between p-4">
-        <span>study set name</span>
+        <span>{name}</span>
         <Button
           onClick={onClick}
           variant={isIn ? "primary" : "outline"}
