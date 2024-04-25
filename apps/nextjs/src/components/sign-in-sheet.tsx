@@ -2,8 +2,9 @@ import Image from "next/image";
 
 import { signIn } from "@acme/auth";
 import { Button } from "@acme/ui/button";
-import { Input } from "@acme/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@acme/ui/sheet";
+
+import SignInForm from "./sign-in-form";
 
 const SignInSheet = () => {
   return (
@@ -34,27 +35,27 @@ const SignInSheet = () => {
                     Sign In with Google
                   </Button>
                 </form>
-                <Button size="lg">Sign In with Github</Button>
+                <form>
+                  <Button
+                    className="w-full"
+                    formAction={async () => {
+                      "use server";
+                      await signIn("github", {
+                        redirectTo: "/latest",
+                      });
+                    }}
+                    size="lg"
+                  >
+                    Sign In with Github
+                  </Button>
+                </form>
               </div>
               <div className="my-8 flex items-center gap-4">
-                <div className="h-px flex-1 bg-slate-100"></div>
-                <div>Or</div>
-                <div className="h-px flex-1 bg-slate-100"></div>
+                <div className="h-px flex-1 bg-border"></div>
+                <span className="text-muted-foreground">OR</span>
+                <div className="h-px flex-1 bg-border"></div>
               </div>
-              <form className="space-y-8">
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Email
-                  </label>
-                  <Input id="email" type="email" placeholder="shadcn" />
-                </div>
-                <Button type="submit" className="w-full">
-                  Sign In
-                </Button>
-              </form>
+              <SignInForm />
             </div>
           </div>
         </div>

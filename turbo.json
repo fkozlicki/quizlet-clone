@@ -38,15 +38,16 @@
     },
     "//#clean": {
       "cache": false
-    },
-    "db:push": {
-      "cache": false
     }
   },
   "globalEnv": [
     "DATABASE_URL",
     "AUTH_GOOGLE_ID",
     "AUTH_GOOGLE_SECRET",
+    "AUTH_GITHUB_ID",
+    "AUTH_GITHUB_SECRET",
+    "AUTH_EMAIL_SERVER",
+    "AUTH_EMAIL_FROM",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET"
   ]
