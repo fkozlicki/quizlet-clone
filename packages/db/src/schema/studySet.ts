@@ -11,7 +11,9 @@ export const studySets = pgTable("study_set", {
   title: text("title").notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-  userId: uuid("user_id").notNull(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
 });
 
 export const studySetsRelations = relations(studySets, ({ many, one }) => ({

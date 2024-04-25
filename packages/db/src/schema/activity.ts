@@ -7,7 +7,9 @@ import { users } from "./auth";
 export const activities = pgTable("activity", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   date: date("date").notNull().defaultNow(),
-  userId: uuid("user_id").notNull(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
 });
 
 export const activitiesRelations = relations(activities, ({ one }) => ({

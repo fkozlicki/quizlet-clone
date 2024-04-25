@@ -10,7 +10,9 @@ export const folders = pgTable("folder", {
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull(),
-  userId: uuid("user_id").notNull(),
+  userId: uuid("user_id")
+    .references(() => users.id, { onDelete: "cascade" })
+    .notNull(),
 });
 
 export const foldersRelations = relations(folders, ({ one, many }) => ({
