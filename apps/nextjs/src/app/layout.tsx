@@ -13,6 +13,7 @@ import "~/app/globals.css";
 import { auth } from "@acme/auth";
 
 import CreateActivity from "~/components/create-activity";
+import CreateFolderDialog from "~/components/create-folder-dialog";
 import Navbar from "~/components/navbar";
 import FolderDialogProvider from "~/contexts/folder-dialog-context";
 
@@ -59,7 +60,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 {props.children}
               </main>
               <Toaster />
-              {session && <CreateActivity />}
+              {session && (
+                <>
+                  <CreateActivity />
+                  <CreateFolderDialog />
+                </>
+              )}
             </TRPCReactProvider>
           </ThemeProvider>
         </FolderDialogProvider>

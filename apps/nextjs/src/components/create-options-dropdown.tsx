@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 
 import { Button } from "@acme/ui/button";
@@ -11,10 +10,14 @@ import {
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
 
-import FolderDialog from "./folder-dialog";
+import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 
 const CreateOptionsDropdown = () => {
-  const [folderOpen, setFolderOpen] = useState<boolean>(false);
+  const [, dispatch] = useFolderDialogContext();
+
+  const openFolderDialog = () => {
+    dispatch({ type: "open" });
+  };
 
   return (
     <>
@@ -23,15 +26,12 @@ const CreateOptionsDropdown = () => {
           <Button variant="outline">Create</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => setFolderOpen(true)}>
-            Folder
-          </DropdownMenuItem>
+          <DropdownMenuItem onClick={openFolderDialog}>Folder</DropdownMenuItem>
           <Link href="/create-set">
             <DropdownMenuItem>Study set</DropdownMenuItem>
           </Link>
         </DropdownMenuContent>
       </DropdownMenu>
-      <FolderDialog open={folderOpen} onOpenChange={setFolderOpen} />
     </>
   );
 };

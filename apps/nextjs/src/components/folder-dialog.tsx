@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { z } from "zod";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 
 import type { EditFolderValues } from "@acme/validators";
@@ -27,6 +27,7 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 import { Textarea } from "@acme/ui/textarea";
+import { toast } from "@acme/ui/toast";
 import { CreateFolderSchema } from "@acme/validators";
 
 import { api } from "~/trpc/react";
@@ -52,13 +53,25 @@ const FolderDialog = ({
       description: "",
     },
   });
-  const router = useRouter();
   const { mutate, isPending } = api.folder.create.useMutation({
     async onSuccess(data) {
       form.reset();
       await utils.folder.invalidate();
       onOpenChange && onOpenChange(false);
-      router.push(`/users/${data.userId}/folders/${data.slug}`);
+      toast.success(
+        <span>
+          Successfully created new folder, you can find it{" "}
+          <Link
+            href={`/users/${data.userId}/folders/${data.slug}`}
+            className="underline"
+          >
+            here
+          </Link>
+        </span>,
+      );
+    },
+    onError() {
+      toast.error("Couldn't create folder, try again");
     },
   });
 
