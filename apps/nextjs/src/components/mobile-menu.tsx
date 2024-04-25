@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { Menu } from "lucide-react";
@@ -6,7 +8,15 @@ import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@acme/ui/sheet";
 
+import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
+
 const MobileMenu = ({ session }: { session: Session | null }) => {
+  const [, dispatch] = useFolderDialogContext();
+
+  const openFolderDialog = () => {
+    dispatch({ type: "open" });
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -31,11 +41,13 @@ const MobileMenu = ({ session }: { session: Session | null }) => {
                 Study set
               </Button>
             </Link>
-            <Link href="/">
-              <Button variant="ghost" className="ml-4 w-full justify-start">
-                Folder
-              </Button>
-            </Link>
+            <Button
+              onClick={openFolderDialog}
+              variant="ghost"
+              className="ml-4 w-full justify-start"
+            >
+              Folder
+            </Button>
           </div>
         </div>
       </SheetContent>

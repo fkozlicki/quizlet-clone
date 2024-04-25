@@ -22,6 +22,7 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 
+import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 import { api } from "~/trpc/react";
 import AddStudySetCard from "./add-study-set-card";
 
@@ -35,6 +36,11 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
     userId: session.user.id,
   });
   const { data: studySet } = api.studySet.byId.useQuery({ id });
+  const [, dispatch] = useFolderDialogContext();
+
+  const openFolderDialog = () => {
+    dispatch({ type: "open" });
+  };
 
   return (
     <Dialog>
@@ -61,7 +67,7 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
             delete this file from our servers?
           </DialogDescription>
         </DialogHeader>
-        <Button>Create new folder</Button>
+        <Button onClick={openFolderDialog}>Create new folder</Button>
         {folders && (
           <div className="flex flex-col gap-4">
             {folders.map((folder) => (
@@ -71,6 +77,7 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
                 studySetId={id}
                 isIn={(studySet?.folders ?? []).some((f) => f.id === folder.id)}
                 revalidate="studySet"
+                name={folder.name}
               />
             ))}
           </div>

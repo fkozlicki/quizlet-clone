@@ -13,6 +13,7 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 
+import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 import { api } from "~/trpc/react";
 import AddStudySetCard from "./add-study-set-card";
 
@@ -24,6 +25,11 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
   const { slug }: { slug: string } = useParams();
   const { data: studySets } = api.studySet.allByUser.useQuery({ userId });
   const { data: folder } = api.folder.bySlug.useQuery({ slug });
+  const [, dispatch] = useFolderDialogContext();
+
+  const openFolderDialog = () => {
+    dispatch({ type: "open" });
+  };
 
   if (!folder) {
     return null;
@@ -43,6 +49,7 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
             Manage study sets within your folder.
           </DialogDescription>
         </DialogHeader>
+        <Button onClick={openFolderDialog}>Create new folder</Button>
         <div className="flex flex-col gap-4">
           {studySets?.map((set) => (
             <AddStudySetCard
@@ -51,6 +58,7 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
               isIn={folder.studySets.some(({ id }) => id === set.id)}
               folderId={folder.id}
               revalidate="folder"
+              name={set.title}
             />
           ))}
         </div>
