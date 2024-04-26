@@ -7,7 +7,7 @@ import { RotateCcw, Undo2 } from "lucide-react";
 import type { RouterOutputs } from "@acme/api";
 
 import { api } from "~/trpc/react";
-import GameResult from "./game-result";
+import GameResult from "../shared/game-result";
 import TestAnswer from "./test-answer";
 import TestForm from "./test-form";
 

@@ -5,7 +5,7 @@ import React, { use } from "react";
 import type { RouterOutputs } from "@acme/api";
 
 import { api } from "~/trpc/react";
-import FolderCard from "./folder-card";
+import FolderCard from "../folder/folder-card";
 
 const UserFolders = ({
   userId,

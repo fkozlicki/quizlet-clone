@@ -16,7 +16,7 @@ import {
 } from "@acme/ui/dialog";
 
 import { api } from "~/trpc/react";
-import AddStudySetCard from "./add-study-set-card";
+import AddStudySetCard from "../shared/add-study-set-card";
 
 interface FolderStudySetsDialogProps {
   userId: string;

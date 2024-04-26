@@ -6,7 +6,7 @@ import SuperJSON from "superjson";
 
 import { appRouter } from "@acme/api";
 
-import TestMode from "~/components/test-mode";
+import TestMode from "~/components/test-mode/test-mode";
 import { api, createContext } from "~/trpc/server";
 
 interface TestModeProps {

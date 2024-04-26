@@ -6,7 +6,7 @@ import SuperJSON from "superjson";
 
 import { appRouter } from "@acme/api";
 
-import LearnMode from "~/components/learn-mode";
+import LearnMode from "~/components/learn-mode/learn-mode";
 import { api, createContext } from "~/trpc/server";
 
 interface LearnModeProps {

@@ -3,7 +3,7 @@
 import React from "react";
 
 import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
-import FolderDialog from "./folder-dialog";
+import FolderDialog from "../folder/folder-dialog";
 
 const CreateFolderDialog = () => {
   const [{ open }, dispatch] = useFolderDialogContext();

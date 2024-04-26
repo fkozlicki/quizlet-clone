@@ -5,7 +5,7 @@ import React, { use } from "react";
 import type { RouterOutputs } from "@acme/api";
 
 import { api } from "~/trpc/react";
-import StudySetCard from "./study-set-card";
+import StudySetCard from "../shared/study-set-card";
 
 const UserStudySets = ({
   promise,

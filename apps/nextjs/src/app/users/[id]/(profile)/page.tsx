@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import ActivityCalendar from "~/components/activity-calendar";
+import ActivityCalendar from "~/components/user/activity-calendar";
 import { api } from "~/trpc/server";
 
 interface UserOverviewProps {

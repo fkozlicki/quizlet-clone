@@ -1,9 +1,8 @@
 import type { ReactNode } from "react";
-import React from "react";
 
 import { auth } from "@acme/auth";
 
-import ProfileLayout from "~/components/profile-layout";
+import ProfileLayout from "~/components/user/profile-layout";
 import { api } from "~/trpc/server";
 
 export default async function Layout({

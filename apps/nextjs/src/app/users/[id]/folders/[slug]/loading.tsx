@@ -1,8 +1,6 @@
-import React from "react";
-
 import { Skeleton } from "@acme/ui/skeleton";
 
-import StudySetSkeleton from "~/components/study-set-skeleton";
+import StudySetSkeleton from "~/components/shared/study-set-skeleton";
 
 export default function Loading() {
   return (

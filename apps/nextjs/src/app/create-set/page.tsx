@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
-import StudySetForm from "~/components/study-set-form";
+import StudySetForm from "~/components/study-set/study-set-form";
 
 export const metadata: Metadata = {
   title: "Create study set",

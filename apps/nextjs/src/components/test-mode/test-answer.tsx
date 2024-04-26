@@ -1,9 +1,9 @@
 import React from "react";
 
 import type { Answer } from "./test-mode";
-import MultipleChoiceCard from "./multiple-choice-card";
-import TrueFalseCard from "./true-false-card";
-import WrittenCard from "./written-card";
+import MultipleChoiceCard from "../shared/multiple-choice-card";
+import TrueFalseCard from "../shared/true-false-card";
+import WrittenCard from "../shared/written-card";
 
 interface TestAnswerProps {
   answer: Answer;

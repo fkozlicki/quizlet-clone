@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import type { Session } from "@acme/auth";
 
 import { api } from "~/trpc/react";
-import FlashcardCard from "./flashcard-card";
+import FlashcardCard from "../shared/flashcard-card";
 
 const StudySetFlashcards = ({ session }: { session: Session | null }) => {
   const { id }: { id: string } = useParams();

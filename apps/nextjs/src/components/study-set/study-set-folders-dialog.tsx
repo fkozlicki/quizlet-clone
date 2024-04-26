@@ -24,7 +24,7 @@ import {
 
 import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 import { api } from "~/trpc/react";
-import AddStudySetCard from "./add-study-set-card";
+import AddStudySetCard from "../shared/add-study-set-card";
 
 interface StudySetFoldersDialogProps {
   session: Session;

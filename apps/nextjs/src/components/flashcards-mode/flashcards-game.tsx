@@ -10,10 +10,10 @@ import { Progress } from "@acme/ui/progress";
 
 import { flashcardsInitial, flashcardsReducer } from "~/reducers/flashcards";
 import { api } from "~/trpc/react";
+import GameResult from "../shared/game-result";
 import FlashcardsGameButtons from "./flashcards-game-buttons";
 import FlashcardsGameSettingsDialog from "./flashcards-game-settings-dialog";
 import FlipCard from "./flip-card";
-import GameResult from "./game-result";
 import MessageCard from "./message-card";
 
 export type FlashcardAnimation = "left" | "right" | "know" | "learning" | null;

@@ -2,7 +2,7 @@ import React from "react";
 
 import type { RouterOutputs } from "@acme/api";
 
-import StudySetCard from "./study-set-card";
+import StudySetCard from "../shared/study-set-card";
 
 interface OtherStudySetsProps {
   studySets: RouterOutputs["studySet"]["byId"]["user"]["studySets"];

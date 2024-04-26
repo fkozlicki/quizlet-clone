@@ -12,9 +12,9 @@ import "~/app/globals.css";
 
 import { auth } from "@acme/auth";
 
-import CreateActivity from "~/components/create-activity";
-import CreateFolderDialog from "~/components/create-folder-dialog";
-import Navbar from "~/components/navbar";
+import CreateActivity from "~/components/layout/create-activity";
+import CreateFolderDialog from "~/components/layout/create-folder-dialog";
+import Navbar from "~/components/layout/navbar";
 import FolderDialogProvider from "~/contexts/folder-dialog-context";
 
 export const metadata: Metadata = {

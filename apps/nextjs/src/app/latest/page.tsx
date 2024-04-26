@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
-import StudySetSkeleton from "~/components/study-set-skeleton";
-import UserStudySets from "~/components/user-study-sets";
+import StudySetSkeleton from "~/components/shared/study-set-skeleton";
+import UserStudySets from "~/components/user/user-study-sets";
 import { api } from "~/trpc/server";
 
 export const metadata: Metadata = {

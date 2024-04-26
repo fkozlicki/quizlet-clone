@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
-import EditStudySet from "~/components/edit-study-set";
+import EditStudySet from "~/components/study-set/edit-study-set";
 import { api } from "~/trpc/server";
 
 interface EditStudySetProps {

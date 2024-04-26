@@ -6,7 +6,7 @@ import SuperJSON from "superjson";
 import { appRouter } from "@acme/api";
 import { auth } from "@acme/auth";
 
-import FlashcardsGame from "~/components/flashcards-game";
+import FlashcardsGame from "~/components/flashcards-mode/flashcards-game";
 import { api, createContext } from "~/trpc/server";
 
 interface FlashcardsModeProps {

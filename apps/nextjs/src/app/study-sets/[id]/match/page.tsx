@@ -6,7 +6,7 @@ import SuperJSON from "superjson";
 
 import { appRouter } from "@acme/api";
 
-import MatchGame from "~/components/match-game";
+import MatchGame from "~/components/match-mode/match-game";
 import { api, createContext } from "~/trpc/server";
 
 interface MatchModeProps {

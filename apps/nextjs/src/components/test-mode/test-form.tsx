@@ -5,9 +5,9 @@ import { Button } from "@acme/ui/button";
 import { Form, FormField, useFieldArray, useForm } from "@acme/ui/form";
 
 import type { Answer } from "./test-mode";
-import MultipleChoiceCard from "./multiple-choice-card";
-import TrueFalseCard from "./true-false-card";
-import WrittenCard from "./written-card";
+import MultipleChoiceCard from "../shared/multiple-choice-card";
+import TrueFalseCard from "../shared/true-false-card";
+import WrittenCard from "../shared/written-card";
 
 const flashcard = z.object({
   id: z.number(),

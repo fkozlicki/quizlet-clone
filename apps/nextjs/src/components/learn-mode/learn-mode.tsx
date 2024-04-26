@@ -9,9 +9,9 @@ import { Progress } from "@acme/ui/progress";
 import { Separator } from "@acme/ui/separator";
 
 import { api } from "~/trpc/react";
-import FlashcardCard from "./flashcard-card";
-import GameResult from "./game-result";
-import MultipleChoiceCard from "./multiple-choice-card";
+import FlashcardCard from "../shared/flashcard-card";
+import GameResult from "../shared/game-result";
+import MultipleChoiceCard from "../shared/multiple-choice-card";
 
 const LearnMode = () => {
   const { id }: { id: string } = useParams();

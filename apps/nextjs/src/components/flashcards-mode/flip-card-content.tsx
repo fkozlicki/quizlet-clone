@@ -7,7 +7,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
 import useStar from "~/hooks/useStar";
-import EditFlashcardDialog from "./edit-flashcard-dialog";
+import EditFlashcardDialog from "../shared/edit-flashcard-dialog";
 
 interface FlipCardContentProps {
   title: string;

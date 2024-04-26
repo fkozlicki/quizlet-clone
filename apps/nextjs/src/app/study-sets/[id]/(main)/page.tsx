@@ -8,13 +8,13 @@ import { appRouter } from "@acme/api";
 import { auth } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 
-import CreatedBy from "~/components/created-by";
-import FlashcardsGame from "~/components/flashcards-game";
-import OtherStudySets from "~/components/other-study-sets";
-import StudyModes from "~/components/study-modes";
-import StudySetCTA from "~/components/study-set-cta";
-import StudySetFlashcards from "~/components/study-set-flashcards";
-import StudySetInfo from "~/components/study-set-info";
+import FlashcardsGame from "~/components/flashcards-mode/flashcards-game";
+import CreatedBy from "~/components/study-set/created-by";
+import OtherStudySets from "~/components/study-set/other-study-sets";
+import StudyModes from "~/components/study-set/study-modes";
+import StudySetCTA from "~/components/study-set/study-set-cta";
+import StudySetFlashcards from "~/components/study-set/study-set-flashcards";
+import StudySetInfo from "~/components/study-set/study-set-info";
 import { api, createContext } from "~/trpc/server";
 
 interface StudySetProps {

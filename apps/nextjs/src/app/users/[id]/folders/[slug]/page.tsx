@@ -5,10 +5,10 @@ import SuperJSON from "superjson";
 
 import { appRouter } from "@acme/api";
 
-import FolderAuthor from "~/components/folder-author";
-import FolderCTA from "~/components/folder-cta";
-import FolderInfo from "~/components/folder-info";
-import FolderStudySets from "~/components/folder-study-sets";
+import FolderAuthor from "~/components/folder/folder-author";
+import FolderCTA from "~/components/folder/folder-cta";
+import FolderInfo from "~/components/folder/folder-info";
+import FolderStudySets from "~/components/folder/folder-study-sets";
 import { api, createContext } from "~/trpc/server";
 
 interface FolderProps {

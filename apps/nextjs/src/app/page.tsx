@@ -1,8 +1,8 @@
 import { Suspense } from "react";
 import Image from "next/image";
 
-import PopularStudySets from "~/components/popular-study-sets";
-import StudySetSkeleton from "~/components/study-set-skeleton";
+import PopularStudySets from "~/components/home/popular-study-sets";
+import StudySetSkeleton from "~/components/shared/study-set-skeleton";
 import { api } from "~/trpc/server";
 
 export default function HomePage() {

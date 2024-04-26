@@ -3,8 +3,8 @@ import { Suspense } from "react";
 
 import { auth } from "@acme/auth";
 
-import FolderSkeleton from "~/components/folder-skeleton";
-import UserFolders from "~/components/user-folders";
+import FolderSkeleton from "~/components/folder/folder-skeleton";
+import UserFolders from "~/components/user/user-folders";
 import { api } from "~/trpc/server";
 
 interface UserFoldersProps {

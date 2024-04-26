@@ -4,7 +4,7 @@ import React from "react";
 import { useParams } from "next/navigation";
 
 import { api } from "~/trpc/react";
-import StudySetCard from "./study-set-card";
+import StudySetCard from "../shared/study-set-card";
 
 const FolderStudySets = () => {
   const { slug }: { slug: string } = useParams();
