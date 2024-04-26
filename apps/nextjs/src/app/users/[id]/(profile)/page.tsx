@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import ActivityCalendar from "~/components/user/activity-calendar";
 import { api } from "~/trpc/server";
@@ -17,15 +18,21 @@ export async function generateMetadata({
   };
 }
 
-export default async function UserOverview() {
-  const activity = await api.activity.allByUser();
+export default async function UserOverview({
+  params: { id },
+}: UserOverviewProps) {
+  try {
+    const activity = await api.activity.allByUser();
 
-  return (
-    <div>
-      <h2 className="mb-6 text-2xl font-bold">Your activity</h2>
-      <div className="flex items-center justify-center rounded-lg bg-secondary p-4">
-        <ActivityCalendar activity={activity} />
+    return (
+      <div>
+        <h2 className="mb-6 text-2xl font-bold">Your activity</h2>
+        <div className="flex items-center justify-center rounded-lg bg-secondary p-4">
+          <ActivityCalendar activity={activity} />
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    redirect(`/users/${id}/study-sets`);
+  }
 }

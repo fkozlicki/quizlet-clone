@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
@@ -12,23 +13,24 @@ import FolderStudySets from "~/components/folder/folder-study-sets";
 import { api, createContext } from "~/trpc/server";
 
 interface FolderProps {
-  params: { slug: string };
+  params: { slug: string; id: string };
 }
 
 export async function generateMetadata({
   params: { slug },
 }: FolderProps): Promise<Metadata> {
-  const { name } = await api.folder.bySlug({ slug });
+  try {
+    const { name } = await api.folder.bySlug({ slug });
 
-  return {
-    title: name,
-  };
+    return {
+      title: name,
+    };
+  } catch {
+    return {};
+  }
 }
 
-export default async function Folder({ params: { slug } }: FolderProps) {
-  const { user, name, description, id } = await api.folder.bySlug({
-    slug,
-  });
+export default async function Folder({ params: { slug, id } }: FolderProps) {
   const helper = createServerSideHelpers({
     router: appRouter,
     ctx: await createContext(),
@@ -37,17 +39,29 @@ export default async function Folder({ params: { slug } }: FolderProps) {
   await helper.folder.bySlug.prefetch({ slug });
   const state = dehydrate(helper.queryClient);
 
-  const defaultValues = { id, name, description: description ?? undefined };
+  try {
+    await api.user.byId({ id });
+    const folder = await api.folder.bySlug({
+      slug,
+    });
 
-  return (
-    <HydrationBoundary state={state}>
-      <div className="mb-4 flex items-center justify-between">
-        <FolderAuthor />
-        <FolderCTA userId={user.id} defaultValues={defaultValues} />
-      </div>
-      <FolderInfo />
-      <h2 className="mb-4 text-2xl font-bold">Study sets</h2>
-      <FolderStudySets />
-    </HydrationBoundary>
-  );
+    const defaultValues = {
+      ...folder,
+      description: folder.description ?? undefined,
+    };
+
+    return (
+      <HydrationBoundary state={state}>
+        <div className="mb-4 flex items-center justify-between">
+          <FolderAuthor />
+          <FolderCTA userId={id} defaultValues={defaultValues} />
+        </div>
+        <FolderInfo />
+        <h2 className="mb-4 text-2xl font-bold">Study sets</h2>
+        <FolderStudySets />
+      </HydrationBoundary>
+    );
+  } catch {
+    notFound();
+  }
 }
