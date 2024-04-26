@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder } from "framer-motion";
 import { LoaderCircle, Trash2Icon } from "lucide-react";
@@ -48,7 +48,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
       flashcards: initialFlashcards,
     },
   });
-  const { fields, replace, append, remove } = useFieldArray({
+  const { fields, append, remove, swap } = useFieldArray({
     name: "flashcards",
     control: form.control,
     keyName: "fieldId",
@@ -69,6 +69,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
       router.push(`/study-sets/${data?.id}`);
     },
   });
+  const [active, setActive] = useState(0);
 
   const onSubmit = (values: EditStudySetValues | CreateStudySetValues) => {
     const flashcards = values.flashcards.map((flashcard, index) => ({
@@ -99,6 +100,10 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
       behavior: "smooth",
       block: "end",
     });
+  };
+
+  const swapCards = (from: number, to: number) => {
+    swap(from, to);
   };
 
   const isPending = create.isPending || edit.isPending;
@@ -153,11 +158,23 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
             <Reorder.Group
               axis="y"
               values={fields}
-              onReorder={replace}
+              onReorder={(newOrder) => {
+                const activeElement = fields[active];
+                newOrder.forEach((item, index) => {
+                  if (item === activeElement) {
+                    swapCards(active, index);
+                    setActive(index);
+                  }
+                });
+              }}
               className="mt-2 flex flex-col gap-8"
             >
               {fields.map((field, index) => (
-                <Reorder.Item key={field.position} value={field}>
+                <Reorder.Item
+                  key={field.fieldId}
+                  value={field}
+                  onDragStart={() => setActive(index)}
+                >
                   <Card>
                     <CardHeader className="pb-4">
                       <div className="flex items-center justify-between ">
