@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
@@ -13,24 +13,16 @@ interface EditStudySetProps {
 export async function generateMetadata({
   params: { id },
 }: EditStudySetProps): Promise<Metadata> {
-  const studySet = await api.studySet.byId({ id });
-
-  if (!studySet) {
-    return {};
-  }
+  const { title } = await api.studySet.byId({ id });
 
   return {
-    title: `${studySet.title} - Edit`,
+    title: `${title} - Edit`,
   };
 }
 
 export default async function Page({ params: { id } }: EditStudySetProps) {
   const session = await auth();
   const studySet = await api.studySet.byId({ id });
-
-  if (!studySet) {
-    notFound();
-  }
 
   if (!session || session.user.id !== studySet.userId) {
     redirect(`/study-sets/${studySet.id}`);

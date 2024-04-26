@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
@@ -25,14 +24,10 @@ interface StudySetProps {
 export async function generateMetadata({
   params: { id },
 }: StudySetProps): Promise<Metadata> {
-  const studySet = await api.studySet.byId({ id });
-
-  if (!studySet) {
-    return {};
-  }
+  const { title } = await api.studySet.byId({ id });
 
   return {
-    title: studySet.title,
+    title,
   };
 }
 
@@ -51,13 +46,7 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
 
   const state = dehydrate(helper.queryClient);
 
-  const studySet = await api.studySet.byId({ id });
-
-  if (!studySet) {
-    notFound();
-  }
-
-  const { userId, user } = studySet;
+  const { userId, user } = await api.studySet.byId({ id });
 
   return (
     <HydrationBoundary state={state}>

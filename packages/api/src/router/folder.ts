@@ -69,7 +69,10 @@ export const folderRouter = {
       });
 
       if (!folder) {
-        return undefined;
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Folder not found",
+        });
       }
 
       const studySets = await selectStudySetList(ctx.db)

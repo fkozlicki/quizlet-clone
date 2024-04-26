@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
@@ -19,18 +18,17 @@ interface FolderProps {
 export async function generateMetadata({
   params: { slug },
 }: FolderProps): Promise<Metadata> {
-  const folder = await api.folder.bySlug({ slug });
-
-  if (!folder) {
-    return {};
-  }
+  const { name } = await api.folder.bySlug({ slug });
 
   return {
-    title: folder.name,
+    title: name,
   };
 }
 
 export default async function Folder({ params: { slug } }: FolderProps) {
+  const { user, name, description, id } = await api.folder.bySlug({
+    slug,
+  });
   const helper = createServerSideHelpers({
     router: appRouter,
     ctx: await createContext(),
@@ -38,15 +36,6 @@ export default async function Folder({ params: { slug } }: FolderProps) {
   });
   await helper.folder.bySlug.prefetch({ slug });
   const state = dehydrate(helper.queryClient);
-  const folder = await api.folder.bySlug({
-    slug,
-  });
-
-  if (!folder) {
-    notFound();
-  }
-
-  const { user, name, description, id } = folder;
 
   const defaultValues = { id, name, description: description ?? undefined };
 

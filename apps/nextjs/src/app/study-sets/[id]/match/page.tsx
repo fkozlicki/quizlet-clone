@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import React from "react";
-import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
@@ -17,14 +16,10 @@ interface MatchModeProps {
 export async function generateMetadata({
   params: { id },
 }: MatchModeProps): Promise<Metadata> {
-  const studySet = await api.studySet.byId({ id });
-
-  if (!studySet) {
-    return {};
-  }
+  const { title } = await api.studySet.byId({ id });
 
   return {
-    title: `${studySet.title} - Match`,
+    title: `${title} - Match`,
   };
 }
 
@@ -39,12 +34,7 @@ export default async function MatchMode({
     transformer: SuperJSON,
   });
   await helper.studySet.matchCards.prefetch({ id });
-  const studySet = await api.studySet.byId({ id });
   const state = dehydrate(helper.queryClient);
-
-  if (!studySet) {
-    notFound();
-  }
 
   return (
     <HydrationBoundary state={state}>

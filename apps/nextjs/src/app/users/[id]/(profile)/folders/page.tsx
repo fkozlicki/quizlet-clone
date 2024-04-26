@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
@@ -15,25 +14,17 @@ interface UserFoldersProps {
 export async function generateMetadata({
   params: { id },
 }: UserFoldersProps): Promise<Metadata> {
-  const user = await api.user.byId({ id });
-
-  if (!user) {
-    return {};
-  }
+  const { name } = await api.user.byId({ id });
 
   return {
-    title: `${user.name}'s folders`,
+    title: `${name}'s folders`,
   };
 }
 
 export default async function Page({ params: { id } }: UserFoldersProps) {
+  const session = await auth();
   const user = await api.user.byId({ id });
 
-  if (!user) {
-    notFound();
-  }
-
-  const session = await auth();
   const folders = api.folder.allByUser({ userId: id });
 
   return (
