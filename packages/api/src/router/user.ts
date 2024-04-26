@@ -10,18 +10,9 @@ export const userRouter = {
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = await ctx.db.query.users.findFirst({
+      return await ctx.db.query.users.findFirst({
         where: eq(schema.users.id, input.id),
       });
-
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User with provided id not found",
-        });
-      }
-
-      return user;
     }),
   update: protectedProcedure
     .input(z.object({ image: z.string() }))

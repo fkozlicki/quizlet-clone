@@ -73,10 +73,7 @@ export const studySetRouter = {
       });
 
       if (!studySet) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Study set with provided id not found",
-        });
+        return undefined;
       }
 
       const otherSets = await selectStudySetList(ctx.db)

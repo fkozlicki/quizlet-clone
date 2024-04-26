@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
@@ -16,10 +17,14 @@ interface FlashcardsModeProps {
 export async function generateMetadata({
   params: { id },
 }: FlashcardsModeProps): Promise<Metadata> {
-  const { title } = await api.studySet.byId({ id });
+  const studySet = await api.studySet.byId({ id });
+
+  if (!studySet) {
+    return {};
+  }
 
   return {
-    title: `${title} - Flashcards`,
+    title: `${studySet.title} - Flashcards`,
   };
 }
 
@@ -34,6 +39,11 @@ export default async function FlashcardsMode({
   await helper.studySet.byId.prefetch({ id });
   const state = dehydrate(helper.queryClient);
   const session = await auth();
+  const studySet = await api.studySet.byId({ id });
+
+  if (!studySet) {
+    notFound();
+  }
 
   return (
     <HydrationBoundary state={state}>

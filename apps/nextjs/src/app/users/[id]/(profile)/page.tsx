@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
+import { auth } from "@acme/auth";
 
 import ActivityCalendar from "~/components/user/activity-calendar";
 import { api } from "~/trpc/server";
@@ -10,14 +13,26 @@ interface UserOverviewProps {
 export async function generateMetadata({
   params: { id },
 }: UserOverviewProps): Promise<Metadata> {
-  const { name } = await api.user.byId({ id });
+  const user = await api.user.byId({ id });
+
+  if (!user) {
+    return {};
+  }
 
   return {
-    title: name,
+    title: user.name,
   };
 }
 
-export default async function UserOverview() {
+export default async function UserOverview({
+  params: { id },
+}: UserOverviewProps) {
+  const session = await auth();
+
+  if (!session) {
+    redirect(`/users/${id}/study-sets`);
+  }
+
   const activity = await api.activity.allByUser();
 
   return (

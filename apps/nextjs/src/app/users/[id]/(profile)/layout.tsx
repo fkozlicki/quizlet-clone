@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
@@ -14,6 +15,10 @@ export default async function Layout({
 }) {
   const session = await auth();
   const user = await api.user.byId({ id });
+
+  if (!user) {
+    notFound();
+  }
 
   return (
     <ProfileLayout user={user} session={session}>
