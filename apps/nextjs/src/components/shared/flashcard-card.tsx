@@ -5,6 +5,7 @@ import { Star } from "lucide-react";
 import type { RouterOutputs } from "@acme/api";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
+import { Separator } from "@acme/ui/separator";
 
 import useStar from "~/hooks/useStar";
 import EditFlashcardDialog from "./edit-flashcard-dialog";
@@ -20,22 +21,27 @@ const FlashcardCard = ({ flashcard, editable }: FlashcardCardProps) => {
 
   return (
     <Card>
-      <CardContent className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
-        <div className="order-2 flex justify-end gap-1">
+      <CardContent className="flex flex-col gap-2 p-4 sm:flex-row">
+        <div className="order-2 flex h-6 items-center justify-end gap-1">
           {editable && <EditFlashcardDialog flashcard={flashcard} />}
-          <Button onClick={toggleStar} size="icon" variant="ghost">
+          <Button
+            onClick={toggleStar}
+            size="icon"
+            variant="ghost"
+            className="rounded-full"
+          >
             <Star
               className={flashcard.starred ? "text-yellow-300" : undefined}
               size={16}
             />
           </Button>
         </div>
-        <div className="border-slate-200 sm:basis-1/2 sm:border-r sm:pr-8">
-          <span className="text-base">{term}</span>
+        <div className="whitespace-pre-line sm:flex-1">{term}</div>
+        <Separator className="my-2 sm:hidden" />
+        <div className="mx-4 hidden sm:block">
+          <Separator orientation="vertical" />
         </div>
-        <div className="sm:basis-1/2 sm:px-8">
-          <span className="text-base">{definition}</span>
-        </div>
+        <div className="whitespace-pre-line sm:flex-1">{definition}</div>
       </CardContent>
     </Card>
   );
