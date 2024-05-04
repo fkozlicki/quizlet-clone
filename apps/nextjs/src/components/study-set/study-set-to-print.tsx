@@ -11,7 +11,7 @@ const StudySetToPrint = forwardRef<HTMLDivElement, StudySetToPrintProps>(
     const { flashcards, title, description } = studySet;
 
     return (
-      <div className="sr-only">
+      <div className="hidden">
         <div ref={ref} className="m-auto max-w-xl py-8 font-sans">
           <div className="mb-4">
             <h1 className="text-3xl font-bold">{title}</h1>
