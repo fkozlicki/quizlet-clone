@@ -19,10 +19,8 @@ import { toast } from "@acme/ui/toast";
 import { api } from "~/trpc/react";
 
 const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
-  const utils = api.useUtils();
   const { mutate, isPending } = api.folder.delete.useMutation({
     async onSuccess() {
-      await utils.folder.invalidate();
       toast.success("Successfully deleted folder");
       router.push(`/users/${userId}/folders`);
     },
@@ -52,8 +50,8 @@ const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button disabled={isPending}>Cancel</Button>
+          <DialogClose asChild disabled={isPending}>
+            <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button
             disabled={isPending}

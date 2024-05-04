@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { useParams } from "next/navigation";
 import { Plus } from "lucide-react";
 
@@ -10,7 +9,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -91,10 +89,9 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
       </TooltipProvider>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Are you absolutely sure?</DialogTitle>
+          <DialogTitle>Folders</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. Are you sure you want to permanently
-            delete this file from our servers?
+            Add or remove your set from folders
           </DialogDescription>
         </DialogHeader>
         <Button onClick={openFolderDialog}>Create new folder</Button>
@@ -115,9 +112,6 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
             );
           })}
         </div>
-        <DialogFooter>
-          <Button type="submit">Confirm</Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

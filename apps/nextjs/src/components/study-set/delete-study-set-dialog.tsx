@@ -28,11 +28,9 @@ const DeleteStudySetDialog = ({
   open,
   onOpenChange,
 }: DeleteStudySetDialogProps) => {
-  const utils = api.useUtils();
   const router = useRouter();
   const { mutate, isPending } = api.studySet.delete.useMutation({
     async onSuccess() {
-      await utils.studySet.invalidate();
       toast.success("Successfully deleted study set");
       router.push("/latest");
     },
@@ -56,8 +54,8 @@ const DeleteStudySetDialog = ({
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <DialogClose asChild>
-            <Button disabled={isPending}>Cancel</Button>
+          <DialogClose asChild disabled={isPending}>
+            <Button variant="outline">Cancel</Button>
           </DialogClose>
           <Button
             disabled={isPending}
