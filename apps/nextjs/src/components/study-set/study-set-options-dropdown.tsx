@@ -22,6 +22,7 @@ import {
 
 import { api } from "~/trpc/react";
 import DeleteStudySetDialog from "./delete-study-set-dialog";
+import StudySetExportDialog from "./study-set-export-dialog";
 import StudySetToPrint from "./study-set-to-print";
 
 const StudySetOptionsDropdown = ({
@@ -32,6 +33,7 @@ const StudySetOptionsDropdown = ({
   id: string;
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
   const utils = api.useUtils();
   const studySet = utils.studySet.byId.getData({ id });
   const printRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,10 @@ const StudySetOptionsDropdown = ({
 
   const openDeleteDialog = () => {
     setDeleteDialogOpen(true);
+  };
+
+  const openExportDialog = () => {
+    setExportDialogOpen(true);
   };
 
   return (
@@ -72,7 +78,7 @@ const StudySetOptionsDropdown = ({
             <PrinterIcon size={16} className="mr-2" />
             Print
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={openExportDialog}>
             <DownloadIcon size={16} className="mr-2" /> Export
           </DropdownMenuItem>
           {isOwner && (
@@ -82,6 +88,11 @@ const StudySetOptionsDropdown = ({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+      <StudySetExportDialog
+        id={id}
+        open={exportDialogOpen}
+        onOpenChange={setExportDialogOpen}
+      />
       {isOwner && (
         <DeleteStudySetDialog
           id={id}
