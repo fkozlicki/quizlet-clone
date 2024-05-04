@@ -197,11 +197,18 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                           <FormItem className="flex-1">
                             <FormLabel>Term</FormLabel>
                             <FormControl>
-                              <Input
-                                disabled={isPending}
-                                placeholder="2+2"
-                                {...field}
-                              />
+                              <div
+                                data-value={field.value}
+                                className="grid after:invisible after:whitespace-pre-wrap after:border after:py-2 after:text-sm after:content-[attr(data-value)_'\n'] after:[grid-area:1/1]"
+                              >
+                                <Textarea
+                                  disabled={isPending}
+                                  placeholder="2+2"
+                                  {...field}
+                                  className="min-h-10 resize-none [grid-area:1/1]"
+                                  rows={1}
+                                />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -214,11 +221,18 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                           <FormItem className="flex-1">
                             <FormLabel>Definition</FormLabel>
                             <FormControl>
-                              <Input
-                                disabled={isPending}
-                                placeholder="4"
-                                {...field}
-                              />
+                              <div
+                                data-value={field.value}
+                                className="grid after:invisible after:whitespace-pre-wrap after:border after:py-2 after:text-sm after:content-[attr(data-value)_'\n'] after:[grid-area:1/1]"
+                              >
+                                <Textarea
+                                  disabled={isPending}
+                                  placeholder="4"
+                                  {...field}
+                                  className="min-h-10 resize-none [grid-area:1/1]"
+                                  rows={1}
+                                />
+                              </div>
                             </FormControl>
                             <FormMessage />
                           </FormItem>
