@@ -42,6 +42,7 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
 
   if (session) {
     await helper.folder.allByUser.prefetch({ userId: session.user.id });
+    await helper.studySet.allByUser.prefetch({ userId: session.user.id });
   }
 
   const state = dehydrate(helper.queryClient);

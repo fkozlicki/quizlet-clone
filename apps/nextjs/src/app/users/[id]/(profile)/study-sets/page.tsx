@@ -25,7 +25,7 @@ export default async function Page({ params: { id } }: UserStudySetsProps) {
   const session = await auth();
   const user = await api.user.byId({ id });
 
-  const studySets = api.studySet.allByUser({ userId: id });
+  const studySets = api.studySet.allByUser({ userId: id, limit: 6 });
 
   return (
     <>

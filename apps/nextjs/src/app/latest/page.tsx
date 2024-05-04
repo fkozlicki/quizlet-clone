@@ -19,7 +19,10 @@ export default async function Latest() {
     redirect("/");
   }
 
-  const studySets = api.studySet.allByUser({ userId: session.user.id });
+  const studySets = api.studySet.allByUser({
+    userId: session.user.id,
+    limit: 6,
+  });
 
   return (
     <>

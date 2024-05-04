@@ -53,11 +53,11 @@ export const studySetRouter = {
       .orderBy(desc(schema.studySets.createdAt));
   }),
   allByUser: publicProcedure
-    .input(z.object({ userId: z.string() }))
+    .input(z.object({ userId: z.string(), limit: z.number().optional() }))
     .query(async ({ input, ctx }) => {
       return await selectStudySetList(ctx.db)
-        .limit(6)
-        .where(eq(schema.studySets.userId, input.userId));
+        .where(eq(schema.studySets.userId, input.userId))
+        .limit(input.limit ?? 0);
     }),
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -132,16 +132,59 @@ export const studySetRouter = {
         });
       }
 
-      await ctx.db.insert(schema.flashcards).values([
-        ...flashcards.map((flashcard) => ({
+      await ctx.db.insert(schema.flashcards).values(
+        flashcards.map((flashcard) => ({
           ...flashcard,
           studySetId: newStudySet.id,
         })),
-      ]);
+      );
 
-      return await ctx.db.query.studySets.findFirst({
-        where: eq(schema.studySets.id, newStudySet.id),
+      return newStudySet;
+    }),
+  combine: protectedProcedure
+    .input(z.object({ id: z.string(), studySets: z.array(z.string()) }))
+    .mutation(async ({ ctx, input }) => {
+      const studySet = await ctx.db.query.studySets.findFirst({
+        where: eq(schema.studySets.id, input.id),
       });
+
+      if (!studySet) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const [newStudySet] = await ctx.db
+        .insert(schema.studySets)
+        .values({
+          title: studySet.title,
+          description: studySet.description,
+          userId: ctx.session.user.id,
+        })
+        .returning();
+
+      if (!newStudySet) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Could not create study set",
+        });
+      }
+
+      const flashcards = await ctx.db.query.flashcards.findMany({
+        where: inArray(schema.flashcards.studySetId, [
+          studySet.id,
+          ...input.studySets,
+        ]),
+      });
+
+      await ctx.db.insert(schema.flashcards).values(
+        flashcards.map((card, index) => ({
+          position: index + 1,
+          studySetId: newStudySet.id,
+          term: card.term,
+          definition: card.definition,
+        })),
+      );
+
+      return newStudySet;
     }),
   edit: protectedProcedure
     .input(EditStudySetSchema)

@@ -16,7 +16,7 @@ const UserStudySets = ({
 }) => {
   const initialData = use(promise);
   const { data: studySets } = api.studySet.allByUser.useQuery(
-    { userId },
+    { userId, limit: 6 },
     {
       initialData,
     },

@@ -22,31 +22,32 @@ import {
 
 import { api } from "~/trpc/react";
 import DeleteStudySetDialog from "./delete-study-set-dialog";
+import StudySetCombineDialog from "./study-set-combine-dialog";
 import StudySetExportDialog from "./study-set-export-dialog";
 import StudySetToPrint from "./study-set-to-print";
 
 const StudySetOptionsDropdown = ({
   isOwner,
   id,
+  userId,
 }: {
   isOwner: boolean;
   id: string;
+  userId?: string;
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
   const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
+  const [combineDialogOpen, setCombineDialogOpen] = useState<boolean>(false);
   const utils = api.useUtils();
   const studySet = utils.studySet.byId.getData({ id });
   const printRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
-    fonts: [
-      {
-        family: "Inter",
-        source:
-          "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
-      },
-    ],
   });
+
+  const openCombineDialog = () => {
+    setCombineDialogOpen(true);
+  };
 
   const openDeleteDialog = () => {
     setDeleteDialogOpen(true);
@@ -68,8 +69,8 @@ const StudySetOptionsDropdown = ({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>More</DropdownMenuLabel>
           <DropdownMenuSeparator />
-          {isOwner && (
-            <DropdownMenuItem>
+          {userId && (
+            <DropdownMenuItem onClick={openCombineDialog}>
               <MergeIcon size={16} className="mr-2" />
               Combine
             </DropdownMenuItem>
@@ -93,6 +94,14 @@ const StudySetOptionsDropdown = ({
         open={exportDialogOpen}
         onOpenChange={setExportDialogOpen}
       />
+      {userId && (
+        <StudySetCombineDialog
+          id={id}
+          open={combineDialogOpen}
+          onOpenChange={setCombineDialogOpen}
+          userId={userId}
+        />
+      )}
       {isOwner && (
         <DeleteStudySetDialog
           id={id}
