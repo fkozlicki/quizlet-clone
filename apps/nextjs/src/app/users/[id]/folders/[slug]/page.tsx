@@ -52,7 +52,7 @@ export default async function Folder({ params: { slug, id } }: FolderProps) {
 
     return (
       <HydrationBoundary state={state}>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between">
           <FolderAuthor />
           <FolderCTA userId={id} defaultValues={defaultValues} />
         </div>
