@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   DownloadIcon,
   Ellipsis,
@@ -8,6 +8,7 @@ import {
   PrinterIcon,
   Trash2Icon,
 } from "lucide-react";
+import { useReactToPrint } from "react-to-print";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -19,7 +20,9 @@ import {
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
 
+import { api } from "~/trpc/react";
 import DeleteStudySetDialog from "./delete-study-set-dialog";
+import StudySetToPrint from "./study-set-to-print";
 
 const StudySetOptionsDropdown = ({
   isOwner,
@@ -29,6 +32,19 @@ const StudySetOptionsDropdown = ({
   id: string;
 }) => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState<boolean>(false);
+  const utils = api.useUtils();
+  const studySet = utils.studySet.byId.getData({ id });
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    fonts: [
+      {
+        family: "Inter",
+        source:
+          "https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap",
+      },
+    ],
+  });
 
   const openDeleteDialog = () => {
     setDeleteDialogOpen(true);
@@ -52,7 +68,7 @@ const StudySetOptionsDropdown = ({
               Combine
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={handlePrint}>
             <PrinterIcon size={16} className="mr-2" />
             Print
           </DropdownMenuItem>
@@ -73,6 +89,7 @@ const StudySetOptionsDropdown = ({
           onOpenChange={setDeleteDialogOpen}
         />
       )}
+      {studySet && <StudySetToPrint ref={printRef} studySet={studySet} />}
     </>
   );
 };
