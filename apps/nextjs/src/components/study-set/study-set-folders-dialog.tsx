@@ -13,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
+import Empty from "@acme/ui/empty";
 import {
   Tooltip,
   TooltipContent,
@@ -95,23 +96,27 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
           </DialogDescription>
         </DialogHeader>
         <Button onClick={openFolderDialog}>Create new folder</Button>
-        <div className="flex flex-col gap-4">
-          {folders?.map((folder) => {
-            const isIn = studySet.folders.some((f) => f.id === folder.id);
+        {folders?.length ? (
+          <div className="flex flex-col gap-4">
+            {folders?.map((folder) => {
+              const isIn = studySet.folders.some((f) => f.id === folder.id);
 
-            return (
-              <AddStudySetCard
-                key={folder.id}
-                folderId={folder.id}
-                studySetId={id}
-                name={folder.name}
-                isIn={isIn}
-                onMutate={() => onMutate(folder.id, isIn)}
-                onSettled={onSettled}
-              />
-            );
-          })}
-        </div>
+              return (
+                <AddStudySetCard
+                  key={folder.id}
+                  folderId={folder.id}
+                  studySetId={id}
+                  name={folder.name}
+                  isIn={isIn}
+                  onMutate={() => onMutate(folder.id, isIn)}
+                  onSettled={onSettled}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <Empty message="You have no folders yet" className="my-3" />
+        )}
       </DialogContent>
     </Dialog>
   );

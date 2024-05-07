@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
+import Empty from "@acme/ui/empty";
 
 import { api } from "~/trpc/react";
 import AddStudySetCard from "../shared/add-study-set-card";
@@ -79,23 +80,27 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
         <Link href="/create-set">
           <Button className="w-full">Create new study set</Button>
         </Link>
-        <div className="flex flex-col gap-4">
-          {studySets?.map((set) => {
-            const isIn = folder.studySets.some(({ id }) => id === set.id);
+        {studySets?.length ? (
+          <div className="flex flex-col gap-4">
+            {studySets?.map((set) => {
+              const isIn = folder.studySets.some(({ id }) => id === set.id);
 
-            return (
-              <AddStudySetCard
-                key={set.id}
-                folderId={folder.id}
-                studySetId={set.id}
-                name={set.title}
-                isIn={isIn}
-                onMutate={() => onMutate(set, isIn)}
-                onSettled={onSettled}
-              />
-            );
-          })}
-        </div>
+              return (
+                <AddStudySetCard
+                  key={set.id}
+                  folderId={folder.id}
+                  studySetId={set.id}
+                  name={set.title}
+                  isIn={isIn}
+                  onMutate={() => onMutate(set, isIn)}
+                  onSettled={onSettled}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <Empty message="You have no study sets yet" className="my-4" />
+        )}
       </DialogContent>
     </Dialog>
   );

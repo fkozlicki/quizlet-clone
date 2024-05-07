@@ -32,20 +32,18 @@ export default async function Page({ params: { id } }: UserFoldersProps) {
       <h1 className="mb-6 text-2xl font-bold">
         {session?.user.id === id ? "Your" : `${user.name}'s`} folders
       </h1>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <Suspense
-          fallback={
-            <>
-              <FolderSkeleton />
-              <FolderSkeleton />
-              <FolderSkeleton />
-              <FolderSkeleton />
-            </>
-          }
-        >
-          <UserFolders userId={id} promise={folders} />
-        </Suspense>
-      </div>
+      <Suspense
+        fallback={
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <FolderSkeleton />
+            <FolderSkeleton />
+            <FolderSkeleton />
+            <FolderSkeleton />
+          </div>
+        }
+      >
+        <UserFolders userId={id} promise={folders} />
+      </Suspense>
     </>
   );
 }

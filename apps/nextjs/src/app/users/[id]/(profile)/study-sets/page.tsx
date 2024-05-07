@@ -32,20 +32,19 @@ export default async function Page({ params: { id } }: UserStudySetsProps) {
       <h1 className="mb-6 text-2xl font-bold">
         {session?.user.id === id ? "Your" : `${user.name}'s`} study sets
       </h1>
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <Suspense
-          fallback={
-            <>
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-            </>
-          }
-        >
-          <UserStudySets userId={id} promise={studySets} />
-        </Suspense>
-      </div>
+
+      <Suspense
+        fallback={
+          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+          </div>
+        }
+      >
+        <UserStudySets userId={id} promise={studySets} />
+      </Suspense>
     </>
   );
 }

@@ -3,6 +3,7 @@
 import React, { use } from "react";
 
 import type { RouterOutputs } from "@acme/api";
+import Empty from "@acme/ui/empty";
 
 import { api } from "~/trpc/react";
 import FolderCard from "../folder/folder-card";
@@ -22,12 +23,14 @@ const UserFolders = ({
     { initialData },
   );
 
-  return (
-    <>
+  return folders.length ? (
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       {folders.map((folder) => (
         <FolderCard key={folder.id} folder={folder} />
       ))}
-    </>
+    </div>
+  ) : (
+    <Empty message="You have no folders yet" />
   );
 };
 

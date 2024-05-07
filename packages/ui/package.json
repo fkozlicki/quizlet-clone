@@ -28,7 +28,8 @@
     "./dropzone": "./src/dropzone.tsx",
     "./slider": "./src/slider.tsx",
     "./cropper": "./src/cropper.tsx",
-    "./skeleton": "./src/skeleton.tsx"
+    "./skeleton": "./src/skeleton.tsx",
+    "./empty": "./src/empty.tsx"
   },
   "license": "MIT",
   "scripts": {

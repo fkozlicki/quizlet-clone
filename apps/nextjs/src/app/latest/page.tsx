@@ -27,20 +27,18 @@ export default async function Latest() {
   return (
     <>
       <h1 className="mb-6 text-2xl font-bold">Your study sets</h1>
-      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <Suspense
-          fallback={
-            <>
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-              <StudySetSkeleton />
-            </>
-          }
-        >
-          <UserStudySets userId={session.user.id} promise={studySets} />
-        </Suspense>
-      </div>
+      <Suspense
+        fallback={
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+            <StudySetSkeleton />
+          </div>
+        }
+      >
+        <UserStudySets userId={session.user.id} promise={studySets} />
+      </Suspense>
     </>
   );
 }
