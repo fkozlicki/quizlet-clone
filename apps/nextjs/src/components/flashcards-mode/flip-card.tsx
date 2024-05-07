@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { useAnimate } from "framer-motion";
 
 import type { RouterOutputs } from "@acme/api";
+import type { Session } from "@acme/auth";
 import { cn } from "@acme/ui";
 
 import FlipCardContent from "./flip-card-content";
@@ -14,6 +15,7 @@ interface FlipCardProps {
   editable: boolean;
   animationScope: AnimationScope<HTMLDivElement>;
   fullscreen?: boolean;
+  session: Session | null;
 }
 
 const FlipCard = ({
@@ -21,6 +23,7 @@ const FlipCard = ({
   editable,
   flashcard,
   fullscreen,
+  session,
 }: FlipCardProps) => {
   const [flipScope, flipAnimate] = useAnimate<HTMLDivElement>();
   const [flipped, setFlipped] = useState<boolean>(false);
@@ -53,12 +56,14 @@ const FlipCard = ({
           content={flashcard.term}
           editable={editable}
           flashcard={flashcard}
+          session={session}
         />
         <FlipCardContent
           title="Definition"
           content={flashcard.definition}
           editable={editable}
           flashcard={flashcard}
+          session={session}
           back
         />
       </div>

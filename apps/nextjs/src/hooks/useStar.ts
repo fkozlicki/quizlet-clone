@@ -1,4 +1,3 @@
-import type { MouseEvent } from "react";
 import { useParams } from "next/navigation";
 
 import type { RouterOutputs } from "@acme/api";
@@ -44,9 +43,7 @@ export default function useStar(
     };
   }
 
-  const toggleStar = (event: MouseEvent) => {
-    event.stopPropagation();
-
+  const toggleStar = () => {
     if (flashcard.starred) {
       deleteStar.mutate({
         flashcardId: flashcard.id,

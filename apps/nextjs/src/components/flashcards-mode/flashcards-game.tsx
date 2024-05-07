@@ -235,6 +235,7 @@ const FlashcardsGame = ({ fullscreen, session }: FlashcardsGameProps) => {
           flashcard={currentCard}
           editable={userId === session?.user.id}
           animationScope={scope}
+          session={session}
         />
       </div>
       <FlashcardsGameButtons
