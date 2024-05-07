@@ -15,6 +15,7 @@ import {
   useForm,
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
+import { toast } from "@acme/ui/toast";
 
 import GithubIcon from "../icons/github";
 import GoogleIcon from "../icons/google";
@@ -25,10 +26,10 @@ const signInSchema = z.object({
 
 type SignInValues = z.infer<typeof signInSchema>;
 
+type Provider = "google" | "github" | "nodemailer";
+
 const SignInForm = () => {
-  const [loadingGoogle, setLoadingGoogle] = useState<boolean>(false);
-  const [loadingGithub, setLoadingGithub] = useState<boolean>(false);
-  const [loadingNodemailer, setLoadingNodemailer] = useState<boolean>(false);
+  const [loading, setLoading] = useState<Provider | false>(false);
 
   const form = useForm({
     schema: signInSchema,
@@ -37,45 +38,33 @@ const SignInForm = () => {
     },
   });
 
-  const signInWithGoogle = async () => {
-    setLoadingGoogle(true);
-    await signIn("google", {
+  const handleSignIn = async (provider: Provider, email?: string) => {
+    setLoading(provider);
+    const res = await signIn(provider, {
       redirectTo: "/latest",
-    });
-    setLoadingGoogle(false);
-  };
-  const signInWithGithub = async () => {
-    setLoadingGithub(true);
-    await signIn("github", {
-      redirectTo: "/latest",
-    });
-    setLoadingGithub(false);
-  };
-
-  const signInWithNodemailer = async (email: string) => {
-    setLoadingNodemailer(true);
-    await signIn("nodemailer", {
       email,
-      redirectTo: "/latest",
     });
-    setLoadingNodemailer(false);
+
+    if (res) {
+      toast.success(`Successfully signed in with ${provider}`);
+    }
+
+    setLoading(false);
   };
 
   const onSubmit = ({ email }: SignInValues) => {
-    void signInWithNodemailer(email);
+    void handleSignIn("nodemailer", email);
   };
-
-  const isDisabled = loadingGithub || loadingGoogle || loadingNodemailer;
 
   return (
     <div>
       <div className="flex flex-col gap-4">
         <Button
           className="w-full"
-          disabled={isDisabled}
-          onClick={signInWithGoogle}
+          disabled={loading !== false}
+          onClick={() => handleSignIn("google")}
         >
-          {loadingGoogle ? (
+          {loading === "google" ? (
             <LoaderIcon size={20} className="animate-spin" />
           ) : (
             <>
@@ -86,10 +75,10 @@ const SignInForm = () => {
         </Button>
         <Button
           className="w-full"
-          disabled={isDisabled}
-          onClick={signInWithGithub}
+          disabled={loading !== false}
+          onClick={() => handleSignIn("github")}
         >
-          {loadingGithub ? (
+          {loading === "github" ? (
             <LoaderIcon size={20} className="animate-spin" />
           ) : (
             <>
@@ -121,12 +110,16 @@ const SignInForm = () => {
                   id="email"
                   type="email"
                   placeholder="example@email.com"
-                  disabled={isDisabled}
+                  disabled={loading !== false}
                   {...field}
                 />
                 <FormMessage />
-                <Button type="submit" className="w-full" disabled={isDisabled}>
-                  {loadingNodemailer ? (
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={loading !== false}
+                >
+                  {loading === "nodemailer" ? (
                     <LoaderIcon size={20} className="animate-spin" />
                   ) : (
                     "Sign In"
