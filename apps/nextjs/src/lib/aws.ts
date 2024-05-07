@@ -14,8 +14,6 @@ const client = new S3Client({
 });
 
 export async function uploadObject(file: File) {
-  console.log(process.env.NEXT_PUBLIC_S3_REGION);
-
   const objectName = `${crypto.randomUUID()}`;
 
   const input: PutObjectCommandInput = {
