@@ -10,11 +10,11 @@ export default function useStar(
 ) {
   const utils = api.useUtils();
   const { id }: { id: string } = useParams();
-  const createStarred = api.starredFlashcard.create.useMutation({
+  const createStar = api.starredFlashcard.create.useMutation({
     onMutate: ({ flashcardId }) => updateStudySet(flashcardId, true),
     onSettled,
   });
-  const deleteStarred = api.starredFlashcard.delete.useMutation({
+  const deleteStar = api.starredFlashcard.delete.useMutation({
     onMutate: ({ flashcardId }) => updateStudySet(flashcardId, false),
     onSettled,
   });
@@ -48,11 +48,11 @@ export default function useStar(
     event.stopPropagation();
 
     if (flashcard.starred) {
-      deleteStarred.mutate({
+      deleteStar.mutate({
         flashcardId: flashcard.id,
       });
     } else {
-      createStarred.mutate({
+      createStar.mutate({
         flashcardId: flashcard.id,
       });
     }
