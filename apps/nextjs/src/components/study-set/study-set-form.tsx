@@ -9,6 +9,7 @@ import type {
   CreateStudySetValues,
   EditStudySetValues,
 } from "@acme/validators";
+import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
 import {
@@ -154,7 +155,18 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
             )}
           />
           <div>
-            <Label>Flashcards</Label>
+            <Label
+              className={cn({
+                "text-destructive": form.formState.errors.flashcards?.root,
+              })}
+            >
+              Flashcards
+            </Label>
+            {form.formState.errors.flashcards?.root && (
+              <p className="text-[0.8rem] font-medium text-destructive">
+                {form.formState.errors.flashcards.root.message}
+              </p>
+            )}
             <Reorder.Group
               axis="y"
               values={fields}
