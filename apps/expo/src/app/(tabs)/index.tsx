@@ -1,18 +1,10 @@
 import React, { useCallback, useRef, useState } from "react";
-import {
-  Animated,
-  Image,
-  RefreshControl,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Animated, RefreshControl, ScrollView, Text, View } from "react-native";
 import { Link } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 
 import HomeHeader from "~/components/home-header";
-import { api } from "~/utils/api";
 
 const sets = [
   {
@@ -44,7 +36,7 @@ const folders = [
 const Home = () => {
   const scrollOffsetY = useRef(new Animated.Value(0)).current;
   const [refreshing, setRefreshing] = useState(false);
-  const { data: popular } = api.studySet.popular.useQuery();
+  // const { data: popular } = api.studySet.popular.useQuery();
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -100,7 +92,7 @@ const Home = () => {
             horizontal
             ItemSeparatorComponent={() => <View className="w-4" />}
             renderItem={({ item }) => (
-              <Link href={`/study-set/${item.id}`}>
+              <Link href={`/study-set:${item.id}`}>
                 <View className="w-[300px] rounded-2xl border-2 border-gray-200 bg-white p-4">
                   <Text className="mb-4 font-bold">{item.title}</Text>
                   <View className="mb-10 self-start rounded-full bg-indigo-50 px-2 py-[1px]">
@@ -109,10 +101,10 @@ const Home = () => {
                     </Text>
                   </View>
                   <View className="flex-row items-center gap-2">
-                    <Image
+                    {/* <Image
                       source={require("../../assets/images/user.jpg")}
                       className="h-6 w-6 rounded-full"
-                    />
+                    /> */}
                     <Text className="text-xs font-semibold">{item.author}</Text>
                   </View>
                 </View>
@@ -138,10 +130,10 @@ const Home = () => {
                   <Text className="text-xs font-medium">{item.count} sets</Text>
                 </View>
                 <View className="flex-row items-center gap-2">
-                  <Image
+                  {/* <Image
                     source={require("../../assets/images/user.jpg")}
                     className="h-6 w-6 rounded-full"
-                  />
+                  /> */}
                   <Text className="text-xs font-semibold">{item.author}</Text>
                 </View>
               </View>
@@ -170,10 +162,10 @@ const Home = () => {
                   </Text>
                   <View className="mx-3 h-3/4 w-px bg-gray-300"></View>
                   <View className="flex-row items-center gap-2">
-                    <Image
+                    {/* <Image
                       source={require("../../assets/images/user.jpg")}
                       className="h-6 w-6 rounded-full"
-                    />
+                    /> */}
                     <Text className="text-xs font-semibold">{item.author}</Text>
                   </View>
                 </View>

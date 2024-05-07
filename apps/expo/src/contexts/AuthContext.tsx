@@ -12,7 +12,7 @@ const initialState: AuthState = {
 const AuthContext = createContext<AuthState>(initialState);
 
 const AuthProvider = ({ children }: PropsWithChildren) => {
-  const [session, setSession] = useState<AuthState["session"]>(null);
+  const [session] = useState<AuthState["session"]>(null);
 
   return (
     <AuthContext.Provider value={{ session }}>{children}</AuthContext.Provider>

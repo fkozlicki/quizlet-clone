@@ -1,11 +1,6 @@
-import { Text, useColorScheme, View } from "react-native";
+import { useColorScheme } from "react-native";
 import { Redirect, Tabs } from "expo-router";
-import {
-  AntDesign,
-  Feather,
-  Ionicons,
-  SimpleLineIcons,
-} from "@expo/vector-icons";
+import { SimpleLineIcons } from "@expo/vector-icons";
 
 import Colors from "~/constants/Colors";
 import { useAuthContext } from "~/contexts/AuthContext";

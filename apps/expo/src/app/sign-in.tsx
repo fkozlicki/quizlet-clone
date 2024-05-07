@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import type { User } from "@react-native-google-signin/google-signin";
+import React, { useEffect, useState } from "react";
 import { Button, Text, View } from "react-native";
 import {
   GoogleSignin,
@@ -10,8 +11,12 @@ GoogleSignin.configure({
 });
 
 const SignIn = () => {
-  const [info, setInfo] = useState();
+  const [info, setInfo] = useState<User["user"] | undefined>();
   const [signedIn, setSignedIn] = useState(false);
+
+  useEffect(() => {
+    void isSignedIn();
+  }, []);
 
   const isSignedIn = async () => {
     const isSignedIn = await GoogleSignin.isSignedIn();
@@ -24,7 +29,7 @@ const SignIn = () => {
       const { user } = await GoogleSignin.signIn();
       setInfo(user);
     } catch (error) {
-      console.error({ ...error });
+      console.error(error);
     }
   };
 
