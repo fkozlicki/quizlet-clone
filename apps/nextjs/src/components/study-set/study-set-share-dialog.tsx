@@ -39,7 +39,7 @@ const StudySetShareDialog = ({ id }: { id: string }) => {
             </Label>
             <Input
               id="link"
-              defaultValue={`http://localhost:3000/study-sets/${id}`}
+              defaultValue={`${location.origin}/study-sets/${id}`}
               readOnly
             />
           </div>
