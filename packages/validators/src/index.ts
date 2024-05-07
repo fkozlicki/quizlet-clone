@@ -8,8 +8,8 @@ export const CreateUserSchema = z.object({
 });
 
 const FlashcardSchema = z.object({
-  term: z.string(),
-  definition: z.string(),
+  term: z.string().min(1, "Specify term of your flashcard"),
+  definition: z.string().min(1, "Specify definition of your flashcard"),
   position: z.number(),
 });
 
