@@ -112,10 +112,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   return (
     <div ref={ref} className="m-auto max-w-xl py-8">
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit, console.log)}
-          className="space-y-8"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
             control={form.control}
             name="title"

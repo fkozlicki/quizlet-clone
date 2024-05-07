@@ -18,8 +18,6 @@ interface ActivityCalendarProps {
 const ActivityCalendar = ({ activity }: ActivityCalendarProps) => {
   const today = dayjs().format("YYYY-MM-DD");
 
-  console.log(today);
-
   return (
     <div className="rounded-lg bg-background p-2">
       <span className="mb-2 inline-block w-full text-center">

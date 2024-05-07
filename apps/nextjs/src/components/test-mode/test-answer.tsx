@@ -12,8 +12,6 @@ interface TestAnswerProps {
 const TestAnswer = ({ answer }: TestAnswerProps) => {
   const { trueOrFalse, multipleChoice, written } = answer;
 
-  console.log(answer);
-
   return (
     <>
       <span className="mb-6 text-xl font-semibold">Your answers</span>
