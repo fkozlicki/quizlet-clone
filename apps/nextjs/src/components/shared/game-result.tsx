@@ -63,6 +63,7 @@ const GameResult = ({
             <Button
               onClick={firstButton.callback}
               className="h-[100px] justify-start"
+              variant="outline"
             >
               <div className="flex items-center gap-4 whitespace-normal">
                 {firstButton.Icon}
@@ -78,6 +79,7 @@ const GameResult = ({
               <Button
                 onClick={secondButton.callback}
                 className="h-[100px] justify-start"
+                variant="outline"
               >
                 <div className="flex items-center gap-4 whitespace-normal">
                   {secondButton.Icon}
