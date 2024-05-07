@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
+import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import {
   DropdownMenu,
@@ -11,28 +12,43 @@ import {
 } from "@acme/ui/dropdown-menu";
 
 import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
+import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
 
-const CreateOptionsDropdown = () => {
+const CreateOptionsDropdown = ({ session }: { session: Session | null }) => {
   const [, dispatch] = useFolderDialogContext();
+  const { onOpenChange } = useSignInDialogContext();
+  const router = useRouter();
 
   const openFolderDialog = () => {
     dispatch({ type: "open" });
   };
 
+  const openSignInDialog = () => {
+    onOpenChange(true);
+  };
+
+  const onFolderClick = () => {
+    session ? openFolderDialog() : openSignInDialog();
+  };
+
+  const onStudySetClick = () => {
+    session ? router.push("/create-set") : openSignInDialog();
+  };
+
   return (
-    <>
+    <div className="hidden md:block">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline">Create</Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={openFolderDialog}>Folder</DropdownMenuItem>
-          <Link href="/create-set">
-            <DropdownMenuItem>Study set</DropdownMenuItem>
-          </Link>
+          <DropdownMenuItem onClick={onFolderClick}>Folder</DropdownMenuItem>
+          <DropdownMenuItem onClick={onStudySetClick}>
+            Study set
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 };
 

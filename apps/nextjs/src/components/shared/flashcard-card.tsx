@@ -3,21 +3,33 @@
 import { Star } from "lucide-react";
 
 import type { RouterOutputs } from "@acme/api";
+import type { Session } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
 import { Separator } from "@acme/ui/separator";
 
+import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
 import useStar from "~/hooks/useStar";
 import EditFlashcardDialog from "./edit-flashcard-dialog";
 
 interface FlashcardCardProps {
   flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][0];
   editable?: boolean;
+  session: Session | null;
 }
 
-const FlashcardCard = ({ flashcard, editable }: FlashcardCardProps) => {
+const FlashcardCard = ({
+  flashcard,
+  editable,
+  session,
+}: FlashcardCardProps) => {
   const { term, definition } = flashcard;
   const { toggleStar } = useStar(flashcard);
+  const { onOpenChange } = useSignInDialogContext();
+
+  const onStarClick = () => {
+    session ? toggleStar : onOpenChange(true);
+  };
 
   return (
     <Card>
@@ -25,7 +37,7 @@ const FlashcardCard = ({ flashcard, editable }: FlashcardCardProps) => {
         <div className="order-2 flex h-6 items-center justify-end gap-1">
           {editable && <EditFlashcardDialog flashcard={flashcard} />}
           <Button
-            onClick={toggleStar}
+            onClick={onStarClick}
             size="icon"
             variant="ghost"
             className="rounded-full"

@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { RotateCcw, Undo2 } from "lucide-react";
 
+import type { Session } from "@acme/auth";
 import { Progress } from "@acme/ui/progress";
 import { Separator } from "@acme/ui/separator";
 
@@ -13,7 +14,7 @@ import FlashcardCard from "../shared/flashcard-card";
 import GameResult from "../shared/game-result";
 import MultipleChoiceCard from "../shared/multiple-choice-card";
 
-const LearnMode = () => {
+const LearnMode = ({ session }: { session: Session | null }) => {
   const { id }: { id: string } = useParams();
   const { data: flashcards } = api.studySet.learnCards.useQuery(
     { id },
@@ -108,12 +109,16 @@ const LearnMode = () => {
           />
           <Separator className="my-4 md:my-8" />
           <div>
-            <span className="mb-4 text-xl font-bold">
+            <span className="mb-4 inline-block text-xl font-bold">
               Terms studied in this round
             </span>
             <div className="flex flex-col gap-4">
               {flashcards.map((flashcard, index) => (
-                <FlashcardCard key={index} flashcard={flashcard} />
+                <FlashcardCard
+                  key={index}
+                  flashcard={flashcard}
+                  session={session}
+                />
               ))}
             </div>
           </div>

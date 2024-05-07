@@ -5,6 +5,7 @@ import { createServerSideHelpers } from "@trpc/react-query/server";
 import SuperJSON from "superjson";
 
 import { appRouter } from "@acme/api";
+import { auth } from "@acme/auth";
 
 import LearnMode from "~/components/learn-mode/learn-mode";
 import { api, createContext } from "~/trpc/server";
@@ -34,13 +35,14 @@ export default async function Learn({
     transformer: SuperJSON,
   });
   await helper.studySet.learnCards.prefetch({ id });
+  const session = await auth();
 
   const state = dehydrate(helper.queryClient);
 
   return (
     <HydrationBoundary state={state}>
       <div className="m-auto max-w-3xl">
-        <LearnMode />
+        <LearnMode session={session} />
       </div>
     </HydrationBoundary>
   );

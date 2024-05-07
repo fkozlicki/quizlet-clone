@@ -15,7 +15,9 @@ import { auth } from "@acme/auth";
 import CreateActivity from "~/components/layout/create-activity";
 import CreateFolderDialog from "~/components/layout/create-folder-dialog";
 import Navbar from "~/components/layout/navbar";
+import SignInDialog from "~/components/layout/sign-in-dialog";
 import FolderDialogProvider from "~/contexts/folder-dialog-context";
+import SignInDialogProvider from "~/contexts/sign-in-dialog-context";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -52,23 +54,26 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
           GeistMono.variable,
         )}
       >
-        <FolderDialogProvider>
-          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <TRPCReactProvider>
-              <Navbar />
-              <main className="container min-h-[calc(100vh-65px)] py-8">
-                {props.children}
-              </main>
-              <Toaster />
-              {session && (
-                <>
-                  <CreateActivity />
-                  <CreateFolderDialog />
-                </>
-              )}
-            </TRPCReactProvider>
-          </ThemeProvider>
-        </FolderDialogProvider>
+        <SignInDialogProvider>
+          <FolderDialogProvider>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <TRPCReactProvider>
+                <Navbar session={session} />
+                <main className="container min-h-[calc(100vh-65px)] py-8">
+                  {props.children}
+                </main>
+                <Toaster />
+                {session && (
+                  <>
+                    <CreateActivity />
+                    <CreateFolderDialog />
+                  </>
+                )}
+                {!session && <SignInDialog />}
+              </TRPCReactProvider>
+            </ThemeProvider>
+          </FolderDialogProvider>
+        </SignInDialogProvider>
       </body>
     </html>
   );

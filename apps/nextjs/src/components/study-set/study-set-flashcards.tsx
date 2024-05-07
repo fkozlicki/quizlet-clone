@@ -22,6 +22,7 @@ const StudySetFlashcards = ({ session }: { session: Session | null }) => {
             editable={data.userId === session?.user.id}
             key={index}
             flashcard={flashcard}
+            session={session}
           />
         ))}
       </div>
