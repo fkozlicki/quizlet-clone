@@ -59,14 +59,14 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const utils = api.useUtils();
   const create = api.studySet.create.useMutation({
     async onSuccess() {
+      void utils.studySet.invalidate();
       form.reset();
-      await utils.studySet.invalidate();
       router.push("/latest");
     },
   });
   const edit = api.studySet.edit.useMutation({
     async onSuccess(data) {
-      await utils.studySet.invalidate();
+      void utils.studySet.invalidate();
       router.push(`/study-sets/${data?.id}`);
     },
   });

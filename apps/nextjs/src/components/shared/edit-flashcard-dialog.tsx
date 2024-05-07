@@ -45,8 +45,8 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
   const utils = api.useUtils();
   const { mutate, isPending } = api.flashcard.edit.useMutation({
     async onSuccess() {
-      await utils.studySet.byId.invalidate({ id });
       setOpen(false);
+      void utils.studySet.byId.invalidate({ id });
     },
   });
 

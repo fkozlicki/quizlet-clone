@@ -63,9 +63,10 @@ const StudySetCombineDialog = ({
   const router = useRouter();
   const { mutate, isPending } = api.studySet.combine.useMutation({
     async onSuccess(data) {
-      await utils.studySet.invalidate();
-      toast.success("Successfully combined study sets");
       router.push(`/study-sets/${data.id}`);
+      toast.success("Successfully combined study sets");
+      onOpenChange(false);
+      void utils.studySet.invalidate();
     },
     onError() {
       toast.error("Couldn't combine study sets");

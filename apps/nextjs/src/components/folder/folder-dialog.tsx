@@ -54,9 +54,7 @@ const FolderDialog = ({
   });
   const create = api.folder.create.useMutation({
     async onSuccess(data) {
-      form.reset();
-      await utils.folder.invalidate();
-      onOpenChange && onOpenChange(false);
+      void utils.folder.invalidate();
       toast.success(
         <span>
           Successfully created new folder, you can find it{" "}
@@ -68,6 +66,8 @@ const FolderDialog = ({
           </Link>
         </span>,
       );
+      form.reset();
+      onOpenChange && onOpenChange(false);
     },
     onError() {
       toast.error("Couldn't create folder, try again");
@@ -75,14 +75,13 @@ const FolderDialog = ({
   });
   const edit = api.folder.edit.useMutation({
     async onSuccess(data) {
+      void utils.folder.invalidate();
+      toast.success("Successfully edited folder");
       form.reset({
         name: data.name,
         description: data.description ?? undefined,
       });
-      await utils.folder.invalidate();
       onOpenChange && onOpenChange(false);
-
-      toast.success("Successfully edited folder");
     },
     onError() {
       toast.error("Couldn't edit folder, try again");
