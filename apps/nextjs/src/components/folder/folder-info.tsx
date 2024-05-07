@@ -7,8 +7,8 @@ import { Folder } from "lucide-react";
 import { api } from "~/trpc/react";
 
 const FolderInfo = () => {
-  const { slug } = useParams();
-  const { data } = api.folder.bySlug.useQuery({ slug: slug as string });
+  const { slug }: { slug: string } = useParams();
+  const { data } = api.folder.bySlug.useQuery({ slug: slug });
 
   return (
     <div className="mb-8">
