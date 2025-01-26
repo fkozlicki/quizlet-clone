@@ -1,6 +1,8 @@
 import { neon, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 
+import * as schema from "./schema";
+
 if (!process.env.DATABASE_URL) {
   throw new Error("Missing process.env.DATABASE_URL");
 }
@@ -16,4 +18,6 @@ if (process.env.NODE_ENV === "development") {
 }
 const sql = neon(url);
 
-export const db = drizzle({ client: sql, casing: "camelCase" });
+export const db = drizzle({ client: sql, schema });
+
+export type Database = typeof db;
