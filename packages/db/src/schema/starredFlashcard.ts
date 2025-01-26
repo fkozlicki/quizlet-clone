@@ -1,18 +1,17 @@
 import { relations } from "drizzle-orm";
-import { integer, primaryKey, uuid } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, uuid } from "drizzle-orm/pg-core";
 
-import { pgTable } from "./_table";
-import { users } from "./auth";
-import { flashcards } from "./flashcard";
+import { Flashcard } from "./flashcard";
+import { User } from "./user";
 
-export const starredFlashcards = pgTable(
-  "starred_flashcard",
+export const StarredFlashcard = pgTable(
+  "starred_flashcards",
   {
     userId: uuid("user_id")
-      .references(() => users.id, { onDelete: "cascade" })
+      .references(() => User.id, { onDelete: "cascade" })
       .notNull(),
     flashcardId: integer("flashcard_id")
-      .references(() => flashcards.id, { onDelete: "cascade" })
+      .references(() => Flashcard.id, { onDelete: "cascade" })
       .notNull(),
   },
   (t) => ({
@@ -20,16 +19,16 @@ export const starredFlashcards = pgTable(
   }),
 );
 
-export const starredFlashcardsRelations = relations(
-  starredFlashcards,
+export const StarredFlashcardRelations = relations(
+  StarredFlashcard,
   ({ one }) => ({
-    user: one(users, {
-      fields: [starredFlashcards.userId],
-      references: [users.id],
+    user: one(User, {
+      fields: [StarredFlashcard.userId],
+      references: [User.id],
     }),
-    flashcard: one(flashcards, {
-      fields: [starredFlashcards.flashcardId],
-      references: [flashcards.id],
+    flashcard: one(Flashcard, {
+      fields: [StarredFlashcard.flashcardId],
+      references: [Flashcard.id],
     }),
   }),
 );

@@ -2,7 +2,8 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { eq, schema } from "@acme/db";
+import { eq } from "@acme/db";
+import { User } from "@acme/db/schema";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
@@ -10,8 +11,8 @@ export const userRouter = {
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = await ctx.db.query.users.findFirst({
-        where: eq(schema.users.id, input.id),
+      const user = await ctx.db.query.User.findFirst({
+        where: eq(User.id, input.id),
       });
 
       if (!user) {
@@ -27,9 +28,9 @@ export const userRouter = {
     .input(z.object({ image: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const [user] = await ctx.db
-        .update(schema.users)
+        .update(User)
         .set(input)
-        .where(eq(schema.users.id, ctx.session.user.id))
+        .where(eq(User.id, ctx.session.user.id))
         .returning();
 
       if (!user) {
@@ -43,8 +44,6 @@ export const userRouter = {
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(schema.users)
-        .where(eq(schema.users.id, input.id));
+      return await ctx.db.delete(User).where(eq(User.id, input.id));
     }),
 } satisfies TRPCRouterRecord;

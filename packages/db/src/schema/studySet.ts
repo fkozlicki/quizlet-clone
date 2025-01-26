@@ -1,26 +1,25 @@
 import { relations } from "drizzle-orm";
-import { text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-import { pgTable } from "./_table";
-import { users } from "./auth";
-import { flashcards } from "./flashcard";
-import { foldersToStudySets } from "./foldersToStudySets";
+import { Flashcard } from "./flashcard";
+import { FoldersToStudySets } from "./folderToStudySet";
+import { User } from "./user";
 
-export const studySets = pgTable("study_set", {
+export const StudySet = pgTable("study_sets", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description"),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
+    .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });
 
-export const studySetsRelations = relations(studySets, ({ many, one }) => ({
-  flashcards: many(flashcards),
-  foldersToStudySets: many(foldersToStudySets),
-  user: one(users, {
-    fields: [studySets.userId],
-    references: [users.id],
+export const StudySetRelations = relations(StudySet, ({ many, one }) => ({
+  flashcards: many(Flashcard),
+  foldersToStudySets: many(FoldersToStudySets),
+  user: one(User, {
+    fields: [StudySet.userId],
+    references: [User.id],
   }),
 }));

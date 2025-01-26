@@ -21,7 +21,9 @@ const createImage = (url: string) =>
   new Promise((resolve, reject) => {
     const image = new Image();
     image.addEventListener("load", () => resolve(image));
-    image.addEventListener("error", (error) => reject(error));
+    image.addEventListener("error", (error) =>
+      reject(new Error(error.message)),
+    );
     image.src = url;
   });
 
@@ -105,10 +107,14 @@ const Cropper = ({ children, aspect, afterCrop }: CropperProps) => {
       croppedAreaPixels,
     )) as File;
 
-    setFileRef.current && setFileRef.current(croppedImage);
+    if (setFileRef.current) {
+      setFileRef.current(croppedImage);
+    }
     setOpen(false);
 
-    afterCrop && afterCrop(croppedImage);
+    if (afterCrop) {
+      afterCrop(croppedImage);
+    }
   };
 
   const onChange = (
@@ -116,9 +122,7 @@ const Cropper = ({ children, aspect, afterCrop }: CropperProps) => {
     setCurrentFile: Dispatch<SetStateAction<File | undefined>>,
   ) => {
     // run children onChange
-    if ((children.props as { onChange: (file: File) => void }).onChange) {
-      (children.props as { onChange: (file: File) => void }).onChange(file);
-    }
+    (children.props as { onChange: (file: File) => void }).onChange(file);
 
     // set image to crop
     const reader = new FileReader();

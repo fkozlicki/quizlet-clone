@@ -1,24 +1,23 @@
 import { relations } from "drizzle-orm";
-import { text, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid } from "drizzle-orm/pg-core";
 
-import { pgTable } from "./_table";
-import { users } from "./auth";
-import { foldersToStudySets } from "./foldersToStudySets";
+import { FoldersToStudySets } from "./folderToStudySet";
+import { User } from "./user";
 
-export const folders = pgTable("folder", {
+export const Folder = pgTable("folders", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: text("name").notNull(),
   description: text("description"),
   slug: text("slug").notNull(),
   userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
+    .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });
 
-export const foldersRelations = relations(folders, ({ one, many }) => ({
-  user: one(users, {
-    fields: [folders.userId],
-    references: [users.id],
+export const FoldersRelations = relations(Folder, ({ one, many }) => ({
+  user: one(User, {
+    fields: [Folder.userId],
+    references: [User.id],
   }),
-  foldersToStudySets: many(foldersToStudySets),
+  foldersToStudySets: many(FoldersToStudySets),
 }));

@@ -54,7 +54,8 @@
     "AUTH_EMAIL_SERVER",
     "AUTH_EMAIL_FROM",
     "AUTH_REDIRECT_PROXY_URL",
-    "AUTH_SECRET"
+    "AUTH_SECRET",
+    "PORT"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",

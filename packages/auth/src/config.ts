@@ -1,10 +1,18 @@
-import type { DefaultSession, NextAuthConfig } from "next-auth";
+import type {
+  DefaultSession,
+  NextAuthConfig,
+  Session as NextAuthSession,
+} from "next-auth";
+import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 import Nodemailer from "next-auth/providers/nodemailer";
 
-import { db, tableCreator } from "@acme/db";
+import { db } from "@acme/db/client";
+import { Account, Session, User, VerificationToken } from "@acme/db/schema";
+
+import { env } from "../env";
 
 declare module "next-auth" {
   interface Session {
@@ -14,19 +22,37 @@ declare module "next-auth" {
   }
 }
 
+const adapter = DrizzleAdapter(db, {
+  usersTable: User,
+  accountsTable: Account,
+  sessionsTable: Session,
+  verificationTokensTable: VerificationToken,
+});
+
+export const isSecureContext = env.NODE_ENV !== "development";
+
 export const authConfig = {
-  adapter: DrizzleAdapter(db, tableCreator),
+  adapter,
+  // In development, we need to skip checks to allow Expo to work
+  ...(!isSecureContext
+    ? {
+        skipCSRFCheck: skipCSRFCheck,
+        trustHost: true,
+      }
+    : {}),
+  secret: env.AUTH_SECRET,
   providers: [
     Google,
     Github,
     Nodemailer({
-      server: process.env.AUTH_EMAIL_SERVER,
-      from: process.env.AUTH_EMAIL_FROM,
+      server: env.AUTH_EMAIL_SERVER,
+      from: env.AUTH_EMAIL_FROM,
     }),
   ],
   callbacks: {
     session: (opts) => {
-      if (!("user" in opts)) throw "unreachable with session strategy";
+      if (!("user" in opts))
+        throw new Error("unreachable with session strategy");
 
       return {
         ...opts.session,
@@ -37,4 +63,25 @@ export const authConfig = {
       };
     },
   },
+  debug: true,
 } satisfies NextAuthConfig;
+
+export const validateToken = async (
+  token: string,
+): Promise<NextAuthSession | null> => {
+  const sessionToken = token.slice("Bearer ".length);
+  const session = await adapter.getSessionAndUser?.(sessionToken);
+  return session
+    ? {
+        user: {
+          ...session.user,
+        },
+        expires: session.session.expires.toISOString(),
+      }
+    : null;
+};
+
+export const invalidateSessionToken = async (token: string) => {
+  const sessionToken = token.slice("Bearer ".length);
+  await adapter.deleteSession?.(sessionToken);
+};

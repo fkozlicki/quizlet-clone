@@ -8,6 +8,7 @@
       "react-server": "./src/index.rsc.ts",
       "default": "./src/index.ts"
     },
+    "./react": "./src/react.tsx",
     "./env": "./env.ts"
   },
   "scripts": {
@@ -19,10 +20,10 @@
   "dependencies": {
     "@acme/db": "workspace:*",
     "@auth/core": "0.37.2",
-    "@auth/drizzle-adapter": "^0.8.1",
-    "@t3-oss/env-nextjs": "^0.9.2",
+    "@auth/drizzle-adapter": "1.7.4",
+    "@t3-oss/env-nextjs": "^0.12.0",
     "next": "^14.2.15",
-    "next-auth": "5.0.0-beta.16",
+    "next-auth": "5.0.0-beta.25",
     "nodemailer": "^6.9.13",
     "react": "catalog:react18",
     "react-dom": "catalog:react18",

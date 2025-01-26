@@ -40,14 +40,11 @@ const SignInForm = () => {
 
   const handleSignIn = async (provider: Provider, email?: string) => {
     setLoading(provider);
+
     const res = await signIn(provider, {
       redirectTo: "/latest",
       email,
     });
-
-    if (res) {
-      toast.success(`Successfully signed in with ${provider}`);
-    }
 
     setLoading(false);
   };

@@ -1,7 +1,8 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 
-import { eq, schema } from "@acme/db";
+import { eq } from "@acme/db";
+import { Flashcard } from "@acme/db/schema";
 import { EditFlashcardSchema } from "@acme/validators";
 
 import { protectedProcedure } from "../trpc";
@@ -13,9 +14,9 @@ export const flashcardRouter = {
       const { id, ...values } = input;
 
       const [flashcard] = await ctx.db
-        .update(schema.flashcards)
+        .update(Flashcard)
         .set(values)
-        .where(eq(schema.flashcards.id, id))
+        .where(eq(Flashcard.id, id))
         .returning();
 
       if (!flashcard) {

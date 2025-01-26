@@ -2,8 +2,16 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { Database } from "@acme/db";
-import { and, asc, count, desc, eq, inArray, not, schema } from "@acme/db";
+import type { Database } from "@acme/db/client";
+import { and, asc, count, desc, eq, inArray, not } from "@acme/db";
+import {
+  Flashcard,
+  Folder,
+  FoldersToStudySets,
+  StarredFlashcard,
+  StudySet,
+  User,
+} from "@acme/db/schema";
 import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
 
 import type { TRPCContext } from "../trpc";
@@ -12,36 +20,33 @@ import { protectedProcedure, publicProcedure } from "../trpc";
 export const selectStudySetList = (db: Database) =>
   db
     .select({
-      id: schema.studySets.id,
-      title: schema.studySets.title,
-      flashcardCount: count(schema.flashcards.id),
+      id: StudySet.id,
+      title: StudySet.title,
+      flashcardCount: count(Flashcard.id),
       user: {
-        id: schema.users.id,
-        name: schema.users.name,
-        image: schema.users.image,
+        id: User.id,
+        name: User.name,
+        image: User.image,
       },
     })
-    .from(schema.studySets)
-    .leftJoin(
-      schema.flashcards,
-      eq(schema.studySets.id, schema.flashcards.studySetId),
-    )
-    .innerJoin(schema.users, eq(schema.studySets.userId, schema.users.id))
-    .groupBy(schema.studySets.id, schema.users.id);
+    .from(StudySet)
+    .leftJoin(Flashcard, eq(StudySet.id, Flashcard.studySetId))
+    .innerJoin(User, eq(StudySet.userId, User.id))
+    .groupBy(StudySet.id, User.id);
 
 const selectStarredFlashcards = async (ctx: TRPCContext, studySetId: string) =>
   ctx.session
     ? await ctx.db
-        .select({ id: schema.flashcards.id })
-        .from(schema.flashcards)
+        .select({ id: Flashcard.id })
+        .from(Flashcard)
         .leftJoin(
-          schema.starredFlashcards,
-          eq(schema.flashcards.id, schema.starredFlashcards.flashcardId),
+          StarredFlashcard,
+          eq(Flashcard.id, StarredFlashcard.flashcardId),
         )
         .where(
           and(
-            eq(schema.starredFlashcards.userId, ctx.session.user.id),
-            eq(schema.flashcards.studySetId, studySetId),
+            eq(StarredFlashcard.userId, ctx.session.user.id),
+            eq(Flashcard.studySetId, studySetId),
           ),
         )
     : [];
@@ -50,23 +55,23 @@ export const studySetRouter = {
   popular: publicProcedure.query(async ({ ctx }) => {
     return await selectStudySetList(ctx.db)
       .limit(6)
-      .orderBy(desc(schema.studySets.createdAt));
+      .orderBy(desc(StudySet.createdAt));
   }),
   allByUser: publicProcedure
     .input(z.object({ userId: z.string(), limit: z.number().optional() }))
     .query(async ({ input, ctx }) => {
       return await selectStudySetList(ctx.db)
-        .where(eq(schema.studySets.userId, input.userId))
+        .where(eq(StudySet.userId, input.userId))
         .limit(input.limit ?? 0);
     }),
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const studySet = await ctx.db.query.studySets.findFirst({
-        where: eq(schema.studySets.id, input.id),
+      const studySet = await ctx.db.query.StudySet.findFirst({
+        where: eq(StudySet.id, input.id),
         with: {
           flashcards: {
-            orderBy: [asc(schema.flashcards.position)],
+            orderBy: [asc(Flashcard.position)],
           },
           user: true,
         },
@@ -83,32 +88,32 @@ export const studySetRouter = {
         .limit(4)
         .where(
           and(
-            eq(schema.studySets.userId, studySet.userId),
-            not(eq(schema.studySets.id, studySet.id)),
+            eq(StudySet.userId, studySet.userId),
+            not(eq(StudySet.id, studySet.id)),
           ),
         );
 
       const starredFlashcards = await selectStarredFlashcards(ctx, input.id);
 
-      const flashcards = studySet.flashcards.map((flashcard) => ({
+      const allFlashcards = studySet.flashcards.map((flashcard) => ({
         ...flashcard,
         starred: starredFlashcards.some((f) => f.id === flashcard.id),
       }));
 
-      const folders = await ctx.db
-        .select({ id: schema.folders.id })
-        .from(schema.folders)
+      const allFolders = await ctx.db
+        .select({ id: Folder.id })
+        .from(Folder)
         .leftJoin(
-          schema.foldersToStudySets,
-          eq(schema.folders.id, schema.foldersToStudySets.folderId),
+          FoldersToStudySets,
+          eq(Folder.id, FoldersToStudySets.folderId),
         )
-        .where(eq(schema.foldersToStudySets.studySetId, studySet.id));
+        .where(eq(FoldersToStudySets.studySetId, studySet.id));
 
       return {
         ...studySet,
         user: { ...studySet.user, studySets: otherSets },
-        flashcards,
-        folders,
+        flashcards: allFlashcards,
+        folders: allFolders,
       };
     }),
   create: protectedProcedure
@@ -117,7 +122,7 @@ export const studySetRouter = {
       const { title, description, flashcards } = input;
 
       const [newStudySet] = await ctx.db
-        .insert(schema.studySets)
+        .insert(StudySet)
         .values({
           title,
           description,
@@ -132,7 +137,7 @@ export const studySetRouter = {
         });
       }
 
-      await ctx.db.insert(schema.flashcards).values(
+      await ctx.db.insert(Flashcard).values(
         flashcards.map((flashcard) => ({
           ...flashcard,
           studySetId: newStudySet.id,
@@ -144,8 +149,8 @@ export const studySetRouter = {
   combine: protectedProcedure
     .input(z.object({ id: z.string(), studySets: z.array(z.string()) }))
     .mutation(async ({ ctx, input }) => {
-      const studySet = await ctx.db.query.studySets.findFirst({
-        where: eq(schema.studySets.id, input.id),
+      const studySet = await ctx.db.query.StudySet.findFirst({
+        where: eq(StudySet.id, input.id),
       });
 
       if (!studySet) {
@@ -153,7 +158,7 @@ export const studySetRouter = {
       }
 
       const [newStudySet] = await ctx.db
-        .insert(schema.studySets)
+        .insert(StudySet)
         .values({
           title: studySet.title,
           description: studySet.description,
@@ -168,14 +173,11 @@ export const studySetRouter = {
         });
       }
 
-      const flashcards = await ctx.db.query.flashcards.findMany({
-        where: inArray(schema.flashcards.studySetId, [
-          studySet.id,
-          ...input.studySets,
-        ]),
+      const flashcards = await ctx.db.query.Flashcard.findMany({
+        where: inArray(Flashcard.studySetId, [studySet.id, ...input.studySets]),
       });
 
-      await ctx.db.insert(schema.flashcards).values(
+      await ctx.db.insert(Flashcard).values(
         flashcards.map((card, index) => ({
           position: index + 1,
           studySetId: newStudySet.id,
@@ -192,12 +194,12 @@ export const studySetRouter = {
       const { id, title, description, flashcards } = input;
 
       const [updated] = await ctx.db
-        .update(schema.studySets)
+        .update(StudySet)
         .set({
           title,
           description,
         })
-        .where(eq(schema.studySets.id, id))
+        .where(eq(StudySet.id, id))
         .returning();
 
       if (!updated) {
@@ -208,8 +210,8 @@ export const studySetRouter = {
       }
 
       const currentFlashcards = (
-        await ctx.db.query.flashcards.findMany({
-          where: eq(schema.flashcards.studySetId, id),
+        await ctx.db.query.Flashcard.findMany({
+          where: eq(Flashcard.studySetId, id),
         })
       ).map((card) => card.id);
 
@@ -219,19 +221,16 @@ export const studySetRouter = {
 
       if (toDeleteIds.length > 0) {
         await ctx.db
-          .delete(schema.flashcards)
-          .where(inArray(schema.flashcards.id, toDeleteIds));
+          .delete(Flashcard)
+          .where(inArray(Flashcard.id, toDeleteIds));
       }
 
       const toUpdate = flashcards.filter(
-        (card) => card.id && currentFlashcards.indexOf(card.id) >= 0,
+        (card) => card.id && currentFlashcards.includes(card.id),
       );
 
       const promises = toUpdate.map((card) =>
-        ctx.db
-          .update(schema.flashcards)
-          .set(card)
-          .where(eq(schema.flashcards.id, card.id!)),
+        ctx.db.update(Flashcard).set(card).where(eq(Flashcard.id, card.id!)),
       );
 
       if (promises.length > 0) {
@@ -241,7 +240,7 @@ export const studySetRouter = {
       const toCreate = flashcards.filter((card) => card.id === undefined);
 
       if (toCreate.length > 0) {
-        await ctx.db.insert(schema.flashcards).values([
+        await ctx.db.insert(Flashcard).values([
           ...toCreate.map((flashcard) => ({
             ...flashcard,
             studySetId: id,
@@ -255,8 +254,8 @@ export const studySetRouter = {
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
       const [deleted] = await ctx.db
-        .delete(schema.studySets)
-        .where(eq(schema.studySets.id, input.id))
+        .delete(StudySet)
+        .where(eq(StudySet.id, input.id))
         .returning();
 
       return deleted;
@@ -268,8 +267,8 @@ export const studySetRouter = {
       }),
     )
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.flashcards.findMany({
-        where: eq(schema.flashcards.studySetId, input.id),
+      const flashcards = await ctx.db.query.Flashcard.findMany({
+        where: eq(Flashcard.studySetId, input.id),
       });
 
       const MAX_CARDS = 4;
@@ -289,8 +288,8 @@ export const studySetRouter = {
   learnCards: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.flashcards.findMany({
-        where: eq(schema.flashcards.studySetId, input.id),
+      const flashcards = await ctx.db.query.Flashcard.findMany({
+        where: eq(Flashcard.studySetId, input.id),
       });
 
       const starredFlashcards = await selectStarredFlashcards(ctx, input.id);
@@ -322,8 +321,8 @@ export const studySetRouter = {
   testCards: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.flashcards.findMany({
-        where: eq(schema.flashcards.studySetId, input.id),
+      const flashcards = await ctx.db.query.Flashcard.findMany({
+        where: eq(Flashcard.studySetId, input.id),
       });
 
       const flashcardsCopy = [...flashcards].sort(() => 0.5 - Math.random());
@@ -363,7 +362,7 @@ export const studySetRouter = {
       const trueOrFalse = flashcardsCopy.map((card) => {
         const otherCards = flashcards.filter((el) => el.id !== card.id);
         const randomFalseAnswer =
-          otherCards[Math.floor(Math.random() * otherCards.length)]!.definition;
+          otherCards[Math.floor(Math.random() * otherCards.length)]?.definition;
         const answer =
           Math.random() < 0.5 ? randomFalseAnswer : card.definition;
 

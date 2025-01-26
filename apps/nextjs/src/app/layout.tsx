@@ -18,10 +18,11 @@ import Navbar from "~/components/layout/navbar";
 import SignInDialog from "~/components/layout/sign-in-dialog";
 import FolderDialogProvider from "~/contexts/folder-dialog-context";
 import SignInDialogProvider from "~/contexts/sign-in-dialog-context";
+import { env } from "~/env";
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.VERCEL_ENV === "production"
+    env.NODE_ENV === "production"
       ? "https://turbo.t3.gg"
       : "http://localhost:3000",
   ),

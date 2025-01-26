@@ -13,7 +13,7 @@ export default async function layout({
   try {
     await api.studySet.byId({ id });
     return children;
-  } catch (error) {
+  } catch {
     notFound();
   }
 }

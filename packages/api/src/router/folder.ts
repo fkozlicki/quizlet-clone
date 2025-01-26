@@ -3,7 +3,8 @@ import { TRPCError } from "@trpc/server";
 import slugify from "slugify";
 import { z } from "zod";
 
-import { and, count, eq, schema } from "@acme/db";
+import { and, count, eq } from "@acme/db";
+import { Folder, FoldersToStudySets, StudySet } from "@acme/db/schema";
 import {
   AddSetSchema,
   CreateFolderSchema,
@@ -19,29 +20,26 @@ export const folderRouter = {
     .query(async ({ input, ctx }) => {
       return await ctx.db
         .select({
-          id: schema.folders.id,
-          name: schema.folders.name,
-          userId: schema.folders.userId,
-          slug: schema.folders.slug,
-          studySetsCount: count(schema.studySets),
+          id: Folder.id,
+          name: Folder.name,
+          userId: Folder.userId,
+          slug: Folder.slug,
+          studySetsCount: count(StudySet),
         })
-        .from(schema.folders)
+        .from(Folder)
         .leftJoin(
-          schema.foldersToStudySets,
-          eq(schema.foldersToStudySets.folderId, schema.folders.id),
+          FoldersToStudySets,
+          eq(FoldersToStudySets.folderId, Folder.id),
         )
-        .leftJoin(
-          schema.studySets,
-          eq(schema.studySets.id, schema.foldersToStudySets.studySetId),
-        )
-        .groupBy(schema.folders.id)
-        .where(eq(schema.folders.userId, input.userId));
+        .leftJoin(StudySet, eq(StudySet.id, FoldersToStudySets.studySetId))
+        .groupBy(Folder.id)
+        .where(eq(Folder.userId, input.userId));
     }),
   create: protectedProcedure
     .input(CreateFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const [folder] = await ctx.db
-        .insert(schema.folders)
+        .insert(Folder)
         .values({
           ...input,
           slug: slugify(input.name),
@@ -61,8 +59,8 @@ export const folderRouter = {
   bySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
-      const folder = await ctx.db.query.folders.findFirst({
-        where: eq(schema.folders.slug, input.slug),
+      const folder = await ctx.db.query.Folder.findFirst({
+        where: eq(Folder.slug, input.slug),
         with: {
           user: true,
         },
@@ -75,20 +73,20 @@ export const folderRouter = {
         });
       }
 
-      const studySets = await selectStudySetList(ctx.db)
+      const sets = await selectStudySetList(ctx.db)
         .leftJoin(
-          schema.foldersToStudySets,
-          eq(schema.studySets.id, schema.foldersToStudySets.studySetId),
+          FoldersToStudySets,
+          eq(StudySet.id, FoldersToStudySets.studySetId),
         )
-        .where(eq(schema.foldersToStudySets.folderId, folder.id))
-        .orderBy(schema.studySets.title);
+        .where(eq(FoldersToStudySets.folderId, folder.id))
+        .orderBy(StudySet.title);
 
-      return { ...folder, studySets };
+      return { ...folder, studySets: sets };
     }),
   addSet: protectedProcedure
     .input(AddSetSchema)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.insert(schema.foldersToStudySets).values({
+      return await ctx.db.insert(FoldersToStudySets).values({
         folderId: input.folderId,
         studySetId: input.studySetId,
       });
@@ -97,11 +95,11 @@ export const folderRouter = {
     .input(AddSetSchema)
     .mutation(async ({ input, ctx }) => {
       return await ctx.db
-        .delete(schema.foldersToStudySets)
+        .delete(FoldersToStudySets)
         .where(
           and(
-            eq(schema.foldersToStudySets.folderId, input.folderId),
-            eq(schema.foldersToStudySets.studySetId, input.studySetId),
+            eq(FoldersToStudySets.folderId, input.folderId),
+            eq(FoldersToStudySets.studySetId, input.studySetId),
           ),
         );
     }),
@@ -110,9 +108,9 @@ export const folderRouter = {
     .mutation(async ({ input, ctx }) => {
       const { id, ...values } = input;
       const [editedFolder] = await ctx.db
-        .update(schema.folders)
+        .update(Folder)
         .set(values)
-        .where(eq(schema.folders.id, id))
+        .where(eq(Folder.id, id))
         .returning();
 
       if (!editedFolder) {
@@ -127,8 +125,6 @@ export const folderRouter = {
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(schema.folders)
-        .where(eq(schema.folders.id, input.id));
+      return await ctx.db.delete(Folder).where(eq(Folder.id, input.id));
     }),
 } satisfies TRPCRouterRecord;

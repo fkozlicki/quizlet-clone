@@ -1,20 +1,19 @@
 import { relations } from "drizzle-orm";
-import { date, uuid } from "drizzle-orm/pg-core";
+import { date, pgTable, uuid } from "drizzle-orm/pg-core";
 
-import { pgTable } from "./_table";
-import { users } from "./auth";
+import { User } from "./user";
 
-export const activities = pgTable("activity", {
+export const Activity = pgTable("activities", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   date: date("date").notNull().defaultNow(),
   userId: uuid("user_id")
-    .references(() => users.id, { onDelete: "cascade" })
+    .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });
 
-export const activitiesRelations = relations(activities, ({ one }) => ({
-  user: one(users, {
-    fields: [activities.userId],
-    references: [users.id],
+export const ActivityRelations = relations(Activity, ({ one }) => ({
+  user: one(User, {
+    fields: [Activity.userId],
+    references: [User.id],
   }),
 }));

@@ -25,7 +25,9 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
           return;
         }
 
-        onChange && onChange(file, setCurrentFile);
+        if (onChange) {
+          onChange(file, setCurrentFile);
+        }
 
         setCurrentFile(file);
       },
@@ -52,7 +54,7 @@ const Dropzone = React.forwardRef<HTMLInputElement, DropzoneProps>(
               Drag &apos;n&apos; drop some files here, or click to select files
             </p>
           )}
-          {currentFile && <p>Uploaded file: {currentFile?.name}</p>}
+          {currentFile && <p>Uploaded file: {currentFile.name}</p>}
           {children}
         </CardContent>
       </Card>

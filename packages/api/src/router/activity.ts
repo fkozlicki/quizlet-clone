@@ -1,28 +1,35 @@
-import { eq, gte, schema } from "@acme/db";
+import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError } from "@trpc/server";
 
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { eq, gte } from "@acme/db";
+import { Activity } from "@acme/db/schema";
 
-export const activityRouter = createTRPCRouter({
+import { protectedProcedure } from "../trpc";
+
+export const activityRouter = {
   create: protectedProcedure.mutation(async ({ ctx }) => {
-    const today = new Date().toISOString().split("T")[0]!;
+    const today = new Date().toISOString().split("T")[0];
 
-    const existing = await ctx.db.query.activities.findFirst({
-      where: gte(schema.activities.date, today),
+    if (!today) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Missing date error",
+      });
+    }
+
+    const existing = await ctx.db.query.Activity.findFirst({
+      where: gte(Activity.date, today),
     });
 
     if (!existing) {
-      const activity = await ctx.db.insert(schema.activities).values({
+      return await ctx.db.insert(Activity).values({
         userId: ctx.session.user.id,
       });
-
-      return activity;
     }
   }),
   allByUser: protectedProcedure.query(async ({ ctx }) => {
-    const activity = await ctx.db.query.activities.findMany({
-      where: eq(schema.activities.userId, ctx.session.user.id),
+    return await ctx.db.query.Activity.findMany({
+      where: eq(Activity.userId, ctx.session.user.id),
     });
-
-    return activity;
   }),
-});
+} satisfies TRPCRouterRecord;
