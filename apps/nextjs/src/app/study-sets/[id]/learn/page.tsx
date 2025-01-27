@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import React from "react";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import SuperJSON from "superjson";
 
-import { appRouter } from "@acme/api";
 import { auth } from "@acme/auth";
 
 import LearnMode from "~/components/learn-mode/learn-mode";
-import { api, createContext } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
 
 interface LearnModeProps {
   params: { id: string };
@@ -29,21 +24,14 @@ export default async function Learn({
 }: {
   params: { id: string };
 }) {
-  const helper = createServerSideHelpers({
-    router: appRouter,
-    ctx: await createContext(),
-    transformer: SuperJSON,
-  });
-  await helper.studySet.learnCards.prefetch({ id });
+  await api.studySet.learnCards.prefetch({ id });
   const session = await auth();
 
-  const state = dehydrate(helper.queryClient);
-
   return (
-    <HydrationBoundary state={state}>
+    <HydrateClient>
       <div className="m-auto max-w-3xl">
         <LearnMode session={session} />
       </div>
-    </HydrationBoundary>
+    </HydrateClient>
   );
 }

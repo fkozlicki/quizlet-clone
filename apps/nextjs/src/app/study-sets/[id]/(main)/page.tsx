@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import SuperJSON from "superjson";
 
-import { appRouter } from "@acme/api";
 import { auth } from "@acme/auth";
 import { Button } from "@acme/ui/button";
 
@@ -15,7 +11,9 @@ import StudyModes from "~/components/study-set/study-modes";
 import StudySetCTA from "~/components/study-set/study-set-cta";
 import StudySetFlashcards from "~/components/study-set/study-set-flashcards";
 import StudySetInfo from "~/components/study-set/study-set-info";
-import { api, createContext } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
+
+export const dynamic = "force-cache";
 
 interface StudySetProps {
   params: { id: string };
@@ -33,24 +31,17 @@ export async function generateMetadata({
 
 export default async function StudySet({ params: { id } }: StudySetProps) {
   const session = await auth();
-  const helper = createServerSideHelpers({
-    router: appRouter,
-    ctx: await createContext(),
-    transformer: SuperJSON,
-  });
-  await helper.studySet.byId.prefetch({ id });
+  await api.studySet.byId.prefetch({ id });
 
   if (session) {
-    await helper.folder.allByUser.prefetch({ userId: session.user.id });
-    await helper.studySet.allByUser.prefetch({ userId: session.user.id });
+    await api.folder.allByUser.prefetch({ userId: session.user.id });
+    await api.studySet.allByUser.prefetch({ userId: session.user.id });
   }
-
-  const state = dehydrate(helper.queryClient);
 
   const { userId, user } = await api.studySet.byId({ id });
 
   return (
-    <HydrationBoundary state={state}>
+    <HydrateClient>
       <div className="m-auto max-w-3xl">
         <StudySetInfo />
         <StudyModes studySetId={id} />
@@ -71,6 +62,6 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
           <OtherStudySets studySets={user.studySets} />
         )}
       </div>
-    </HydrationBoundary>
+    </HydrateClient>
   );
 }

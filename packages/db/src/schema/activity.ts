@@ -6,7 +6,7 @@ import { User } from "./user";
 export const Activity = pgTable("activities", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   date: date("date").notNull().defaultNow(),
-  userId: uuid("user_id")
+  userId: uuid("userId")
     .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });

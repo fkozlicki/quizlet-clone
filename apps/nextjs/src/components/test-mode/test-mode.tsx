@@ -64,7 +64,7 @@ const TestMode = () => {
   };
 
   const backToStudySet = () => {
-    router.push(`/study-set/${id}`);
+    router.push(`/study-sets/${id}`);
   };
 
   return (

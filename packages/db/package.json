@@ -20,32 +20,31 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
-    "clean": "rm -rf .turbo node_modules",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "push": "pnpm with-env drizzle-kit push",
     "studio": "pnpm with-env drizzle-kit studio",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false",
-    "with-env": "dotenv -e ../../.env --",
-    "migrate": "drizzle-kit generate"
+    "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
-    "bcrypt": "^5.1.1",
+    "@vercel/postgres": "^0.10.0",
     "drizzle-orm": "^0.38.4",
-    "pg": "^8.11.4"
+    "drizzle-zod": "^0.6.1",
+    "pg": "^8.13.1",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@acme/eslint-config": "workspace:*",
     "@acme/prettier-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@types/bcrypt": "^5.0.2",
-    "@types/pg": "^8.11.4",
-    "dotenv-cli": "^7.4.1",
+    "@types/pg": "^8.11.11",
+    "dotenv-cli": "^8.0.0",
     "drizzle-kit": "^0.30.2",
     "eslint": "catalog:",
-    "mysql2": "^3.9.2",
     "prettier": "catalog:",
     "typescript": "catalog:"
   },

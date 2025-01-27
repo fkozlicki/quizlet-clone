@@ -1,5 +1,7 @@
 "use client";
 
+import type { PropsWithChildren } from "react";
+
 import {
   Dialog,
   DialogContent,
@@ -9,9 +11,9 @@ import {
 } from "@acme/ui/dialog";
 
 import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
-import SignInForm from "./sign-in-form";
+import SignInWithEmail from "./sign-in-with-email";
 
-const SignInDialog = () => {
+const SignInDialog = ({ children }: PropsWithChildren) => {
   const { open, onOpenChange } = useSignInDialogContext();
 
   return (
@@ -24,7 +26,15 @@ const SignInDialog = () => {
             remove your account.
           </DialogDescription>
         </DialogHeader>
-        <SignInForm />
+        <div>
+          {children}
+          <div className="my-4 flex items-center gap-4">
+            <div className="h-px flex-1 bg-border"></div>
+            <span className="text-sm text-muted-foreground">OR</span>
+            <div className="h-px flex-1 bg-border"></div>
+          </div>
+          <SignInWithEmail />
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -46,12 +46,12 @@
     }
   },
   "globalEnv": [
-    "DATABASE_URL",
-    "AUTH_GOOGLE_ID",
+    "POSTGRES_URL",
     "AUTH_GOOGLE_SECRET",
+    "AUTH_GOOGLE_ID",
     "AUTH_GITHUB_ID",
     "AUTH_GITHUB_SECRET",
-    "AUTH_EMAIL_SERVER",
+    "AUTH_RESEND_KEY",
     "AUTH_EMAIL_FROM",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",

@@ -5,12 +5,12 @@ import { Folder } from "./folder";
 import { StudySet } from "./studySet";
 
 export const FoldersToStudySets = pgTable(
-  "folders_to_study_sets",
+  "folderToStudySet",
   {
-    folderId: uuid("folder_id")
+    folderId: uuid("folderId")
       .notNull()
       .references(() => Folder.id, { onDelete: "cascade" }),
-    studySetId: uuid("study_set_id")
+    studySetId: uuid("studySetId")
       .notNull()
       .references(() => StudySet.id, { onDelete: "cascade" }),
   },
@@ -19,7 +19,7 @@ export const FoldersToStudySets = pgTable(
   }),
 );
 
-export const FoldersToStudySetsRelations = relations(
+export const FolderToStudySetRelations = relations(
   FoldersToStudySets,
   ({ one }) => ({
     folder: one(Folder, {

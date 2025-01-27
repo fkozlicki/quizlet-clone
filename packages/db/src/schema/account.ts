@@ -11,7 +11,7 @@ import {
 import { User } from "./user";
 
 export const Account = pgTable(
-  "accounts",
+  "account",
   {
     userId: uuid("userId").notNull(),
     type: varchar("type", { length: 255 })

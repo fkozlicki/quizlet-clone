@@ -16,6 +16,7 @@ import CreateActivity from "~/components/layout/create-activity";
 import CreateFolderDialog from "~/components/layout/create-folder-dialog";
 import Navbar from "~/components/layout/navbar";
 import SignInDialog from "~/components/layout/sign-in-dialog";
+import SignInWithOauth from "~/components/layout/sign-in-with-oauth";
 import FolderDialogProvider from "~/contexts/folder-dialog-context";
 import SignInDialogProvider from "~/contexts/sign-in-dialog-context";
 import { env } from "~/env";
@@ -70,7 +71,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                     <CreateFolderDialog />
                   </>
                 )}
-                {!session && <SignInDialog />}
+                {!session && (
+                  <SignInDialog>
+                    <SignInWithOauth />
+                  </SignInDialog>
+                )}
               </TRPCReactProvider>
             </ThemeProvider>
           </FolderDialogProvider>

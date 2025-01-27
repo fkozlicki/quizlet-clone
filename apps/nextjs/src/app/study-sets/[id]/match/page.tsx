@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import React from "react";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import { createServerSideHelpers } from "@trpc/react-query/server";
-import SuperJSON from "superjson";
-
-import { appRouter } from "@acme/api";
 
 import MatchGame from "~/components/match-mode/match-game";
-import { api, createContext } from "~/trpc/server";
+import { api, HydrateClient } from "~/trpc/server";
 
 interface MatchModeProps {
   params: { id: string };
@@ -28,17 +22,11 @@ export default async function MatchMode({
 }: {
   params: { id: string };
 }) {
-  const helper = createServerSideHelpers({
-    router: appRouter,
-    ctx: await createContext(),
-    transformer: SuperJSON,
-  });
-  await helper.studySet.matchCards.prefetch({ id });
-  const state = dehydrate(helper.queryClient);
+  await api.studySet.matchCards.prefetch({ id });
 
   return (
-    <HydrationBoundary state={state}>
+    <HydrateClient>
       <MatchGame />
-    </HydrationBoundary>
+    </HydrateClient>
   );
 }

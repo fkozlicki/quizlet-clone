@@ -7,10 +7,10 @@ import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import Nodemailer from "next-auth/providers/nodemailer";
+import Resend from "next-auth/providers/resend";
 
 import { db } from "@acme/db/client";
-import { Account, Session, User, VerificationToken } from "@acme/db/schema";
+import { Account, Session, User } from "@acme/db/schema";
 
 import { env } from "../env";
 
@@ -26,7 +26,6 @@ const adapter = DrizzleAdapter(db, {
   usersTable: User,
   accountsTable: Account,
   sessionsTable: Session,
-  verificationTokensTable: VerificationToken,
 });
 
 export const isSecureContext = env.NODE_ENV !== "development";
@@ -44,8 +43,8 @@ export const authConfig = {
   providers: [
     Google,
     Github,
-    Nodemailer({
-      server: env.AUTH_EMAIL_SERVER,
+    Resend({
+      apiKey: env.AUTH_RESEND_KEY,
       from: env.AUTH_EMAIL_FROM,
     }),
   ],

@@ -3,11 +3,11 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 import * as schema from "./schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error("Missing process.env.DATABASE_URL");
+if (!process.env.POSTGRES_URL) {
+  throw new Error("Missing process.env.POSTGRES_URL");
 }
 
-let url = process.env.DATABASE_URL;
+let url = process.env.POSTGRES_URL;
 if (process.env.NODE_ENV === "development") {
   url = "postgres://postgres:postgres@db.localtest.me:5432/main";
   neonConfig.fetchEndpoint = (host) => {

@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "nitro build",
-    "clean": "rm -rf .turbo node_modules",
-    "dev": "nitro dev --port 3001",
+    "clean": "git clean -xdf .cache .nitro .output .turbo .vercel node_modules",
     "lint": "eslint",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "typecheck": "tsc --noEmit"
@@ -18,9 +17,9 @@
     "@acme/prettier-config": "workspace:*",
     "@acme/tailwind-config": "workspace:*",
     "@acme/tsconfig": "workspace:*",
-    "@types/node": "^20.17.7",
+    "@types/node": "^22.10.10",
     "eslint": "catalog:",
-    "h3": "^1.13.0",
+    "h3": "^1.14.0",
     "nitropack": "^2.10.4",
     "prettier": "catalog:",
     "typescript": "catalog:"

@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import type { Session } from "@acme/auth";
-import { signOut } from "@acme/auth/react";
+import { signOut } from "@acme/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@acme/ui/avatar";
 import {
   DropdownMenu,
@@ -37,7 +37,20 @@ const UserDropdown = ({ user }: { user: Session["user"] }) => {
         <Link href="/settings#dark-mode">
           <DropdownMenuItem>Dark mode</DropdownMenuItem>
         </Link>
-        <DropdownMenuItem onClick={() => signOut()}>Sign out</DropdownMenuItem>
+        <form>
+          <DropdownMenuItem asChild>
+            <button
+              className="w-full"
+              formAction={async () => {
+                "use server";
+                await signOut();
+              }}
+            >
+              Sign out
+            </button>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild></DropdownMenuItem>
+        </form>
       </DropdownMenuContent>
     </DropdownMenu>
   );

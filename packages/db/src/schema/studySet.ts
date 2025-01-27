@@ -5,7 +5,7 @@ import { Flashcard } from "./flashcard";
 import { FoldersToStudySets } from "./folderToStudySet";
 import { User } from "./user";
 
-export const StudySet = pgTable("study_sets", {
+export const StudySet = pgTable("studySet", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   title: text("title").notNull(),
   description: text("description"),

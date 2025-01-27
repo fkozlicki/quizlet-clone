@@ -7,7 +7,7 @@ export const env = createEnv({
     AUTH_GOOGLE_SECRET: z.string().min(1),
     AUTH_GITHUB_ID: z.string().min(1),
     AUTH_GITHUB_SECRET: z.string().min(1),
-    AUTH_EMAIL_SERVER: z.string().min(1),
+    AUTH_RESEND_KEY: z.string().min(1),
     AUTH_EMAIL_FROM: z.string().min(1),
     AUTH_SECRET:
       process.env.NODE_ENV === "production"
@@ -17,5 +17,6 @@ export const env = createEnv({
   },
   client: {},
   experimental__runtimeEnv: {},
-  skipValidation: !!process.env.CI || !!process.env.SKIP_ENV_VALIDATION,
+  skipValidation:
+    !!process.env.CI || process.env.npm_lifecycle_event === "lint",
 });

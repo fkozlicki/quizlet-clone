@@ -4,7 +4,6 @@ import { useState } from "react";
 import { LoaderIcon } from "lucide-react";
 import { z } from "zod";
 
-import { signIn } from "@acme/auth/react";
 import { Button } from "@acme/ui/button";
 import {
   Form,
@@ -15,8 +14,8 @@ import {
   useForm,
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
-import { toast } from "@acme/ui/toast";
 
+import { signInAction } from "~/actions/sign-in-action";
 import GithubIcon from "../icons/github";
 import GoogleIcon from "../icons/google";
 
@@ -26,7 +25,7 @@ const signInSchema = z.object({
 
 type SignInValues = z.infer<typeof signInSchema>;
 
-type Provider = "google" | "github" | "nodemailer";
+type Provider = "google" | "github" | "resend";
 
 const SignInForm = () => {
   const [loading, setLoading] = useState<Provider | false>(false);
@@ -41,7 +40,7 @@ const SignInForm = () => {
   const handleSignIn = async (provider: Provider, email?: string) => {
     setLoading(provider);
 
-    const res = await signIn(provider, {
+    await signInAction(provider, {
       redirectTo: "/latest",
       email,
     });
@@ -50,7 +49,7 @@ const SignInForm = () => {
   };
 
   const onSubmit = ({ email }: SignInValues) => {
-    void handleSignIn("nodemailer", email);
+    void handleSignIn("resend", email);
   };
 
   return (
@@ -116,7 +115,7 @@ const SignInForm = () => {
                   className="w-full"
                   disabled={loading !== false}
                 >
-                  {loading === "nodemailer" ? (
+                  {loading === "resend" ? (
                     <LoaderIcon size={20} className="animate-spin" />
                   ) : (
                     "Sign In"

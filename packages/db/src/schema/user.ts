@@ -7,7 +7,7 @@ import { Folder } from "./folder";
 import { StarredFlashcard } from "./starredFlashcard";
 import { StudySet } from "./studySet";
 
-export const User = pgTable("users", {
+export const User = pgTable("user", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: varchar("name", { length: 255 }),
   email: varchar("email", { length: 255 }).notNull(),

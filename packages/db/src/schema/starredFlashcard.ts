@@ -5,12 +5,12 @@ import { Flashcard } from "./flashcard";
 import { User } from "./user";
 
 export const StarredFlashcard = pgTable(
-  "starred_flashcards",
+  "starredFlashcard",
   {
-    userId: uuid("user_id")
+    userId: uuid("userId")
       .references(() => User.id, { onDelete: "cascade" })
       .notNull(),
-    flashcardId: integer("flashcard_id")
+    flashcardId: integer("flashcardId")
       .references(() => Flashcard.id, { onDelete: "cascade" })
       .notNull(),
   },
