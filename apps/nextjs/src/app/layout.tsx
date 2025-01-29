@@ -65,13 +65,12 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                   {props.children}
                 </main>
                 <Toaster />
-                {session && (
+                {session ? (
                   <>
                     <CreateActivity />
                     <CreateFolderDialog />
                   </>
-                )}
-                {!session && (
+                ) : (
                   <SignInDialog>
                     <SignInWithOauth />
                   </SignInDialog>

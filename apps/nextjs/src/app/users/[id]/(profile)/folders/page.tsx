@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { auth } from "@acme/auth";
 
-import FolderSkeleton from "~/components/folder/folder-skeleton";
+import FolderSkeletonGrid from "~/components/folder/folder-skeleton-grid";
 import UserFolders from "~/components/user/user-folders";
 import { api } from "~/trpc/server";
 
@@ -32,16 +32,7 @@ export default async function Page({ params: { id } }: UserFoldersProps) {
       <h1 className="mb-6 text-2xl font-bold">
         {session?.user.id === id ? "Your" : `${user.name}'s`} folders
       </h1>
-      <Suspense
-        fallback={
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <FolderSkeleton />
-            <FolderSkeleton />
-            <FolderSkeleton />
-            <FolderSkeleton />
-          </div>
-        }
-      >
+      <Suspense fallback={<FolderSkeletonGrid />}>
         <UserFolders userId={id} promise={folders} />
       </Suspense>
     </>

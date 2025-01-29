@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import React from "react";
 import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";

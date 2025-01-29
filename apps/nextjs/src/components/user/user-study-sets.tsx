@@ -1,27 +1,18 @@
 "use client";
 
-import React, { use } from "react";
+import { Suspense } from "react";
 
-import type { RouterOutputs } from "@acme/api";
 import Empty from "@acme/ui/empty";
 
 import { api } from "~/trpc/react";
 import StudySetCard from "../shared/study-set-card";
+import StudySetSkeletonGrid from "../shared/study-set-skeleton-grid";
 
-const UserStudySets = ({
-  promise,
-  userId,
-}: {
-  userId: string;
-  promise: Promise<RouterOutputs["studySet"]["allByUser"]>;
-}) => {
-  const initialData = use(promise);
-  const { data: studySets } = api.studySet.allByUser.useQuery(
-    { userId, limit: 6 },
-    {
-      initialData,
-    },
-  );
+const UserStudySetsGrid = ({ userId }: { userId: string }) => {
+  const [studySets] = api.studySet.allByUser.useSuspenseQuery({
+    userId,
+    limit: 6,
+  });
 
   if (studySets.length === 0) {
     return <Empty message="You have no study sets yet" />;
@@ -33,6 +24,17 @@ const UserStudySets = ({
         <StudySetCard key={set.id} studySet={set} />
       ))}
     </div>
+  );
+};
+
+const UserStudySets = ({ userId }: { userId: string }) => {
+  return (
+    <>
+      <h1 className="mb-6 text-2xl font-bold">Your study sets</h1>
+      <Suspense fallback={<StudySetSkeletonGrid />}>
+        <UserStudySetsGrid userId={userId} />
+      </Suspense>
+    </>
   );
 };
 

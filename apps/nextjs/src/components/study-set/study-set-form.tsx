@@ -58,16 +58,16 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const router = useRouter();
   const utils = api.useUtils();
   const create = api.studySet.create.useMutation({
-    async onSuccess() {
+    onSuccess() {
       void utils.studySet.invalidate();
       form.reset();
       router.push("/latest");
     },
   });
   const edit = api.studySet.edit.useMutation({
-    async onSuccess(data) {
+    onSuccess(data) {
       void utils.studySet.invalidate();
-      router.push(`/study-sets/${data?.id}`);
+      router.push(`/study-sets/${data.id}`);
     },
   });
   const [active, setActive] = useState(0);
@@ -186,7 +186,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                 >
                   <Card>
                     <CardHeader className="pb-4">
-                      <div className="flex items-center justify-between ">
+                      <div className="flex items-center justify-between">
                         <span>{index + 1}</span>
                         <Button
                           type="button"

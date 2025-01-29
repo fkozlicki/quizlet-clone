@@ -3,7 +3,7 @@ import { Suspense } from "react";
 
 import { auth } from "@acme/auth";
 
-import StudySetSkeleton from "~/components/shared/study-set-skeleton";
+import StudySetSkeletonGrid from "~/components/shared/study-set-skeleton-grid";
 import UserStudySets from "~/components/user/user-study-sets";
 import { api } from "~/trpc/server";
 
@@ -33,16 +33,7 @@ export default async function Page({ params: { id } }: UserStudySetsProps) {
         {session?.user.id === id ? "Your" : `${user.name}'s`} study sets
       </h1>
 
-      <Suspense
-        fallback={
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-            <StudySetSkeleton />
-            <StudySetSkeleton />
-            <StudySetSkeleton />
-            <StudySetSkeleton />
-          </div>
-        }
-      >
+      <Suspense fallback={<StudySetSkeletonGrid />}>
         <UserStudySets userId={id} promise={studySets} />
       </Suspense>
     </>
