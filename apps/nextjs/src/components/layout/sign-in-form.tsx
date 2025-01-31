@@ -15,9 +15,9 @@ import {
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 
-import { signInAction } from "~/actions/sign-in-action";
 import GithubIcon from "../icons/github";
 import GoogleIcon from "../icons/google";
+import { signInAction } from "./sign-in-action";
 
 const signInSchema = z.object({
   email: z.string().min(1, "Enter your email").email(),

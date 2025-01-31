@@ -44,7 +44,7 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
   });
   const utils = api.useUtils();
   const { mutate, isPending } = api.flashcard.edit.useMutation({
-    async onSuccess() {
+    onSuccess() {
       setOpen(false);
       void utils.studySet.byId.invalidate({ id });
     },
@@ -54,7 +54,7 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
     form.reset(flashcard);
   }, [flashcard]);
 
-  const stopPropagation = (
+  const handleStopPropagation = (
     event: MouseEvent<HTMLElement, globalThis.MouseEvent>,
   ) => {
     event.stopPropagation();
@@ -68,7 +68,7 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          onClick={stopPropagation}
+          onClick={handleStopPropagation}
           className="rounded-full"
           variant="ghost"
           size="icon"

@@ -39,11 +39,8 @@ const StudySetOptionsDropdown = ({
   const [exportDialogOpen, setExportDialogOpen] = useState<boolean>(false);
   const [combineDialogOpen, setCombineDialogOpen] = useState<boolean>(false);
   const utils = api.useUtils();
-  const studySet = utils.studySet.byId.getData({ id });
-  const printRef = useRef<HTMLDivElement>(null);
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-  });
+  const contentRef = useRef<HTMLDivElement>(null);
+  const handlePrint = useReactToPrint({ contentRef });
 
   const openCombineDialog = () => {
     setCombineDialogOpen(true);
@@ -56,6 +53,8 @@ const StudySetOptionsDropdown = ({
   const openExportDialog = () => {
     setExportDialogOpen(true);
   };
+
+  const studySet = utils.studySet.byId.getData({ id });
 
   return (
     <>
@@ -75,7 +74,7 @@ const StudySetOptionsDropdown = ({
               Combine
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onClick={handlePrint}>
+          <DropdownMenuItem onClick={() => handlePrint()}>
             <PrinterIcon size={16} className="mr-2" />
             Print
           </DropdownMenuItem>
@@ -109,7 +108,7 @@ const StudySetOptionsDropdown = ({
           onOpenChange={setDeleteDialogOpen}
         />
       )}
-      {studySet && <StudySetToPrint ref={printRef} studySet={studySet} />}
+      {studySet && <StudySetToPrint ref={contentRef} studySet={studySet} />}
     </>
   );
 };

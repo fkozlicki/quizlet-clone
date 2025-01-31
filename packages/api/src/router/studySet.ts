@@ -362,7 +362,8 @@ export const studySetRouter = {
       const trueOrFalse = flashcardsCopy.map((card) => {
         const otherCards = flashcards.filter((el) => el.id !== card.id);
         const randomFalseAnswer =
-          otherCards[Math.floor(Math.random() * otherCards.length)]?.definition;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          otherCards[Math.floor(Math.random() * otherCards.length)]!.definition;
         const answer =
           Math.random() < 0.5 ? randomFalseAnswer : card.definition;
 

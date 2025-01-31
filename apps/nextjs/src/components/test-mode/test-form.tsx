@@ -18,17 +18,13 @@ const flashcard = z.object({
   position: z.number(),
 });
 
-const trueOrFalse = z
-  .object({
-    answer: z.string(),
-  })
-  .merge(flashcard);
+const trueOrFalse = flashcard.extend({
+  answer: z.string(),
+});
 
-const multipleChoice = z
-  .object({
-    answers: z.array(z.string()),
-  })
-  .merge(flashcard);
+const multipleChoice = flashcard.extend({
+  answers: z.array(z.string()),
+});
 
 const testSchema = z.object({
   trueOrFalse: z.array(trueOrFalse),
@@ -42,15 +38,14 @@ interface TestFormProps {
 }
 
 const TestForm = ({ test, onSubmit }: TestFormProps) => {
-  const initialData = Object.fromEntries(
-    Object.entries(test).map((entry) => [
-      entry[0],
-      entry[1].map((question) => ({ ...question, userAnswer: "" })),
-    ]),
-  );
+  const initalData = {
+    multipleChoice: test.multipleChoice.map((i) => ({ ...i, userAnswer: "" })),
+    trueOrFalse: test.trueOrFalse.map((i) => ({ ...i, userAnswer: "" })),
+    written: test.written.map((i) => ({ ...i, userAnswer: "" })),
+  };
   const form = useForm({
     schema: testSchema,
-    defaultValues: initialData,
+    defaultValues: initalData,
   });
   const { fields: multipleChoice } = useFieldArray({
     control: form.control,

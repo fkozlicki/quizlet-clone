@@ -27,10 +27,16 @@ const UserStudySetsGrid = ({ userId }: { userId: string }) => {
   );
 };
 
-const UserStudySets = ({ userId }: { userId: string }) => {
+const UserStudySets = ({
+  userId,
+  title = "Your study sets",
+}: {
+  userId: string;
+  title?: string;
+}) => {
   return (
     <>
-      <h1 className="mb-6 text-2xl font-bold">Your study sets</h1>
+      <h1 className="mb-6 text-2xl font-bold">{title}</h1>
       <Suspense fallback={<StudySetSkeletonGrid />}>
         <UserStudySetsGrid userId={userId} />
       </Suspense>
