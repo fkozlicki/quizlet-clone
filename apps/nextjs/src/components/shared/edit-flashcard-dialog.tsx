@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Edit, LoaderCircle } from "lucide-react";
 
-import type { Flashcard } from "@acme/db";
+import { RouterOutputs } from "@acme/api";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
@@ -32,7 +32,7 @@ import { EditFlashcardSchema } from "@acme/validators";
 import { api } from "~/trpc/react";
 
 interface EditFlashcardDialogProps {
-  flashcard: Omit<Flashcard, "studySetId" | "position">;
+  flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][number];
 }
 
 const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {

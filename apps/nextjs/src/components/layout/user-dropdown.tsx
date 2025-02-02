@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
+import Image from "next/image";
 
 const UserDropdown = ({ user }: { user: Session["user"] }) => {
   const { id, image, name, email } = user;
@@ -19,7 +20,14 @@ const UserDropdown = ({ user }: { user: Session["user"] }) => {
     <DropdownMenu>
       <DropdownMenuTrigger className="outline-none">
         <Avatar>
-          <AvatarImage src={image ?? undefined} alt="" />
+          {image && (
+            <AvatarImage
+              src={image}
+              alt={name ?? "user avatar"}
+              width={32}
+              height={32}
+            />
+          )}
           <AvatarFallback>{name?.at(0) ?? "U"}</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
