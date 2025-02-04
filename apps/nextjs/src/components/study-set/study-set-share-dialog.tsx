@@ -1,23 +1,29 @@
 "use client";
 
-import React from "react";
 import { Copy, Share } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@acme/ui/dialog";
 import { Input } from "@acme/ui/input";
-import { Label } from "@acme/ui/label";
+import { toast } from "@acme/ui/toast";
+
+import { getAppUrl } from "~/utils/get-url";
 
 const StudySetShareDialog = ({ id }: { id: string }) => {
+  const url = `${getAppUrl()}/study-sets/${id}`;
+
+  const onCopy = async () => {
+    await navigator.clipboard.writeText(url);
+    toast.success("Copied");
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -33,28 +39,12 @@ const StudySetShareDialog = ({ id }: { id: string }) => {
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-2">
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="link" className="sr-only">
-              Link
-            </Label>
-            <Input
-              id="link"
-              defaultValue={`${location.origin}/study-sets/${id}`}
-              readOnly
-            />
-          </div>
-          <Button type="submit" size="sm" className="px-3">
+          <Input id="link" defaultValue={url} readOnly autoFocus={false} />
+          <Button onClick={onCopy} type="submit" size="icon" className="px-3">
             <span className="sr-only">Copy</span>
             <Copy className="h-4 w-4" />
           </Button>
         </div>
-        <DialogFooter className="sm:justify-start">
-          <DialogClose asChild>
-            <Button type="button" variant="secondary">
-              Close
-            </Button>
-          </DialogClose>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
