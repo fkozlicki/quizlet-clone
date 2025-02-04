@@ -5,12 +5,12 @@ import { Flashcard } from "./flashcard";
 import { FoldersToStudySets } from "./folderToStudySet";
 import { User } from "./user";
 
-export const StudySet = pgTable("studySet", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  title: text("title").notNull(),
-  description: text("description"),
-  createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
-  userId: uuid("user_id")
+export const StudySet = pgTable("study_set", {
+  id: uuid().notNull().primaryKey().defaultRandom(),
+  title: text().notNull(),
+  description: text(),
+  createdAt: timestamp({ mode: "date" }).notNull().defaultNow(),
+  userId: uuid()
     .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });

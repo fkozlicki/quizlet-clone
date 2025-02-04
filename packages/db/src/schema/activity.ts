@@ -3,10 +3,10 @@ import { date, pgTable, uuid } from "drizzle-orm/pg-core";
 
 import { User } from "./user";
 
-export const Activity = pgTable("activities", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  date: date("date").notNull().defaultNow(),
-  userId: uuid("userId")
+export const Activity = pgTable("activity", {
+  id: uuid().notNull().primaryKey().defaultRandom(),
+  date: date().notNull().defaultNow(),
+  userId: uuid()
     .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });

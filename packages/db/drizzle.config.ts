@@ -10,5 +10,5 @@ export default {
   dbCredentials: {
     url: process.env.POSTGRES_URL,
   },
-  casing: "camelCase",
+  casing: "snake_case",
 } satisfies Config;

@@ -8,13 +8,13 @@ import { StarredFlashcard } from "./starredFlashcard";
 import { StudySet } from "./studySet";
 
 export const User = pgTable("user", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  name: varchar("name", { length: 255 }),
-  email: varchar("email", { length: 255 }).notNull(),
-  emailVerified: timestamp("emailVerified", {
+  id: uuid().notNull().primaryKey().defaultRandom(),
+  name: varchar({ length: 255 }),
+  email: varchar({ length: 255 }).notNull(),
+  emailVerified: timestamp({
     mode: "date",
   }).default(sql`CURRENT_TIMESTAMP(3)`),
-  image: varchar("image", { length: 255 }),
+  image: varchar({ length: 255 }),
 });
 
 export const UserRelations = relations(User, ({ many }) => ({

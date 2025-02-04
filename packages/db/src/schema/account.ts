@@ -13,19 +13,19 @@ import { User } from "./user";
 export const Account = pgTable(
   "account",
   {
-    userId: uuid("userId").notNull(),
-    type: varchar("type", { length: 255 })
+    userId: uuid().notNull(),
+    type: varchar({ length: 255 })
       .$type<"oauth" | "oidc" | "email">()
       .notNull(),
-    provider: varchar("provider", { length: 255 }).notNull(),
-    providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
-    refresh_token: varchar("refresh_token", { length: 255 }),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: varchar("token_type", { length: 255 }),
-    scope: varchar("scope", { length: 255 }),
-    id_token: text("id_token"),
-    session_state: varchar("session_state", { length: 255 }),
+    provider: varchar({ length: 255 }).notNull(),
+    providerAccountId: varchar({ length: 255 }).notNull(),
+    refresh_token: varchar({ length: 255 }),
+    access_token: text(),
+    expires_at: integer(),
+    token_type: varchar({ length: 255 }),
+    scope: varchar({ length: 255 }),
+    id_token: text(),
+    session_state: varchar({ length: 255 }),
   },
   (account) => ({
     compoundKey: primaryKey({

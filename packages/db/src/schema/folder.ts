@@ -5,11 +5,11 @@ import { FoldersToStudySets } from "./folderToStudySet";
 import { User } from "./user";
 
 export const Folder = pgTable("folder", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  description: text("description"),
-  slug: text("slug").notNull(),
-  userId: uuid("userId")
+  id: uuid().notNull().primaryKey().defaultRandom(),
+  name: text().notNull(),
+  description: text(),
+  slug: text().notNull(),
+  userId: uuid()
     .references(() => User.id, { onDelete: "cascade" })
     .notNull(),
 });

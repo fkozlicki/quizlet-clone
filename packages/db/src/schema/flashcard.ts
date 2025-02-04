@@ -5,11 +5,11 @@ import { StarredFlashcard } from "./starredFlashcard";
 import { StudySet } from "./studySet";
 
 export const Flashcard = pgTable("flashcard", {
-  id: serial("id").notNull().primaryKey(),
-  term: text("term").notNull().default(""),
-  definition: text("definition").notNull().default(""),
-  position: integer("position").notNull(),
-  studySetId: uuid("studySetId")
+  id: serial().notNull().primaryKey(),
+  term: text().notNull().default(""),
+  definition: text().notNull().default(""),
+  position: integer().notNull(),
+  studySetId: uuid()
     .references(() => StudySet.id, { onDelete: "cascade" })
     .notNull(),
 });

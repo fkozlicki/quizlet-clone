@@ -18,6 +18,6 @@ if (process.env.NODE_ENV === "development") {
 }
 const sql = neon(url);
 
-export const db = drizzle({ client: sql, schema });
+export const db = drizzle({ client: sql, schema, casing: "snake_case" });
 
 export type Database = typeof db;
