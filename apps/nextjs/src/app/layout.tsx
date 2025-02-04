@@ -64,7 +64,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
                 <main className="container min-h-[calc(100vh-65px)] py-8">
                   {props.children}
                 </main>
-                <Toaster />
+                <Toaster richColors />
                 {session ? (
                   <>
                     <CreateActivity />
