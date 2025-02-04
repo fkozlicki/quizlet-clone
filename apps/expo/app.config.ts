@@ -2,9 +2,9 @@ import type { ConfigContext, ExpoConfig } from "expo/config";
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: "expo",
-  slug: "expo",
-  scheme: "expo",
+  name: "quizletv2",
+  slug: "quizletv2",
+  scheme: "quizletv2",
   version: "0.1.0",
   orientation: "portrait",
   icon: "./assets/icon.png",
@@ -19,21 +19,21 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ["**/*"],
   ios: {
-    bundleIdentifier: "your.bundle.identifier",
+    bundleIdentifier: "pl.filipkozlicki.quizletv2",
     supportsTablet: true,
   },
   android: {
-    package: "your.bundle.identifier",
+    package: "pl.filipkozlicki.quizletv2",
     adaptiveIcon: {
       foregroundImage: "./assets/icon.png",
       backgroundColor: "#1F104A",
     },
   },
-  // extra: {
-  //   eas: {
-  //     projectId: "your-eas-project-id",
-  //   },
-  // },
+  extra: {
+    eas: {
+      projectId: "81c4bd64-4192-40db-8539-2996975f941f",
+    },
+  },
   experiments: {
     tsconfigPaths: true,
     typedRoutes: true,
