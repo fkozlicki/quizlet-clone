@@ -20,7 +20,7 @@ import { api } from "~/trpc/react";
 
 const DeleteFolderDialog = ({ id, userId }: { id: string; userId: string }) => {
   const { mutate, isPending } = api.folder.delete.useMutation({
-    async onSuccess() {
+    onSuccess() {
       toast.success("Successfully deleted folder");
       router.push(`/users/${userId}/folders`);
     },

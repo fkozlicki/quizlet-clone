@@ -28,11 +28,19 @@ const CreateOptionsDropdown = ({ session }: { session: Session | null }) => {
   };
 
   const onFolderClick = () => {
-    session ? openFolderDialog() : openSignInDialog();
+    if (session) {
+      openFolderDialog();
+    } else {
+      openSignInDialog();
+    }
   };
 
   const onStudySetClick = () => {
-    session ? router.push("/create-set") : openSignInDialog();
+    if (session) {
+      router.push("/create-set");
+    } else {
+      openSignInDialog();
+    }
   };
 
   return (

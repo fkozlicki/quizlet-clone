@@ -25,8 +25,8 @@ interface FlashcardsGameProps {
 
 const FlashcardsGame = ({ fullscreen, session }: FlashcardsGameProps) => {
   const { id }: { id: string } = useParams();
-  const { data } = api.studySet.byId.useQuery({ id });
-  const { flashcards: initialFlashcards, userId } = data!;
+  const [data] = api.studySet.byId.useSuspenseQuery({ id });
+  const { flashcards: initialFlashcards, userId } = data;
   const [
     { cardIndex, sorting, flashcards, hard, settingsOpen, starredOnly, know },
     dispatch,

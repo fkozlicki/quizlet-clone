@@ -66,7 +66,7 @@ const StudySetCombineDialog = ({
       router.push(`/study-sets/${data.id}`);
       toast.success("Successfully combined study sets");
       onOpenChange(false);
-      void utils.studySet.invalidate();
+      await utils.studySet.invalidate();
     },
     onError() {
       toast.error("Couldn't combine study sets");

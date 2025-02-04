@@ -82,7 +82,7 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
         </Link>
         {studySets?.length ? (
           <div className="flex flex-col gap-4">
-            {studySets?.map((set) => {
+            {studySets.map((set) => {
               const isIn = folder.studySets.some(({ id }) => id === set.id);
 
               return (

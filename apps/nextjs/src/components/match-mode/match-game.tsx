@@ -23,7 +23,7 @@ const blueBorder = "#2563eb";
 
 const MatchGame = () => {
   const { id }: { id: string } = useParams();
-  const { data } = api.studySet.matchCards.useQuery(
+  const [data] = api.studySet.matchCards.useSuspenseQuery(
     { id },
     {
       refetchOnReconnect: false,
@@ -32,7 +32,7 @@ const MatchGame = () => {
     },
   );
   const [{ cards, matched, selected, stage, ellapsedTime }, dispatch] =
-    useReducer(matchReducer, { ...matchInitial, cards: data! });
+    useReducer(matchReducer, { ...matchInitial, cards: data });
   const utils = api.useUtils();
   const [scope, animate] = useAnimate();
 
@@ -75,7 +75,7 @@ const MatchGame = () => {
     );
   };
 
-  const selectCard = async (index: number) => {
+  const selectCard = (index: number) => {
     if (selected === undefined) {
       dispatch({ type: "setSelected", payload: index });
       void animate(

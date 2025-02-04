@@ -25,12 +25,14 @@ const TestMode = () => {
   const [answer, setAnswer] = useState<Answer | undefined>();
   const [hard, setHard] = useState<number>(0);
 
-  const cardCount = Object.values(test!).flatMap((e) => e).length;
+  const cardCount = test ? Object.values(test).flatMap((e) => e).length : 0;
 
   const onSubmit = (answer: Answer) => {
     setAnswer(answer);
     setHard(calculateHard(answer));
-    window && window.scrollTo(0, 0);
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+    }
   };
 
   const calculateHard = (answer: Answer) => {
@@ -69,7 +71,7 @@ const TestMode = () => {
 
   return (
     <>
-      {answer && hard !== undefined ? (
+      {answer ? (
         <>
           <GameResult
             hard={hard}
@@ -90,7 +92,7 @@ const TestMode = () => {
           <TestAnswer answer={answer} />
         </>
       ) : (
-        <TestForm test={test!} onSubmit={onSubmit} />
+        test && <TestForm test={test} onSubmit={onSubmit} />
       )}
     </>
   );

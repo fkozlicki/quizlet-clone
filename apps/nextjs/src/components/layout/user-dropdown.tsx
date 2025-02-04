@@ -11,7 +11,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
-import Image from "next/image";
 
 const UserDropdown = ({ user }: { user: Session["user"] }) => {
   const { id, image, name, email } = user;

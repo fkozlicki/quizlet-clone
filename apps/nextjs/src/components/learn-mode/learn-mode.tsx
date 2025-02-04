@@ -16,7 +16,7 @@ import MultipleChoiceCard from "../shared/multiple-choice-card";
 
 const LearnMode = ({ session }: { session: Session | null }) => {
   const { id }: { id: string } = useParams();
-  const { data: flashcards } = api.studySet.learnCards.useQuery(
+  const [flashcards] = api.studySet.learnCards.useSuspenseQuery(
     { id },
     {
       refetchOnMount: false,
@@ -30,7 +30,7 @@ const LearnMode = ({ session }: { session: Session | null }) => {
   const utils = api.useUtils();
   const router = useRouter();
 
-  const currentCard = flashcards![cardIndex];
+  const currentCard = flashcards[cardIndex];
 
   const resetLearning = async () => {
     await utils.studySet.learnCards.invalidate();
@@ -77,7 +77,7 @@ const LearnMode = ({ session }: { session: Session | null }) => {
   return (
     <>
       <Progress
-        value={(cardIndex / flashcards!.length) * 100}
+        value={(cardIndex / flashcards.length) * 100}
         className="mb-4"
       />
       {currentCard && (
@@ -88,7 +88,7 @@ const LearnMode = ({ session }: { session: Session | null }) => {
           callback={chooseAnswer}
         />
       )}
-      {flashcards && cardIndex === flashcards.length && (
+      {cardIndex === flashcards.length && (
         <>
           <div className="mb-8 text-2xl font-bold">U finished learning</div>
           <GameResult

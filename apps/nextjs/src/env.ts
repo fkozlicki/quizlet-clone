@@ -25,12 +25,20 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_S3_REGION: z.string(),
+    NEXT_PUBLIC_S3_ACCESS_KEY: z.string(),
+    NEXT_PUBLIC_S3_SECRET_KEY: z.string(),
+    NEXT_PUBLIC_S3_BUCKET_NAME: z.string(),
   },
   /**
    * Destructure all variables from `process.env` to make sure they aren't tree-shaken away.
    */
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_S3_REGION: process.env.NEXT_PUBLIC_S3_REGION,
+    NEXT_PUBLIC_S3_ACCESS_KEY: process.env.NEXT_PUBLIC_S3_ACCESS_KEY,
+    NEXT_PUBLIC_S3_SECRET_KEY: process.env.NEXT_PUBLIC_S3_SECRET_KEY,
+    NEXT_PUBLIC_S3_BUCKET_NAME: process.env.NEXT_PUBLIC_S3_BUCKET_NAME,
 
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },

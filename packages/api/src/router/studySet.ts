@@ -60,9 +60,15 @@ export const studySetRouter = {
   allByUser: publicProcedure
     .input(z.object({ userId: z.string(), limit: z.number().optional() }))
     .query(async ({ input, ctx }) => {
-      return await selectStudySetList(ctx.db)
-        .where(eq(StudySet.userId, input.userId))
-        .limit(input.limit ?? 0);
+      const query = selectStudySetList(ctx.db).where(
+        eq(StudySet.userId, input.userId),
+      );
+
+      if (input.limit) {
+        return await query.limit(input.limit);
+      }
+
+      return await query;
     }),
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
@@ -216,7 +222,7 @@ export const studySetRouter = {
       ).map((card) => card.id);
 
       const toDeleteIds = currentFlashcards.filter(
-        (card) => !flashcards.map((card) => card.id).includes(card),
+        (cardId) => !flashcards.map((card) => card.id).includes(cardId),
       );
 
       if (toDeleteIds.length > 0) {
@@ -225,12 +231,14 @@ export const studySetRouter = {
           .where(inArray(Flashcard.id, toDeleteIds));
       }
 
+      type FlashcardToUpdate = Required<(typeof flashcards)[number]>;
+
       const toUpdate = flashcards.filter(
         (card) => card.id && currentFlashcards.includes(card.id),
-      );
+      ) as FlashcardToUpdate[];
 
       const promises = toUpdate.map((card) =>
-        ctx.db.update(Flashcard).set(card).where(eq(Flashcard.id, card.id!)),
+        ctx.db.update(Flashcard).set(card).where(eq(Flashcard.id, card.id)),
       );
 
       if (promises.length > 0) {

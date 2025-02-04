@@ -28,7 +28,11 @@ const FlashcardCard = ({
   const { onOpenChange } = useSignInDialogContext();
 
   const onStarClick = () => {
-    session ? toggleStar() : onOpenChange(true);
+    if (session) {
+      toggleStar();
+    } else {
+      onOpenChange(true);
+    }
   };
 
   return (

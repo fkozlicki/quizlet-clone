@@ -35,7 +35,11 @@ const FlipCardContent = ({
   const onStarClick = (event: MouseEvent) => {
     event.stopPropagation();
 
-    session ? toggleStar() : onOpenChange(true);
+    if (session) {
+      toggleStar();
+    } else {
+      onOpenChange(true);
+    }
   };
 
   return (

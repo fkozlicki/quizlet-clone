@@ -78,13 +78,10 @@ export const flashcardsReducer = (
       flashcards: state.starredOnly ? starredCards : action.payload,
     };
   }
-  if (action.type === "setStarredOnly") {
-    return {
-      ...state,
-      starredOnly: action.payload,
-      cardIndex: 0,
-    };
-  }
 
-  return state;
+  return {
+    ...state,
+    starredOnly: action.payload,
+    cardIndex: 0,
+  };
 };

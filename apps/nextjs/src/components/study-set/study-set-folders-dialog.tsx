@@ -98,7 +98,7 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
         <Button onClick={openFolderDialog}>Create new folder</Button>
         {folders?.length ? (
           <div className="flex flex-col gap-4">
-            {folders?.map((folder) => {
+            {folders.map((folder) => {
               const isIn = studySet.folders.some((f) => f.id === folder.id);
 
               return (

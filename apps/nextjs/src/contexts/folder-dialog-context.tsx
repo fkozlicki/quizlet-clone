@@ -19,13 +19,11 @@ const folderModalReducer = (
       open: true,
     };
   }
-  if (action.type === "close") {
-    return {
-      ...state,
-      open: false,
-    };
-  }
-  return state;
+
+  return {
+    ...state,
+    open: false,
+  };
 };
 
 const initialState: FolderDialogState = {

@@ -5,11 +5,13 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 
+import { env } from "~/env";
+
 const client = new S3Client({
-  region: process.env.NEXT_PUBLIC_S3_REGION,
+  region: env.NEXT_PUBLIC_S3_REGION,
   credentials: {
-    accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY!,
-    secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY!,
+    accessKeyId: env.NEXT_PUBLIC_S3_ACCESS_KEY,
+    secretAccessKey: env.NEXT_PUBLIC_S3_SECRET_KEY,
   },
 });
 
@@ -33,7 +35,7 @@ export async function uploadObject(file: File) {
 export async function getFileFromS3(key: string) {
   const { Body } = await client.send(
     new GetObjectCommand({
-      Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
+      Bucket: env.NEXT_PUBLIC_S3_BUCKET_NAME,
       Key: key,
     }),
   );
