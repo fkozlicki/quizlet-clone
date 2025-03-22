@@ -1,8 +1,10 @@
+
+![Screenshot from 2025-03-22 18-24-56](https://github.com/user-attachments/assets/39637d80-1950-403a-9ac9-2470767f446c)
+
 <p align="center">
 	<h1 align="center"><b>Quizlet Clone</b></h1>
-
  <p align="center">
-   Open source flashcards with modern web stack
+   Open source flashcards built with modern tech stack
 </p>
 
 ## About Quizlet Clone
