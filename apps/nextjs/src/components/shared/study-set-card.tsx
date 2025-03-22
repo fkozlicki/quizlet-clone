@@ -25,7 +25,7 @@ const StudySetCard = ({
         <Badge className="mt-2 block w-fit">Terms {flashcardCount}</Badge>
         <Link
           href={`/users/${user.id}`}
-          className="relative z-10 mt-8 inline-flex items-center "
+          className="relative z-10 mt-8 inline-flex items-center"
         >
           <Avatar className="mr-2 h-6 w-6">
             <AvatarImage src={user.image ?? undefined} alt="author avatar" />
