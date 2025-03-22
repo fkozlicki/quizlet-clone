@@ -54,7 +54,7 @@ const selectStarredFlashcards = async (ctx: TRPCContext, studySetId: string) =>
 export const studySetRouter = {
   popular: publicProcedure.query(async ({ ctx }) => {
     return await selectStudySetList(ctx.db)
-      .limit(6)
+      .limit(8)
       .orderBy(desc(StudySet.createdAt));
   }),
   allByUser: publicProcedure
