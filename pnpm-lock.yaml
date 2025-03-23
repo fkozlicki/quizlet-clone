@@ -434,9 +434,6 @@ importers:
       '@neondatabase/serverless':
         specifier: ^0.10.4
         version: 0.10.4
-      '@vercel/postgres':
-        specifier: ^0.10.0
-        version: 0.10.0
       date-fns:
         specifier: ^4.1.0
         version: 4.1.0
@@ -11218,6 +11215,7 @@ snapshots:
   '@neondatabase/serverless@0.9.5':
     dependencies:
       '@types/pg': 8.11.6
+    optional: true
 
   '@netlify/functions@2.8.2':
     dependencies:
@@ -13180,6 +13178,7 @@ snapshots:
       ws: 8.18.0(bufferutil@4.0.9)
     transitivePeerDependencies:
       - utf-8-validate
+    optional: true
 
   '@web3-storage/multipart-parser@1.0.0': {}
 
@@ -13642,6 +13641,7 @@ snapshots:
   bufferutil@4.0.9:
     dependencies:
       node-gyp-build: 4.8.4
+    optional: true
 
   busboy@1.6.0:
     dependencies:
