@@ -8,11 +8,11 @@ import { api } from "~/trpc/react";
 import StudySetCard from "../shared/study-set-card";
 import StudySetSkeletonGrid from "../shared/study-set-skeleton-grid";
 
-const PopularStudySetsGrid = () => {
-  const [studySets] = api.studySet.popular.useSuspenseQuery();
+const LatestStudySetsGrid = () => {
+  const [studySets] = api.studySet.latest.useSuspenseQuery();
 
   if (studySets.length === 0) {
-    return <Empty message="No popular study sets yet." />;
+    return <Empty message="No latest study sets yet." />;
   }
 
   return (
@@ -24,15 +24,15 @@ const PopularStudySetsGrid = () => {
   );
 };
 
-const PopularStudySets = () => {
+const LatestStudySets = () => {
   return (
-    <div>
-      <h2 className="mb-6 text-2xl font-bold">Popular study sets</h2>
+    <div className="mt-8">
+      <h2 className="mb-6 text-2xl font-bold">Latest study sets</h2>
       <Suspense fallback={<StudySetSkeletonGrid />}>
-        <PopularStudySetsGrid />
+        <LatestStudySetsGrid />
       </Suspense>
     </div>
   );
 };
 
-export default PopularStudySets;
+export default LatestStudySets;

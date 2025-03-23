@@ -119,6 +119,10 @@ export function getPopularStudySetsQuery(db: Database) {
     .limit(8);
 }
 
+export function getLatestStudySets(db: Database) {
+  return getStudySetsQuery(db).orderBy(desc(StudySet.createdAt)).limit(8);
+}
+
 export function getUserStudySetsQuery(db: Database, userId: string) {
   return getStudySetsQuery(db).where(eq(StudySet.userId, userId)).limit(8);
 }

@@ -12,6 +12,7 @@ import {
   upsertFlashcards,
 } from "@acme/db/mutations";
 import {
+  getLatestStudySets,
   getOtherStudySets,
   getPopularStudySetsQuery,
   getStarredFlashcardsQuery,
@@ -62,6 +63,9 @@ const generateMultipleChoiceCards = (
 export const studySetRouter = {
   popular: publicProcedure.query(async ({ ctx }) => {
     return await getPopularStudySetsQuery(ctx.db);
+  }),
+  latest: publicProcedure.query(async ({ ctx }) => {
+    return await getLatestStudySets(ctx.db);
   }),
   allByUser: publicProcedure
     .input(z.object({ userId: z.string() }))
