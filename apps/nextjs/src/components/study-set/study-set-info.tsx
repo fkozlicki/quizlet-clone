@@ -7,11 +7,7 @@ import { api } from "~/trpc/react";
 
 const StudySetInfo = () => {
   const { id }: { id: string } = useParams();
-  const { data } = api.studySet.byId.useQuery({ id });
-
-  if (!data) {
-    return null;
-  }
+  const [data] = api.studySet.byId.useSuspenseQuery({ id });
 
   const { title, description } = data;
 

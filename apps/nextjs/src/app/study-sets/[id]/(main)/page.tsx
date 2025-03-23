@@ -30,15 +30,20 @@ export async function generateMetadata({
 }
 
 export default async function StudySet({ params: { id } }: StudySetProps) {
-  const session = await auth();
+  const { userId, user } = await api.studySet.byId({ id });
+  const otherStudySets = await api.studySet.other({
+    studySetId: id,
+    userId: user.id,
+  });
+
   await api.studySet.byId.prefetch({ id });
+
+  const session = await auth();
 
   if (session) {
     await api.folder.allByUser.prefetch({ userId: session.user.id });
     await api.studySet.allByUser.prefetch({ userId: session.user.id });
   }
-
-  const { userId, user } = await api.studySet.byId({ id });
 
   return (
     <HydrateClient>
@@ -58,8 +63,8 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
             </Button>
           </Link>
         )}
-        {user.studySets.length > 0 && (
-          <OtherStudySets studySets={user.studySets} />
+        {otherStudySets.length > 0 && (
+          <OtherStudySets studySets={otherStudySets} />
         )}
       </div>
     </HydrateClient>

@@ -2,86 +2,76 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import type { Database } from "@acme/db/client";
-import { and, asc, count, desc, eq, inArray, not } from "@acme/db";
+import type { SelectFlashcard } from "@acme/db/schema";
+import { eq, inArray } from "@acme/db";
 import {
-  Flashcard,
-  Folder,
-  FoldersToStudySets,
-  StarredFlashcard,
-  StudySet,
-  User,
-} from "@acme/db/schema";
+  createStudySet,
+  deleteExcludedFlashcards,
+  deleteStudySet,
+  updateStudySet,
+  upsertFlashcards,
+} from "@acme/db/mutations";
+import {
+  getOtherStudySets,
+  getPopularStudySetsQuery,
+  getStarredFlashcardsQuery,
+  getStudySetFlashcardsQuery,
+  getStudySetQuery,
+  getStudySetWithFlashcardsQuery,
+  getUserStudySetsQuery,
+} from "@acme/db/queries";
+import { Flashcard, Folder, FoldersToStudySets } from "@acme/db/schema";
 import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
 
 import type { TRPCContext } from "../trpc";
 import { protectedProcedure, publicProcedure } from "../trpc";
 
-export const selectStudySetList = (db: Database) =>
-  db
-    .select({
-      id: StudySet.id,
-      title: StudySet.title,
-      flashcardCount: count(Flashcard.id),
-      user: {
-        id: User.id,
-        name: User.name,
-        image: User.image,
-      },
-    })
-    .from(StudySet)
-    .leftJoin(Flashcard, eq(StudySet.id, Flashcard.studySetId))
-    .innerJoin(User, eq(StudySet.userId, User.id))
-    .groupBy(StudySet.id, User.id);
+const getStarredFlashcards = async (ctx: TRPCContext, studySetId: string) => {
+  if (ctx.session) {
+    return await getStarredFlashcardsQuery(ctx.db, {
+      studySetId,
+      userId: ctx.session.user.id,
+    });
+  }
 
-const selectStarredFlashcards = async (ctx: TRPCContext, studySetId: string) =>
-  ctx.session
-    ? await ctx.db
-        .select({ id: Flashcard.id })
-        .from(Flashcard)
-        .leftJoin(
-          StarredFlashcard,
-          eq(Flashcard.id, StarredFlashcard.flashcardId),
-        )
-        .where(
-          and(
-            eq(StarredFlashcard.userId, ctx.session.user.id),
-            eq(Flashcard.studySetId, studySetId),
-          ),
-        )
-    : [];
+  return [];
+};
+
+const generateMultipleChoiceCards = (
+  flashcards: SelectFlashcard[],
+  pool: SelectFlashcard[],
+) => {
+  return flashcards.map((card) => {
+    const falseAnswers = pool
+      .filter(({ id }) => id !== card.id)
+      .sort(() => 0.5 - Math.random())
+      .map((card) => card.definition)
+      .slice(0, 3);
+
+    const answers = [...falseAnswers, card.definition].sort(
+      () => 0.5 - Math.random(),
+    );
+
+    return {
+      ...card,
+      answers,
+    };
+  });
+};
 
 export const studySetRouter = {
   popular: publicProcedure.query(async ({ ctx }) => {
-    return await selectStudySetList(ctx.db)
-      .limit(8)
-      .orderBy(desc(StudySet.createdAt));
+    return await getPopularStudySetsQuery(ctx.db);
   }),
   allByUser: publicProcedure
-    .input(z.object({ userId: z.string(), limit: z.number().optional() }))
+    .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const query = selectStudySetList(ctx.db).where(
-        eq(StudySet.userId, input.userId),
-      );
-
-      if (input.limit) {
-        return await query.limit(input.limit);
-      }
-
-      return await query;
+      return await getUserStudySetsQuery(ctx.db, input.userId);
     }),
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const studySet = await ctx.db.query.StudySet.findFirst({
-        where: eq(StudySet.id, input.id),
-        with: {
-          flashcards: {
-            orderBy: [asc(Flashcard.position)],
-          },
-          user: true,
-        },
-      });
+      const studySet = await getStudySetWithFlashcardsQuery(ctx.db, input.id);
 
       if (!studySet) {
         throw new TRPCError({
@@ -90,20 +80,11 @@ export const studySetRouter = {
         });
       }
 
-      const otherSets = await selectStudySetList(ctx.db)
-        .limit(4)
-        .where(
-          and(
-            eq(StudySet.userId, studySet.userId),
-            not(eq(StudySet.id, studySet.id)),
-          ),
-        );
+      const starredFlashcards = await getStarredFlashcards(ctx, input.id);
 
-      const starredFlashcards = await selectStarredFlashcards(ctx, input.id);
-
-      const allFlashcards = studySet.flashcards.map((flashcard) => ({
+      const updatedFlashcards = studySet.flashcards.map((flashcard) => ({
         ...flashcard,
-        starred: starredFlashcards.some((f) => f.id === flashcard.id),
+        starred: starredFlashcards.some(({ id }) => id === flashcard.id),
       }));
 
       const allFolders = await ctx.db
@@ -117,24 +98,25 @@ export const studySetRouter = {
 
       return {
         ...studySet,
-        user: { ...studySet.user, studySets: otherSets },
-        flashcards: allFlashcards,
+        flashcards: updatedFlashcards,
         folders: allFolders,
       };
+    }),
+  other: publicProcedure
+    .input(z.object({ studySetId: z.string(), userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return await getOtherStudySets(ctx.db, input);
     }),
   create: protectedProcedure
     .input(CreateStudySetSchema)
     .mutation(async ({ input, ctx }) => {
       const { title, description, flashcards } = input;
 
-      const [newStudySet] = await ctx.db
-        .insert(StudySet)
-        .values({
-          title,
-          description,
-          userId: ctx.session.user.id,
-        })
-        .returning();
+      const newStudySet = await createStudySet(ctx.db, {
+        title,
+        description,
+        userId: ctx.session.user.id,
+      });
 
       if (!newStudySet) {
         throw new TRPCError({
@@ -143,34 +125,29 @@ export const studySetRouter = {
         });
       }
 
-      await ctx.db.insert(Flashcard).values(
-        flashcards.map((flashcard) => ({
-          ...flashcard,
-          studySetId: newStudySet.id,
-        })),
-      );
+      const values = flashcards.map((flashcard) => ({
+        ...flashcard,
+        studySetId: newStudySet.id,
+      }));
+
+      await upsertFlashcards(ctx.db, values);
 
       return newStudySet;
     }),
   combine: protectedProcedure
     .input(z.object({ id: z.string(), studySets: z.array(z.string()) }))
     .mutation(async ({ ctx, input }) => {
-      const studySet = await ctx.db.query.StudySet.findFirst({
-        where: eq(StudySet.id, input.id),
-      });
+      const studySet = await getStudySetQuery(ctx.db, input.id);
 
       if (!studySet) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const [newStudySet] = await ctx.db
-        .insert(StudySet)
-        .values({
-          title: studySet.title,
-          description: studySet.description,
-          userId: ctx.session.user.id,
-        })
-        .returning();
+      const newStudySet = await createStudySet(ctx.db, {
+        title: studySet.title,
+        description: studySet.description,
+        userId: ctx.session.user.id,
+      });
 
       if (!newStudySet) {
         throw new TRPCError({
@@ -183,90 +160,51 @@ export const studySetRouter = {
         where: inArray(Flashcard.studySetId, [studySet.id, ...input.studySets]),
       });
 
-      await ctx.db.insert(Flashcard).values(
-        flashcards.map((card, index) => ({
-          position: index + 1,
-          studySetId: newStudySet.id,
-          term: card.term,
-          definition: card.definition,
-        })),
-      );
+      const values = flashcards.map((card, index) => ({
+        position: index + 1,
+        studySetId: newStudySet.id,
+        term: card.term,
+        definition: card.definition,
+      }));
+
+      await upsertFlashcards(ctx.db, values);
 
       return newStudySet;
     }),
   edit: protectedProcedure
     .input(EditStudySetSchema)
     .mutation(async ({ input, ctx }) => {
-      const { id, title, description, flashcards } = input;
+      const { flashcards, ...rest } = input;
 
-      const [updated] = await ctx.db
-        .update(StudySet)
-        .set({
-          title,
-          description,
-        })
-        .where(eq(StudySet.id, id))
-        .returning();
+      const updatedStudySet = await updateStudySet(ctx.db, rest);
 
-      if (!updated) {
+      if (!updatedStudySet) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Could not update study set",
         });
       }
 
-      const currentFlashcards = (
-        await ctx.db.query.Flashcard.findMany({
-          where: eq(Flashcard.studySetId, id),
-        })
-      ).map((card) => card.id);
+      const present = flashcards
+        .map((card) => card.id)
+        .filter((i) => i !== undefined);
 
-      const toDeleteIds = currentFlashcards.filter(
-        (cardId) => !flashcards.map((card) => card.id).includes(cardId),
+      await deleteExcludedFlashcards(ctx.db, {
+        studySetId: updatedStudySet.id,
+        flashcards: present,
+      });
+
+      await upsertFlashcards(
+        ctx.db,
+        flashcards.map((card) => ({ ...card, studySetId: updatedStudySet.id })),
       );
 
-      if (toDeleteIds.length > 0) {
-        await ctx.db
-          .delete(Flashcard)
-          .where(inArray(Flashcard.id, toDeleteIds));
-      }
-
-      type FlashcardToUpdate = Required<(typeof flashcards)[number]>;
-
-      const toUpdate = flashcards.filter(
-        (card) => card.id && currentFlashcards.includes(card.id),
-      ) as FlashcardToUpdate[];
-
-      const promises = toUpdate.map((card) =>
-        ctx.db.update(Flashcard).set(card).where(eq(Flashcard.id, card.id)),
-      );
-
-      if (promises.length > 0) {
-        await Promise.all(promises);
-      }
-
-      const toCreate = flashcards.filter((card) => card.id === undefined);
-
-      if (toCreate.length > 0) {
-        await ctx.db.insert(Flashcard).values([
-          ...toCreate.map((flashcard) => ({
-            ...flashcard,
-            studySetId: id,
-          })),
-        ]);
-      }
-
-      return updated;
+      return updatedStudySet;
     }),
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const [deleted] = await ctx.db
-        .delete(StudySet)
-        .where(eq(StudySet.id, input.id))
-        .returning();
-
-      return deleted;
+      return await deleteStudySet(ctx.db, input.id);
     }),
   matchCards: publicProcedure
     .input(
@@ -275,15 +213,11 @@ export const studySetRouter = {
       }),
     )
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.Flashcard.findMany({
-        where: eq(Flashcard.studySetId, input.id),
+      const flashcards = await getStudySetFlashcardsQuery(ctx.db, input.id, {
+        limit: 4,
       });
 
-      const MAX_CARDS = 4;
-
       const matchCards = flashcards
-        .sort(() => 0.5 - Math.random())
-        .slice(0, Math.min(flashcards.length, MAX_CARDS))
         .map((card) => [
           { flashcardId: card.id, content: card.term },
           { flashcardId: card.id, content: card.definition },
@@ -296,44 +230,23 @@ export const studySetRouter = {
   learnCards: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.Flashcard.findMany({
-        where: eq(Flashcard.studySetId, input.id),
-      });
+      const flashcards = await getStudySetFlashcardsQuery(ctx.db, input.id);
 
-      const starredFlashcards = await selectStarredFlashcards(ctx, input.id);
+      const cards = generateMultipleChoiceCards(flashcards, flashcards);
 
-      // COPYING CARDS FOR RANDOM ANSWERS
-      const flashcardsCopy = [
-        ...flashcards.map((flashcard) => ({
-          ...flashcard,
-          starred: starredFlashcards.some((f) => f.id === flashcard.id),
-        })),
-      ].sort(() => 0.5 - Math.random());
+      const starredFlashcards = await getStarredFlashcards(ctx, input.id);
 
-      // ADDING 3 RANDOM ANSWERS + DEFINITION
-      const learnCards = flashcardsCopy.map((multipleChoice) => {
-        const answers = [
-          ...flashcards
-            .filter((card) => card.id !== multipleChoice.id)
-            .sort(() => 0.5 - Math.random())
-            .map((card) => card.definition)
-            .slice(0, 3),
-          multipleChoice.definition,
-        ].sort(() => 0.5 - Math.random());
-
-        return { ...multipleChoice, answers };
-      });
-
-      return learnCards;
+      return cards.map((card) => ({
+        ...card,
+        starred: starredFlashcards.some(({ id }) => id === card.id),
+      }));
     }),
   testCards: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const flashcards = await ctx.db.query.Flashcard.findMany({
-        where: eq(Flashcard.studySetId, input.id),
-      });
+      const flashcards = await getStudySetFlashcardsQuery(ctx.db, input.id);
 
-      const flashcardsCopy = [...flashcards].sort(() => 0.5 - Math.random());
+      const copy = [...flashcards];
 
       // multipleChoice should be 10% and minimum 1
       // write should be 10% and minimum 1
@@ -345,35 +258,24 @@ export const studySetRouter = {
 
       // RANDOMIZING QUESTIONS
       //multipleChoice
-      const multipleChoiceWithoutAnswers = flashcardsCopy.splice(0, count);
-      const multipleChoice = multipleChoiceWithoutAnswers.map(
-        (multipleChoice) => {
-          const answers = [
-            ...flashcards
-              .filter((card) => card.id !== multipleChoice.id)
-              .sort(() => 0.5 - Math.random())
-              .map((card) => card.definition),
-            multipleChoice.definition,
-          ]
-            .sort(() => 0.5 - Math.random())
-            .slice(0, 4);
-
-          return {
-            ...multipleChoice,
-            answers,
-          };
-        },
+      const multipleChoiceInitial = copy.splice(0, count);
+      const multipleChoice = generateMultipleChoiceCards(
+        multipleChoiceInitial,
+        flashcards,
       );
+
       // written
-      const written = flashcardsCopy.splice(0, count);
+      const written = copy.splice(0, count);
+
       // trueFalse
-      const trueOrFalse = flashcardsCopy.map((card) => {
-        const otherCards = flashcards.filter((el) => el.id !== card.id);
-        const randomFalseAnswer =
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          otherCards[Math.floor(Math.random() * otherCards.length)]!.definition;
-        const answer =
-          Math.random() < 0.5 ? randomFalseAnswer : card.definition;
+      const trueOrFalse = copy.map((card) => {
+        const falseAnswer =
+          flashcards
+            .filter((el) => el.id !== card.id)
+            .at(Math.floor(Math.random() * (flashcards.length - 1)))
+            ?.definition ?? card.definition;
+
+        const answer = Math.random() < 0.5 ? falseAnswer : card.definition;
 
         return { ...card, answer };
       });

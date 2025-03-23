@@ -1,8 +1,10 @@
 import type { TRPCRouterRecord } from "@trpc/server";
 import { z } from "zod";
 
-import { and, eq } from "@acme/db";
-import { StarredFlashcard } from "@acme/db/schema";
+import {
+  createStarredFlashcard,
+  deleteStarredFlashcard,
+} from "@acme/db/mutations";
 
 import { protectedProcedure } from "../trpc";
 
@@ -10,24 +12,17 @@ export const starredFlashcardRouter = {
   create: protectedProcedure
     .input(z.object({ flashcardId: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .insert(StarredFlashcard)
-        .values({
-          userId: ctx.session.user.id,
-          flashcardId: input.flashcardId,
-        })
-        .returning();
+      return await createStarredFlashcard(ctx.db, {
+        flashcardId: input.flashcardId,
+        userId: ctx.session.user.id,
+      });
     }),
   delete: protectedProcedure
     .input(z.object({ flashcardId: z.number() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(StarredFlashcard)
-        .where(
-          and(
-            eq(StarredFlashcard.userId, ctx.session.user.id),
-            eq(StarredFlashcard.flashcardId, input.flashcardId),
-          ),
-        );
+      return await deleteStarredFlashcard(ctx.db, {
+        flashcardId: input.flashcardId,
+        userId: ctx.session.user.id,
+      });
     }),
 } satisfies TRPCRouterRecord;

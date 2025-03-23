@@ -23,3 +23,6 @@ export const StudySetRelations = relations(StudySet, ({ many, one }) => ({
     references: [User.id],
   }),
 }));
+
+export type InsertStudySet = typeof StudySet.$inferInsert;
+export type UpdateStudySet = Partial<InsertStudySet> & { id: string };

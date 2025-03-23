@@ -21,3 +21,7 @@ export const flashcardsRelations = relations(Flashcard, ({ one, many }) => ({
   }),
   starredFlashcards: many(StarredFlashcard),
 }));
+
+export type SelectFlashcard = typeof Flashcard.$inferSelect;
+export type InsertFlashcard = typeof Flashcard.$inferInsert;
+export type UpdateFlashcard = Partial<InsertFlashcard> & { id: number };

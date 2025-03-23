@@ -13,7 +13,7 @@ import useStar from "~/hooks/useStar";
 import EditFlashcardDialog from "./edit-flashcard-dialog";
 
 interface FlashcardCardProps {
-  flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][0];
+  flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][number];
   editable?: boolean;
   session: Session | null;
 }

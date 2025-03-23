@@ -24,3 +24,5 @@ export const UserRelations = relations(User, ({ many }) => ({
   studySets: many(StudySet),
   activities: many(Activity),
 }));
+
+export type UpdateUser = Partial<typeof User.$inferInsert> & { id: string };

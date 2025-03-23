@@ -3,8 +3,14 @@ import { TRPCError } from "@trpc/server";
 import slugify from "slugify";
 import { z } from "zod";
 
-import { and, count, eq } from "@acme/db";
-import { Folder, FoldersToStudySets, StudySet } from "@acme/db/schema";
+import {
+  createFolder,
+  createFolderToStudySet,
+  deleteFolder,
+  deleteFolderToStudySet,
+  editFolder,
+} from "@acme/db/mutations";
+import { getFolderQuery, getUserFoldersQuery } from "@acme/db/queries";
 import {
   AddSetSchema,
   CreateFolderSchema,
@@ -12,40 +18,23 @@ import {
 } from "@acme/validators";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
-import { selectStudySetList } from "./studySet";
 
 export const folderRouter = {
   allByUser: publicProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
-      return await ctx.db
-        .select({
-          id: Folder.id,
-          name: Folder.name,
-          userId: Folder.userId,
-          slug: Folder.slug,
-          studySetsCount: count(StudySet),
-        })
-        .from(Folder)
-        .leftJoin(
-          FoldersToStudySets,
-          eq(FoldersToStudySets.folderId, Folder.id),
-        )
-        .leftJoin(StudySet, eq(StudySet.id, FoldersToStudySets.studySetId))
-        .groupBy(Folder.id)
-        .where(eq(Folder.userId, input.userId));
+      return await getUserFoldersQuery(ctx.db, input.userId);
     }),
   create: protectedProcedure
     .input(CreateFolderSchema)
     .mutation(async ({ input, ctx }) => {
-      const [folder] = await ctx.db
-        .insert(Folder)
-        .values({
-          ...input,
-          slug: slugify(input.name),
-          userId: ctx.session.user.id,
-        })
-        .returning();
+      const slug = slugify(input.name);
+
+      const folder = await createFolder(ctx.db, {
+        ...input,
+        slug,
+        userId: ctx.session.user.id,
+      });
 
       if (!folder) {
         throw new TRPCError({
@@ -59,12 +48,7 @@ export const folderRouter = {
   bySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input, ctx }) => {
-      const folder = await ctx.db.query.Folder.findFirst({
-        where: eq(Folder.slug, input.slug),
-        with: {
-          user: true,
-        },
-      });
+      const folder = await getFolderQuery(ctx.db, input.slug);
 
       if (!folder) {
         throw new TRPCError({
@@ -73,58 +57,35 @@ export const folderRouter = {
         });
       }
 
-      const sets = await selectStudySetList(ctx.db)
-        .leftJoin(
-          FoldersToStudySets,
-          eq(StudySet.id, FoldersToStudySets.studySetId),
-        )
-        .where(eq(FoldersToStudySets.folderId, folder.id))
-        .orderBy(StudySet.title);
-
-      return { ...folder, studySets: sets };
+      return folder;
     }),
   addSet: protectedProcedure
     .input(AddSetSchema)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.insert(FoldersToStudySets).values({
-        folderId: input.folderId,
-        studySetId: input.studySetId,
-      });
+      return await createFolderToStudySet(ctx.db, input);
     }),
   removeSet: protectedProcedure
     .input(AddSetSchema)
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db
-        .delete(FoldersToStudySets)
-        .where(
-          and(
-            eq(FoldersToStudySets.folderId, input.folderId),
-            eq(FoldersToStudySets.studySetId, input.studySetId),
-          ),
-        );
+      return await deleteFolderToStudySet(ctx.db, input);
     }),
   edit: protectedProcedure
     .input(EditFolderSchema)
     .mutation(async ({ input, ctx }) => {
-      const { id, ...values } = input;
-      const [editedFolder] = await ctx.db
-        .update(Folder)
-        .set(values)
-        .where(eq(Folder.id, id))
-        .returning();
+      const folder = await editFolder(ctx.db, input);
 
-      if (!editedFolder) {
+      if (!folder) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Server error",
         });
       }
 
-      return editedFolder;
+      return folder;
     }),
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.delete(Folder).where(eq(Folder.id, input.id));
+      return await deleteFolder(ctx.db, input.id);
     }),
 } satisfies TRPCRouterRecord;

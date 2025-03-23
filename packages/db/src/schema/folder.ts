@@ -21,3 +21,6 @@ export const FoldersRelations = relations(Folder, ({ one, many }) => ({
   }),
   foldersToStudySets: many(FoldersToStudySets),
 }));
+
+export type InsertFolder = typeof Folder.$inferInsert;
+export type UpdateFolder = Partial<InsertFolder> & { id: string };

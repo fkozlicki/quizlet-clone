@@ -2,8 +2,8 @@ import type { TRPCRouterRecord } from "@trpc/server";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
-import { eq } from "@acme/db";
-import { User } from "@acme/db/schema";
+import { deleteUser, updateUser } from "@acme/db/mutations";
+import { getUserQuery } from "@acme/db/queries";
 
 import { protectedProcedure, publicProcedure } from "../trpc";
 
@@ -11,9 +11,7 @@ export const userRouter = {
   byId: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = await ctx.db.query.User.findFirst({
-        where: eq(User.id, input.id),
-      });
+      const user = await getUserQuery(ctx.db, input.id);
 
       if (!user) {
         throw new TRPCError({
@@ -27,11 +25,10 @@ export const userRouter = {
   update: protectedProcedure
     .input(z.object({ image: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      const [user] = await ctx.db
-        .update(User)
-        .set(input)
-        .where(eq(User.id, ctx.session.user.id))
-        .returning();
+      const user = await updateUser(ctx.db, {
+        ...input,
+        id: ctx.session.user.id,
+      });
 
       if (!user) {
         throw new TRPCError({
@@ -44,6 +41,6 @@ export const userRouter = {
   delete: protectedProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      return await ctx.db.delete(User).where(eq(User.id, input.id));
+      return await deleteUser(ctx.db, input.id);
     }),
 } satisfies TRPCRouterRecord;

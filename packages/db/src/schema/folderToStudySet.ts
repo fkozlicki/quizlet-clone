@@ -32,3 +32,5 @@ export const FolderToStudySetRelations = relations(
     }),
   }),
 );
+
+export type InsertFolderToStudySet = typeof FoldersToStudySets.$inferInsert;

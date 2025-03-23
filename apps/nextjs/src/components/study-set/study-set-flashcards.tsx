@@ -9,17 +9,17 @@ import FlashcardCard from "../shared/flashcard-card";
 
 const StudySetFlashcards = ({ session }: { session: Session | null }) => {
   const { id }: { id: string } = useParams();
-  const { data } = api.studySet.byId.useQuery({ id });
+  const [{ flashcards, userId }] = api.studySet.byId.useSuspenseQuery({ id });
 
   return (
     <div className="mb-8">
       <span className="mb-5 inline-block text-lg font-bold">
-        Terms in this set ({data?.flashcards.length})
+        Terms in this set ({flashcards.length})
       </span>
       <div className="flex flex-col gap-3">
-        {data?.flashcards.map((flashcard, index) => (
+        {flashcards.map((flashcard, index) => (
           <FlashcardCard
-            editable={data.userId === session?.user.id}
+            editable={userId === session?.user.id}
             key={index}
             flashcard={flashcard}
             session={session}

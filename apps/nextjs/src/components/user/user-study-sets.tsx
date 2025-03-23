@@ -11,7 +11,6 @@ import StudySetSkeletonGrid from "../shared/study-set-skeleton-grid";
 const UserStudySetsGrid = ({ userId }: { userId: string }) => {
   const [studySets] = api.studySet.allByUser.useSuspenseQuery({
     userId,
-    limit: 6,
   });
 
   if (studySets.length === 0) {

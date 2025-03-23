@@ -1,4 +1,3 @@
-import React from "react";
 import Link from "next/link";
 
 import type { RouterOutputs } from "@acme/api";
@@ -10,7 +9,7 @@ import { Card, CardContent } from "@acme/ui/card";
 const StudySetCard = ({
   studySet,
 }: {
-  studySet: RouterOutputs["studySet"]["popular"][0];
+  studySet: RouterOutputs["studySet"]["other"][number];
 }) => {
   const { id, title, flashcardCount, user } = studySet;
 
