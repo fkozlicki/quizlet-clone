@@ -42,7 +42,6 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
 
   if (session) {
     await api.folder.allByUser.prefetch({ userId: session.user.id });
-    await api.studySet.allByUser.prefetch({ userId: session.user.id });
   }
 
   return (
