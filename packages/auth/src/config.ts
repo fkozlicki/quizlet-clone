@@ -62,7 +62,6 @@ export const authConfig = {
       };
     },
   },
-  debug: true,
 } satisfies NextAuthConfig;
 
 export const validateToken = async (

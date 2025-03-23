@@ -1,6 +1,6 @@
 import { and, eq, notInArray, sql } from "drizzle-orm";
 
-import type { Database } from "../client";
+import type { Database, Transaction } from "../client";
 import type {
   InsertFlashcard,
   InsertFolder,
@@ -95,7 +95,7 @@ export function deleteUser(db: Database, id: string) {
   return db.delete(User).where(eq(User.id, id));
 }
 
-export async function createStudySet(db: Database, values: InsertStudySet) {
+export async function createStudySet(db: Transaction, values: InsertStudySet) {
   return db
     .insert(StudySet)
     .values(values)
@@ -104,7 +104,7 @@ export async function createStudySet(db: Database, values: InsertStudySet) {
 }
 
 export async function upsertFlashcards(
-  db: Database,
+  db: Transaction,
   values: InsertFlashcard[],
 ) {
   return db
@@ -120,9 +120,9 @@ export async function upsertFlashcards(
     });
 }
 
-export async function updateStudySet(db: Database, values: UpdateStudySet) {
+export async function updateStudySet(tx: Transaction, values: UpdateStudySet) {
   const { id, ...rest } = values;
-  return db
+  return tx
     .update(StudySet)
     .set(rest)
     .where(eq(StudySet.id, id))
@@ -160,7 +160,7 @@ export function deleteStarredFlashcard(
 }
 
 export function deleteExcludedFlashcards(
-  db: Database,
+  db: Transaction,
   { flashcards, studySetId }: { studySetId: string; flashcards: number[] },
 ) {
   return db
