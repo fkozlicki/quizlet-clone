@@ -11,13 +11,7 @@ import { api } from "~/trpc/react";
 
 const FolderAuthor = () => {
   const { slug }: { slug: string } = useParams();
-  const { data } = api.folder.bySlug.useQuery({ slug });
-
-  if (!data) {
-    return null;
-  }
-
-  const { studySets, user } = data;
+  const [{ studySets, user }] = api.folder.bySlug.useSuspenseQuery({ slug });
 
   return (
     <div className="flex items-center gap-6">

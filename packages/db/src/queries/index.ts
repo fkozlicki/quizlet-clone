@@ -86,7 +86,7 @@ export async function getFolderQuery(db: Database, slug: string) {
       eq(StudySet.id, FoldersToStudySets.studySetId),
     )
     .where(eq(FoldersToStudySets.folderId, folder.id))
-    .orderBy(StudySet.title);
+    .orderBy(sql`lower(${StudySet.title})`);
 
   return { ...folder, studySets };
 }
