@@ -71,8 +71,8 @@ const FlashcardsGameButtons = ({
           {sorting ? <Check /> : <ArrowRight />}
         </Button>
       </div>
-      <div className="absolute top-0 flex h-full w-full items-center justify-between">
-        <TooltipProvider>
+      <TooltipProvider delayDuration={0}>
+        <div className="absolute top-0 flex h-full w-full items-center justify-between">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button variant="outline" onClick={shuffle} size="icon">
@@ -81,9 +81,7 @@ const FlashcardsGameButtons = ({
             </TooltipTrigger>
             <TooltipContent>Shuffle</TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-        <div className="flex gap-2">
-          <TooltipProvider>
+          <div className="flex gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -96,9 +94,7 @@ const FlashcardsGameButtons = ({
               </TooltipTrigger>
               <TooltipContent>Settings</TooltipContent>
             </Tooltip>
-          </TooltipProvider>
-          {!fullscreen && (
-            <TooltipProvider>
+            {!fullscreen && (
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link href={`/study-sets/${setId}/flashcards`}>
@@ -109,10 +105,10 @@ const FlashcardsGameButtons = ({
                 </TooltipTrigger>
                 <TooltipContent>Fullscreen</TooltipContent>
               </Tooltip>
-            </TooltipProvider>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      </TooltipProvider>
     </div>
   );
 };

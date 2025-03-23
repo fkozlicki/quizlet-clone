@@ -13,6 +13,7 @@ import {
 } from "@acme/ui/dialog";
 import { Input } from "@acme/ui/input";
 import { toast } from "@acme/ui/toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { getAppUrl } from "~/utils/get-url";
 
@@ -26,11 +27,16 @@ const StudySetShareDialog = ({ id }: { id: string }) => {
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <Button size="icon" variant="outline">
-          <Share size={16} />
-        </Button>
-      </DialogTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button size="icon" variant="outline">
+              <Share size={16} />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Share</TooltipContent>
+      </Tooltip>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Share link</DialogTitle>

@@ -22,10 +22,10 @@ interface StudySetCTAProps {
 
 const StudySetCTA = ({ session, id, userId }: StudySetCTAProps) => {
   return (
-    <div className="flex gap-2">
-      {session && <StudySetFoldersDialog session={session} />}
-      {session?.user.id === userId && (
-        <TooltipProvider>
+    <TooltipProvider delayDuration={0}>
+      <div className="flex gap-2">
+        {session && <StudySetFoldersDialog session={session} />}
+        {session?.user.id === userId && (
           <Tooltip>
             <Link href={`/study-sets/${id}/edit`}>
               <TooltipTrigger asChild>
@@ -39,15 +39,15 @@ const StudySetCTA = ({ session, id, userId }: StudySetCTAProps) => {
               <p>Edit</p>
             </TooltipContent>
           </Tooltip>
-        </TooltipProvider>
-      )}
-      <StudySetShareDialog id={id} />
-      <StudySetOptionsDropdown
-        id={id}
-        isOwner={session?.user.id === userId}
-        userId={session?.user.id}
-      />
-    </div>
+        )}
+        <StudySetShareDialog id={id} />
+        <StudySetOptionsDropdown
+          id={id}
+          isOwner={session?.user.id === userId}
+          userId={session?.user.id}
+        />
+      </div>
+    </TooltipProvider>
   );
 };
 

@@ -14,12 +14,7 @@ import {
   DialogTrigger,
 } from "@acme/ui/dialog";
 import Empty from "@acme/ui/empty";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@acme/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { useFolderDialogContext } from "~/contexts/folder-dialog-context";
 import { api } from "~/trpc/react";
@@ -43,21 +38,19 @@ const StudySetFoldersDialog = ({ session }: StudySetFoldersDialogProps) => {
 
   return (
     <Dialog>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <DialogTrigger asChild>
-              <Button size="icon" variant="outline">
-                <Plus size={16} />
-                <span className="sr-only">Add to folder</span>
-              </Button>
-            </DialogTrigger>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Add to folder</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button size="icon" variant="outline">
+              <Plus size={16} />
+              <span className="sr-only">Add to folder</span>
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Add to folder</p>
+        </TooltipContent>
+      </Tooltip>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Folders</DialogTitle>

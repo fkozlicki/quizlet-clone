@@ -61,7 +61,7 @@ const FlashcardsGameSettingsDialog = ({
         <Separator />
         <div className="flex items-center justify-between">
           <span className="font-medium">Study only starred terms</span>
-          <TooltipProvider>
+          <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <div>

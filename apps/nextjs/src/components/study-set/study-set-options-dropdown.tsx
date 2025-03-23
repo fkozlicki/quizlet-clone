@@ -19,6 +19,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@acme/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@acme/ui/tooltip";
 
 import { api } from "~/trpc/react";
 import DeleteStudySetDialog from "./delete-study-set-dialog";
@@ -59,12 +60,17 @@ const StudySetOptionsDropdown = ({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon">
-            <Ellipsis size={16} />
-            <span className="sr-only">More</span>
-          </Button>
-        </DropdownMenuTrigger>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon">
+                <Ellipsis size={16} />
+                <span className="sr-only">More</span>
+              </Button>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent>More</TooltipContent>
+        </Tooltip>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>More</DropdownMenuLabel>
           <DropdownMenuSeparator />
