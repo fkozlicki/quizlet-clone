@@ -1,6 +1,6 @@
 "use client";
 
-import { LoaderCircle, Minus, Plus } from "lucide-react";
+import { Loader2Icon, Minus, Plus } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
@@ -48,9 +48,15 @@ const AddStudySetCard = ({
           size="icon"
         >
           {isPending ? (
-            <LoaderCircle size={14} className="animate-spin" />
+            <Loader2Icon className="size-4 animate-spin" />
           ) : (
-            <>{isIn ? <Minus size={14} /> : <Plus size={14} />}</>
+            <>
+              {isIn ? (
+                <Minus className="size-4" />
+              ) : (
+                <Plus className="size-4" />
+              )}
+            </>
           )}
         </Button>
       </CardContent>

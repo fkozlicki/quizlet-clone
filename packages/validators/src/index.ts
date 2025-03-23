@@ -21,7 +21,7 @@ export const CreateStudySetSchema = z.object({
   description: z.string().optional(),
   flashcards: z
     .array(FlashcardSchema)
-    .min(2, "You have to create at least 2 flashcards"),
+    .min(4, "You have to create at least 4 flashcards"),
 });
 
 export type CreateStudySetValues = z.infer<typeof CreateStudySetSchema>;

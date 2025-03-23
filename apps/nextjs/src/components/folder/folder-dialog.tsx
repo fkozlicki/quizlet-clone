@@ -2,12 +2,13 @@
 
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { LoaderCircle } from "lucide-react";
+import { Loader2Icon } from "lucide-react";
 
 import type { CreateFolderValues, EditFolderValues } from "@acme/validators";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -78,7 +79,7 @@ const FolderDialog = ({
   const edit = api.folder.edit.useMutation({
     async onSuccess(data) {
       await utils.folder.invalidate();
-      toast.success("Successfully edited folder");
+      toast.success("Saved folder");
       form.reset({
         name: data.name,
         description: data.description ?? undefined,
@@ -88,7 +89,7 @@ const FolderDialog = ({
       }
     },
     onError() {
-      toast.error("Couldn't edit folder, try again");
+      toast.error("Couldn't save folder. Try again");
     },
   });
 
@@ -154,19 +155,21 @@ const FolderDialog = ({
                 </FormItem>
               )}
             />
-            <Button
-              disabled={isPending}
-              type="submit"
-              className="ml-auto block"
-            >
-              {isPending ? (
-                <LoaderCircle className="animate-spin" />
-              ) : defaultValues ? (
-                "Save"
-              ) : (
-                "Create"
-              )}
-            </Button>
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="outline">Close</Button>
+              </DialogClose>
+
+              <Button disabled={isPending} type="submit">
+                {isPending ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : defaultValues ? (
+                  "Save"
+                ) : (
+                  "Create"
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>

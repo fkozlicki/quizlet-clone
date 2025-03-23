@@ -113,7 +113,7 @@ const StudySetCombineDialog = ({
         </div>
         <DialogFooter>
           <DialogClose asChild disabled={isPending}>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">Close</Button>
           </DialogClose>
           <Button onClick={combine} disabled={isDisabled}>
             {isPending ? (

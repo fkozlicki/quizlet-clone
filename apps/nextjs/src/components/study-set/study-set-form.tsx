@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder } from "framer-motion";
-import { LoaderCircle, Trash2Icon } from "lucide-react";
+import { LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
 
 import type {
   CreateStudySetValues,
@@ -26,6 +26,7 @@ import {
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Textarea } from "@acme/ui/textarea";
+import { toast } from "@acme/ui/toast";
 import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
 
 import { api } from "~/trpc/react";
@@ -59,15 +60,23 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const utils = api.useUtils();
   const create = api.studySet.create.useMutation({
     onSuccess() {
+      toast.success("Created new study set");
       void utils.studySet.invalidate();
       form.reset();
       router.push("/latest");
     },
+    onError(error) {
+      toast.error(error.message);
+    },
   });
   const edit = api.studySet.edit.useMutation({
     onSuccess(data) {
+      toast.success("Saved study set");
       void utils.studySet.invalidate();
       router.push(`/study-sets/${data.id}`);
+    },
+    onError(error) {
+      toast.error(error.message);
     },
   });
   const [active, setActive] = useState(0);
@@ -256,17 +265,22 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
               type="button"
               onClick={addEmptyFlashcard}
               className="mt-8 w-full"
+              variant="outline"
             >
+              <PlusIcon className="mr-2 size-4" />
               Add flashcard
             </Button>
           </div>
-          <Button disabled={isPending} type="submit">
+          <Button
+            disabled={isPending}
+            type="submit"
+            className="w-full"
+            size="lg"
+          >
             {isPending ? (
               <LoaderCircle size={16} className="animate-spin" />
-            ) : defaultValues ? (
-              "Save"
             ) : (
-              "Create"
+              <>{defaultValues ? "Save" : "Create"} study set</>
             )}
           </Button>
         </form>

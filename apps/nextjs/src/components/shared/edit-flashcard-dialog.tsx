@@ -4,12 +4,13 @@ import type { MouseEvent } from "react";
 import type { z } from "zod";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Edit, LoaderCircle } from "lucide-react";
+import { Edit, Loader2Icon } from "lucide-react";
 
-import { RouterOutputs } from "@acme/api";
+import type { RouterOutputs } from "@acme/api";
 import { Button } from "@acme/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -27,6 +28,7 @@ import {
   useForm,
 } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
+import { toast } from "@acme/ui/toast";
 import { EditFlashcardSchema } from "@acme/validators";
 
 import { api } from "~/trpc/react";
@@ -45,8 +47,12 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
   const utils = api.useUtils();
   const { mutate, isPending } = api.flashcard.edit.useMutation({
     onSuccess() {
+      toast.success("Saved flashcard");
       setOpen(false);
       void utils.studySet.byId.invalidate({ id });
+    },
+    onError({ message }) {
+      toast.error(message);
     },
   });
 
@@ -114,9 +120,18 @@ const EditFlashcardDialog = ({ flashcard }: EditFlashcardDialogProps) => {
                 </FormItem>
               )}
             />
-            <Button disabled={isPending} type="submit">
-              {isPending ? <LoaderCircle size={16} /> : "Submit"}
-            </Button>
+            <div className="flex justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="outline">Close</Button>
+              </DialogClose>
+              <Button disabled={isPending} type="submit">
+                {isPending ? (
+                  <Loader2Icon className="size-4 animate-spin" />
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
