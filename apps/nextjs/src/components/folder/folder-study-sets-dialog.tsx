@@ -32,7 +32,7 @@ const FolderStudySetsDialog = ({ userId }: FolderStudySetsDialogProps) => {
     ...studySets.filter(
       (set) => !folder.studySets.some((folderSet) => folderSet.id === set.id),
     ),
-  ];
+  ].sort((a, b) => a.title.localeCompare(b.title));
 
   return (
     <Dialog>
