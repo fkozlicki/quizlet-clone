@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LoaderIcon, MinusIcon, PlusIcon } from "lucide-react";
+import { Loader2Icon, MinusIcon, PlusIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import { Card, CardContent } from "@acme/ui/card";
@@ -57,7 +57,7 @@ const StudySetCombineDialog = ({
 }: StudySetCombineDialogProps) => {
   const utils = api.useUtils();
   const studySet = utils.studySet.byId.getData({ id });
-  const { data: studySets } = api.studySet.allByUser.useQuery({
+  const [studySets] = api.studySet.allByUser.useSuspenseQuery({
     userId,
   });
   const router = useRouter();
@@ -101,7 +101,7 @@ const StudySetCombineDialog = ({
         </DialogHeader>
         <div className="flex flex-col gap-4">
           {studySets
-            ?.filter((studySet) => studySet.id !== id)
+            .filter((studySet) => studySet.id !== id)
             .map((studySet) => (
               <StudySetCombineCard
                 key={studySet.id}
@@ -117,7 +117,7 @@ const StudySetCombineDialog = ({
           </DialogClose>
           <Button onClick={combine} disabled={isDisabled}>
             {isPending ? (
-              <LoaderIcon size={20} className="animate-spin" />
+              <Loader2Icon className="size-4 animate-spin" />
             ) : (
               "Combine"
             )}

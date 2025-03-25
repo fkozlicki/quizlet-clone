@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { RotateCcw, Undo2 } from "lucide-react";
 
@@ -20,12 +20,12 @@ export interface Answer {
 
 const TestMode = () => {
   const { id }: { id: string } = useParams();
-  const { data: test } = api.studySet.testCards.useQuery({ id });
+  const [test] = api.studySet.testCards.useSuspenseQuery({ id });
   const router = useRouter();
   const [answer, setAnswer] = useState<Answer | undefined>();
   const [hard, setHard] = useState<number>(0);
 
-  const cardCount = test ? Object.values(test).flatMap((e) => e).length : 0;
+  const cardCount = Object.values(test).flatMap((e) => e).length;
 
   const onSubmit = (answer: Answer) => {
     setAnswer(answer);
@@ -69,33 +69,31 @@ const TestMode = () => {
     router.push(`/study-sets/${id}`);
   };
 
-  return (
-    <>
-      {answer ? (
-        <>
-          <GameResult
-            hard={hard}
-            cardCount={cardCount}
-            firstButton={{
-              text: "Take a new test",
-              description: "Take a new test with another questions.",
-              Icon: <RotateCcw />,
-              callback: takeNewTest,
-            }}
-            secondButton={{
-              text: "Back to study set",
-              description: "Back to study set",
-              Icon: <Undo2 />,
-              callback: backToStudySet,
-            }}
-          />
-          <TestAnswer answer={answer} />
-        </>
-      ) : (
-        test && <TestForm test={test} onSubmit={onSubmit} />
-      )}
-    </>
-  );
+  if (answer) {
+    return (
+      <>
+        <GameResult
+          hard={hard}
+          cardCount={cardCount}
+          firstButton={{
+            text: "Take a new test",
+            description: "Take a new test with another questions.",
+            Icon: <RotateCcw />,
+            callback: takeNewTest,
+          }}
+          secondButton={{
+            text: "Back to study set",
+            description: "Back to study set",
+            Icon: <Undo2 />,
+            callback: backToStudySet,
+          }}
+        />
+        <TestAnswer answer={answer} />
+      </>
+    );
+  }
+
+  return <TestForm test={test} onSubmit={onSubmit} />;
 };
 
 export default TestMode;

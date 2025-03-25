@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 import type { RouterOutputs } from "@acme/api";
 
 import { api } from "~/trpc/react";
