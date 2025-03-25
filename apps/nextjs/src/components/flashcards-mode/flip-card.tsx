@@ -2,7 +2,7 @@
 
 import type { AnimationScope } from "framer-motion";
 import React, { useState } from "react";
-import { useAnimate } from "framer-motion";
+import { motion } from "framer-motion";
 
 import type { RouterOutputs } from "@acme/api";
 import type { Session } from "@acme/auth";
@@ -11,7 +11,7 @@ import { cn } from "@acme/ui";
 import FlipCardContent from "./flip-card-content";
 
 interface FlipCardProps {
-  flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][0];
+  flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][number];
   editable: boolean;
   animationScope: AnimationScope<HTMLDivElement>;
   fullscreen?: boolean;
@@ -25,30 +25,38 @@ const FlipCard = ({
   fullscreen,
   session,
 }: FlipCardProps) => {
-  const [flipScope, flipAnimate] = useAnimate<HTMLDivElement>();
-  const [flipped, setFlipped] = useState<boolean>(false);
+  const [animation, setAnimation] = useState<
+    "flipIn" | "flipOut" | undefined
+  >();
 
-  const flipCard = () => {
-    if (flipped) {
-      void flipAnimate(flipScope.current, { rotateX: [0, 180] });
-    } else {
-      void flipAnimate(flipScope.current, { rotateX: [180, 360] });
-    }
-    setFlipped((prev) => !prev);
+  const toggleFlip = () => {
+    setAnimation((prev) =>
+      !prev || prev === "flipOut" ? "flipIn" : "flipOut",
+    );
+  };
+
+  const flipVariants = {
+    flipIn: {
+      rotateX: [0, 180],
+    },
+    flipOut: {
+      rotateX: [180, 360],
+    },
   };
 
   return (
     <div
       role="presentation"
-      onClick={flipCard}
+      onClick={toggleFlip}
       ref={animationScope}
       className={cn("w-full [perspective:1000px]", {
         "min-h-[21rem] sm:min-h-[25rem]": !fullscreen,
         "min-h-[40rem]": fullscreen,
       })}
     >
-      <div
-        ref={flipScope}
+      <motion.div
+        variants={flipVariants}
+        animate={animation}
         className="relative h-full w-full cursor-pointer [transform-style:preserve-3d]"
       >
         <FlipCardContent
@@ -66,7 +74,7 @@ const FlipCard = ({
           session={session}
           back
         />
-      </div>
+      </motion.div>
     </div>
   );
 };
