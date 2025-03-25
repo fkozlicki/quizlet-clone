@@ -23,7 +23,9 @@ export default async function Page({ params: { id } }: UserStudySetsProps) {
   const session = await auth();
   const user = await api.user.byId({ id });
 
-  const title = `${session?.user.id === id ? "Your" : `${user.name}'s`} study sets`;
+  const isOwner = session?.user.id === id;
+
+  const title = `${isOwner ? "Your" : `${user.name}'s`} study sets`;
 
   return <UserStudySets userId={user.id} title={title} />;
 }

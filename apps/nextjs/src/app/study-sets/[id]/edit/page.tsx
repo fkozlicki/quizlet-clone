@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import { auth } from "@acme/auth";
 
-import EditStudySet from "~/components/study-set/edit-study-set";
+import StudySetForm from "~/components/study-set/study-set-form";
 import { api } from "~/trpc/server";
 
 interface EditStudySetProps {
@@ -28,5 +28,5 @@ export default async function Page({ params: { id } }: EditStudySetProps) {
     redirect(`/study-sets/${studySet.id}`);
   }
 
-  return <EditStudySet studySet={studySet} />;
+  return <StudySetForm defaultValues={studySet} />;
 }

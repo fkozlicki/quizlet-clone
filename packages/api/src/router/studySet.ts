@@ -8,7 +8,6 @@ import {
   createStudySet,
   deleteExcludedFlashcards,
   deleteStudySet,
-  updateStudySet,
   upsertFlashcards,
 } from "@acme/db/mutations";
 import {
@@ -22,7 +21,7 @@ import {
   getUserStudySetsQuery,
 } from "@acme/db/queries";
 import { Flashcard, Folder, FoldersToStudySets } from "@acme/db/schema";
-import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
+import { StudySetSchema } from "@acme/validators";
 
 import type { TRPCContext } from "../trpc";
 import { protectedProcedure, publicProcedure } from "../trpc";
@@ -113,12 +112,13 @@ export const studySetRouter = {
       return await getOtherStudySets(ctx.db, input);
     }),
   create: protectedProcedure
-    .input(CreateStudySetSchema)
+    .input(StudySetSchema)
     .mutation(async ({ input, ctx }) => {
-      const { title, description, flashcards } = input;
+      const { id, title, description, flashcards } = input;
 
       const result = await ctx.db.transaction(async (tx) => {
         const newStudySet = await createStudySet(tx, {
+          id,
           title,
           description,
           userId: ctx.session.user.id,
@@ -132,6 +132,17 @@ export const studySetRouter = {
           ...flashcard,
           studySetId: newStudySet.id,
         }));
+
+        if (id) {
+          const present = flashcards
+            .map((card) => card.id)
+            .filter((i) => i !== undefined);
+
+          await deleteExcludedFlashcards(tx, {
+            studySetId: newStudySet.id,
+            flashcards: present,
+          });
+        }
 
         await upsertFlashcards(tx, values);
 
@@ -187,46 +198,6 @@ export const studySetRouter = {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Could not create study set",
-        });
-      }
-
-      return result;
-    }),
-  edit: protectedProcedure
-    .input(EditStudySetSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { flashcards, ...rest } = input;
-
-      const present = flashcards
-        .map((card) => card.id)
-        .filter((i) => i !== undefined);
-
-      const result = await ctx.db.transaction(async (tx) => {
-        const updatedStudySet = await updateStudySet(tx, rest);
-
-        if (!updatedStudySet) {
-          return null;
-        }
-
-        await deleteExcludedFlashcards(tx, {
-          studySetId: updatedStudySet.id,
-          flashcards: present,
-        });
-
-        const values = flashcards.map((card) => ({
-          ...card,
-          studySetId: updatedStudySet.id,
-        }));
-
-        await upsertFlashcards(tx, values);
-
-        return updatedStudySet;
-      });
-
-      if (!result) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Could not update study set",
         });
       }
 

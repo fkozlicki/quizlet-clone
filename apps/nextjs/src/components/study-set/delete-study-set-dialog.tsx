@@ -28,9 +28,11 @@ const DeleteStudySetDialog = ({
   open,
   onOpenChange,
 }: DeleteStudySetDialogProps) => {
+  const utils = api.useUtils();
   const router = useRouter();
   const { mutate, isPending } = api.studySet.delete.useMutation({
     onSuccess() {
+      void utils.studySet.invalidate();
       toast.success("Successfully deleted study set");
       router.push("/latest");
     },

@@ -99,6 +99,13 @@ export async function createStudySet(db: Transaction, values: InsertStudySet) {
   return db
     .insert(StudySet)
     .values(values)
+    .onConflictDoUpdate({
+      target: Flashcard.id,
+      set: {
+        title: sql`excluded.title`,
+        description: sql`excluded.description`,
+      },
+    })
     .returning()
     .then((res) => res[0]);
 }

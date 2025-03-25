@@ -11,9 +11,12 @@ const FlashcardSchema = z.object({
   term: z.string().min(1, "Specify term of your flashcard"),
   definition: z.string().min(1, "Specify definition of your flashcard"),
   position: z.number(),
+  id: z.number().optional(),
+  studySetId: z.string().optional(),
 });
 
-export const CreateStudySetSchema = z.object({
+export const StudySetSchema = z.object({
+  id: z.string().optional(),
   title: z
     .string()
     .min(1, "Title is required")
@@ -24,21 +27,7 @@ export const CreateStudySetSchema = z.object({
     .min(4, "You have to create at least 4 flashcards"),
 });
 
-export type CreateStudySetValues = z.infer<typeof CreateStudySetSchema>;
-
-export const EditStudySetSchema = CreateStudySetSchema.extend({
-  id: z.string().min(1, "Id is required"),
-  flashcards: z
-    .array(
-      FlashcardSchema.extend({
-        id: z.number().optional(),
-        studySetId: z.string().optional(),
-      }),
-    )
-    .min(2, "You have to create at least 2 flashcards"),
-});
-
-export type EditStudySetValues = z.infer<typeof EditStudySetSchema>;
+export type StudySetValues = z.infer<typeof StudySetSchema>;
 
 export const CreateFolderSchema = z.object({
   name: z.string().min(1, "Folder name is required"),

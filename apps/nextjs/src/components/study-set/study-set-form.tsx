@@ -1,14 +1,12 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Reorder } from "framer-motion";
 import { LoaderCircle, PlusIcon, Trash2Icon } from "lucide-react";
 
-import type {
-  CreateStudySetValues,
-  EditStudySetValues,
-} from "@acme/validators";
+import type { RouterOutputs } from "@acme/api";
+import type { StudySetValues } from "@acme/validators";
 import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 import { Card, CardContent, CardHeader } from "@acme/ui/card";
@@ -27,7 +25,7 @@ import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 import { Textarea } from "@acme/ui/textarea";
 import { toast } from "@acme/ui/toast";
-import { CreateStudySetSchema, EditStudySetSchema } from "@acme/validators";
+import { StudySetSchema } from "@acme/validators";
 
 import { api } from "~/trpc/react";
 
@@ -38,16 +36,17 @@ const initialFlashcards = Array.from({ length: 4 }, (_, index) => ({
 }));
 
 interface StudySetFormProps {
-  defaultValues?: EditStudySetValues;
+  defaultValues?: RouterOutputs["studySet"]["byId"];
 }
 
 const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const form = useForm({
-    schema: defaultValues ? EditStudySetSchema : CreateStudySetSchema,
-    defaultValues: defaultValues ?? {
-      title: "",
-      description: "",
-      flashcards: initialFlashcards,
+    schema: StudySetSchema,
+    defaultValues: {
+      id: defaultValues?.id,
+      title: defaultValues?.title ?? "",
+      description: defaultValues?.description ?? "",
+      flashcards: defaultValues?.flashcards ?? initialFlashcards,
     },
   });
   const { fields, append, remove, swap } = useFieldArray({
@@ -60,63 +59,58 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
   const utils = api.useUtils();
   const create = api.studySet.create.useMutation({
     onSuccess() {
-      toast.success("Created new study set");
+      form.reset({});
+      toast.success(`${defaultValues ? "Saved" : "Created new"} study set`);
       void utils.studySet.invalidate();
-      form.reset();
-      router.push("/latest");
+
+      const route = defaultValues
+        ? `/study-sets/${defaultValues.id}`
+        : "/latest";
+
+      router.push(route);
     },
     onError(error) {
       toast.error(error.message);
     },
   });
-  const edit = api.studySet.edit.useMutation({
-    onSuccess(data) {
-      toast.success("Saved study set");
-      void utils.studySet.invalidate();
-      router.push(`/study-sets/${data.id}`);
-    },
-    onError(error) {
-      toast.error(error.message);
-    },
-  });
+  const [isInitialRender, setIsInitialRender] = useState(true);
   const [active, setActive] = useState(0);
 
-  const onSubmit = (values: EditStudySetValues | CreateStudySetValues) => {
+  useEffect(() => {
+    if (isInitialRender) {
+      setIsInitialRender(false);
+      return;
+    }
+
+    ref.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }, [fields.length]);
+
+  const onSubmit = (values: StudySetValues) => {
     const flashcards = values.flashcards.map((flashcard, index) => ({
       ...flashcard,
       position: index,
     }));
 
-    if ("id" in values) {
-      edit.mutate({
-        ...values,
-        flashcards,
-      });
-    } else {
-      create.mutate({ ...values, flashcards });
-    }
+    create.mutate({
+      ...values,
+      flashcards,
+    });
   };
 
-  const addEmptyFlashcard = async () => {
-    await new Promise<void>((resolve) => {
-      append({
-        term: "",
-        definition: "",
-        position: fields.length,
-      });
-      resolve();
-    });
-    ref.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "end",
+  const addFlashcard = () => {
+    append({
+      term: "",
+      definition: "",
+      position: fields.length,
     });
   };
 
   const swapCards = (from: number, to: number) => {
     swap(from, to);
   };
-
-  const isPending = create.isPending || edit.isPending;
 
   return (
     <div ref={ref} className="m-auto max-w-xl py-8">
@@ -130,7 +124,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                 <FormLabel>Title</FormLabel>
                 <FormControl>
                   <Input
-                    disabled={isPending}
+                    disabled={create.isPending}
                     placeholder="Mathematics"
                     {...field}
                   />
@@ -148,7 +142,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                 <FormLabel>Description (optional)</FormLabel>
                 <FormControl>
                   <Textarea
-                    disabled={isPending}
+                    disabled={create.isPending}
                     placeholder="Addition learning set..."
                     {...field}
                   />
@@ -220,7 +214,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                                 className="grid after:invisible after:whitespace-pre-wrap after:border after:py-2 after:text-sm after:content-[attr(data-value)_'\n'] after:[grid-area:1/1]"
                               >
                                 <Textarea
-                                  disabled={isPending}
+                                  disabled={create.isPending}
                                   placeholder="2+2"
                                   {...field}
                                   className="min-h-10 resize-none [grid-area:1/1]"
@@ -244,7 +238,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
                                 className="grid after:invisible after:whitespace-pre-wrap after:border after:py-2 after:text-sm after:content-[attr(data-value)_'\n'] after:[grid-area:1/1]"
                               >
                                 <Textarea
-                                  disabled={isPending}
+                                  disabled={create.isPending}
                                   placeholder="4"
                                   {...field}
                                   className="min-h-10 resize-none [grid-area:1/1]"
@@ -263,7 +257,7 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
             </Reorder.Group>
             <Button
               type="button"
-              onClick={addEmptyFlashcard}
+              onClick={addFlashcard}
               className="mt-8 w-full"
               variant="outline"
             >
@@ -272,12 +266,12 @@ const StudySetForm = ({ defaultValues }: StudySetFormProps) => {
             </Button>
           </div>
           <Button
-            disabled={isPending}
+            disabled={create.isPending}
             type="submit"
             className="w-full"
             size="lg"
           >
-            {isPending ? (
+            {create.isPending ? (
               <LoaderCircle size={16} className="animate-spin" />
             ) : (
               <>{defaultValues ? "Save" : "Create"} study set</>
