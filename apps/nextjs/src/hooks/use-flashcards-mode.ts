@@ -63,6 +63,8 @@ export function useFlashcardsMode(id: string) {
     }
 
     if (sorting) {
+      dispatch({ type: "MARK_HARD", payload: currentCard });
+
       await animateMessage(
         messageRef.current,
         {
@@ -83,7 +85,6 @@ export function useFlashcardsMode(id: string) {
       );
 
       dispatch({ type: "NEXT" });
-      dispatch({ type: "MARK_HARD", payload: currentCard });
     } else {
       dispatch({ type: "PREVIOUS" });
       animateCard(
