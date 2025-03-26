@@ -1,12 +1,10 @@
-import React from "react";
-
 import { Button } from "@acme/ui/button";
 
-interface StartScreenProps {
-  startGame: () => void;
-}
+import { useMatchModeContext } from "~/contexts/match-mode-context";
 
-const StartScreen = ({ startGame }: StartScreenProps) => {
+const StartScreen = () => {
+  const { start } = useMatchModeContext();
+
   return (
     <div>
       <span className="mb-2 block text-center text-2xl font-semibold">
@@ -15,7 +13,7 @@ const StartScreen = ({ startGame }: StartScreenProps) => {
       <span className="mb-5 block text-center text-lg">
         Match all terms with definitions
       </span>
-      <Button onClick={startGame} className="m-auto block">
+      <Button onClick={start} className="m-auto block">
         Start game
       </Button>
     </div>

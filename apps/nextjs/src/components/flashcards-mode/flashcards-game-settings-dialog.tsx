@@ -1,4 +1,5 @@
 import React from "react";
+import { SettingsIcon } from "lucide-react";
 
 import { Button } from "@acme/ui/button";
 import {
@@ -7,6 +8,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@acme/ui/dialog";
 import { Separator } from "@acme/ui/separator";
 import { Switch } from "@acme/ui/switch";
@@ -17,29 +19,30 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 
-interface FlashcardsGameSettingsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  sorting: boolean;
-  switchSorting: (value: boolean) => void;
-  resetFlashcards: () => void;
-  disableStarredOnly: boolean;
-  starredOnly: boolean;
-  switchStarredOnly: (value: boolean) => void;
-}
+import { useFlashcardsModeContext } from "~/contexts/flashcards-mode-context";
 
-const FlashcardsGameSettingsDialog = ({
-  open,
-  onOpenChange,
-  sorting,
-  switchSorting,
-  resetFlashcards,
-  disableStarredOnly,
-  starredOnly,
-  switchStarredOnly,
-}: FlashcardsGameSettingsDialogProps) => {
+const FlashcardsGameSettingsDialog = () => {
+  const {
+    sorting,
+    reset,
+    toggleSorting,
+    starredOnly,
+    toggleStarredOnly,
+    disableStarredOnly,
+  } = useFlashcardsModeContext();
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="icon">
+              <SettingsIcon className="size-4" />
+            </Button>
+          </DialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>Settings</TooltipContent>
+      </Tooltip>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
@@ -56,7 +59,7 @@ const FlashcardsGameSettingsDialog = ({
               on hard ones only.
             </span>
           </div>
-          <Switch checked={sorting} onCheckedChange={switchSorting} />
+          <Switch checked={sorting} onCheckedChange={toggleSorting} />
         </div>
         <Separator />
         <div className="flex items-center justify-between">
@@ -68,7 +71,7 @@ const FlashcardsGameSettingsDialog = ({
                   <Switch
                     disabled={disableStarredOnly}
                     checked={starredOnly}
-                    onCheckedChange={switchStarredOnly}
+                    onCheckedChange={toggleStarredOnly}
                   />
                 </div>
               </TooltipTrigger>
@@ -82,7 +85,7 @@ const FlashcardsGameSettingsDialog = ({
         </div>
         <Separator />
         <div>
-          <Button onClick={resetFlashcards} variant="destructive">
+          <Button onClick={reset} variant="destructive">
             Restart Flashcards
           </Button>
         </div>

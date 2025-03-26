@@ -1,14 +1,13 @@
-import type { AnimationScope } from "framer-motion";
+"use client";
 
-interface MessageCardProps {
-  know: boolean;
-  animationScope: AnimationScope<HTMLDivElement>;
-}
+import { useFlashcardsModeContext } from "~/contexts/flashcards-mode-context";
 
-const MessageCard = ({ know, animationScope }: MessageCardProps) => {
+const MessageCard = () => {
+  const { messageRef, know } = useFlashcardsModeContext();
+
   return (
     <div
-      ref={animationScope}
+      ref={messageRef}
       className="invisible absolute left-0 top-0 z-30 flex h-full w-full items-center justify-center rounded-lg bg-secondary opacity-0 shadow"
     >
       <div

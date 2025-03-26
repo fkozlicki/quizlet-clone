@@ -1,12 +1,12 @@
 import React from "react";
 
-import type { Answer } from "./test-mode";
+import type { Answers } from "./test-mode";
 import MultipleChoiceCard from "../shared/multiple-choice-card";
 import TrueFalseCard from "../shared/true-false-card";
 import WrittenCard from "../shared/written-card";
 
 interface TestAnswerProps {
-  answer: Answer;
+  answer: Answers;
 }
 
 const TestAnswer = ({ answer }: TestAnswerProps) => {

@@ -1,11 +1,12 @@
-import React from "react";
+"use client";
+
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ArrowLeft,
   ArrowRight,
   Check,
   Maximize,
-  Settings,
   Shuffle,
   X,
 } from "lucide-react";
@@ -19,36 +20,25 @@ import {
   TooltipTrigger,
 } from "@acme/ui/tooltip";
 
+import { useFlashcardsModeContext } from "~/contexts/flashcards-mode-context";
+import FlashcardsGameSettingsDialog from "./flashcards-game-settings-dialog";
+
 interface FlashcardButtonsProps {
-  cardIndex: number;
-  cardCount: number;
-  sorting: boolean;
-  setId: string;
-  handleLeft: () => void;
-  handleRight: () => void;
-  openSettingsModal: () => void;
-  shuffle: () => void;
   fullscreen?: boolean;
 }
 
-const FlashcardsGameButtons = ({
-  sorting,
-  cardIndex,
-  cardCount,
-  setId,
-  handleLeft,
-  handleRight,
-  shuffle,
-  openSettingsModal,
-  fullscreen,
-}: FlashcardButtonsProps) => {
+const FlashcardsGameButtons = ({ fullscreen }: FlashcardButtonsProps) => {
+  const { id }: { id: string } = useParams();
+  const { shuffle, handleLeft, handleRight, index, sorting, count } =
+    useFlashcardsModeContext();
+
   return (
     <div className="relative mb-4 mt-4 flex justify-center">
       <div className="relative z-10 flex items-center gap-4">
         <Button
           variant="outline"
           onClick={handleLeft}
-          disabled={!sorting && cardIndex === 0}
+          disabled={!sorting && index === 0}
           className={cn("rounded-full", {
             "hover:border-red-500 hover:text-red-500": sorting,
           })}
@@ -57,12 +47,12 @@ const FlashcardsGameButtons = ({
           {sorting ? <X /> : <ArrowLeft />}
         </Button>
         <span className="select-none font-semibold tracking-[0.4em] text-muted-foreground">
-          {cardIndex + 1}/{cardCount}
+          {index + 1}/{count}
         </span>
         <Button
           variant="outline"
           onClick={handleRight}
-          disabled={cardIndex === cardCount}
+          disabled={index === count}
           className={cn("rounded-full", {
             "hover:border-green-600 hover:text-green-600": sorting,
           })}
@@ -82,22 +72,12 @@ const FlashcardsGameButtons = ({
             <TooltipContent>Shuffle</TooltipContent>
           </Tooltip>
           <div className="flex gap-2">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  onClick={openSettingsModal}
-                  size="icon"
-                >
-                  <Settings size={18} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Settings</TooltipContent>
-            </Tooltip>
+            <FlashcardsGameSettingsDialog />
+
             {!fullscreen && (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Link href={`/study-sets/${setId}/flashcards`}>
+                  <Link href={`/study-sets/${id}/flashcards`}>
                     <Button variant="outline" size="icon">
                       <Maximize size={18} />
                     </Button>

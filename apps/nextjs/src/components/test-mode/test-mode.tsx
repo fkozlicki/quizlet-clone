@@ -12,22 +12,27 @@ import TestAnswer from "./test-answer";
 import TestForm from "./test-form";
 
 type Test = RouterOutputs["studySet"]["testCards"];
-export interface Answer {
-  multipleChoice: (Test["multipleChoice"][0] & { userAnswer: string })[];
-  written: (Test["written"][0] & { userAnswer: string })[];
-  trueOrFalse: (Test["trueOrFalse"][0] & { userAnswer: string })[];
+
+type MultipleChoice = Test["multipleChoice"][number] & { userAnswer: string };
+type Written = Test["written"][number] & { userAnswer: string };
+type TrueFalse = Test["trueOrFalse"][number] & { userAnswer: string };
+
+export interface Answers {
+  multipleChoice: MultipleChoice[];
+  written: Written[];
+  trueOrFalse: TrueFalse[];
 }
 
 const TestMode = () => {
   const { id }: { id: string } = useParams();
   const [test] = api.studySet.testCards.useSuspenseQuery({ id });
   const router = useRouter();
-  const [answer, setAnswer] = useState<Answer | undefined>();
+  const [answer, setAnswer] = useState<Answers | undefined>();
   const [hard, setHard] = useState<number>(0);
 
   const cardCount = Object.values(test).flatMap((e) => e).length;
 
-  const onSubmit = (answer: Answer) => {
+  const onSubmit = (answer: Answers) => {
     setAnswer(answer);
     setHard(calculateHard(answer));
     if (typeof window !== "undefined") {
@@ -35,7 +40,7 @@ const TestMode = () => {
     }
   };
 
-  const calculateHard = (answer: Answer) => {
+  const calculateHard = (answer: Answers) => {
     const { multipleChoice, written, trueOrFalse } = answer;
     const hard =
       multipleChoice.reduce(

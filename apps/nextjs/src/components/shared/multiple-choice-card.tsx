@@ -11,7 +11,7 @@ interface MultipleChoiceCardProps
   term: string;
   answers: string[];
   index: number;
-  callback?: (index: number, event: MouseEvent) => void;
+  callback?: (index: number, event: MouseEvent<HTMLDivElement>) => void;
   definition?: string;
   userAnswer?: string;
 }

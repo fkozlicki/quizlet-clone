@@ -13,21 +13,17 @@ import useStar from "~/hooks/useStar";
 import EditFlashcardDialog from "../shared/edit-flashcard-dialog";
 
 interface FlipCardContentProps {
-  title: string;
-  content: string;
-  editable?: boolean;
-  back?: boolean;
   flashcard: RouterOutputs["studySet"]["byId"]["flashcards"][0];
   session: Session | null;
+  editable?: boolean;
+  back?: boolean;
 }
 
 const FlipCardContent = ({
-  back,
-  title,
-  content,
-  editable,
   flashcard,
   session,
+  back,
+  editable,
 }: FlipCardContentProps) => {
   const { toggleStar } = useStar(flashcard);
   const { onOpenChange } = useSignInDialogContext();
@@ -41,6 +37,10 @@ const FlipCardContent = ({
       onOpenChange(true);
     }
   };
+
+  const title = back ? "Definition" : "Term";
+
+  const content = back ? flashcard.definition : flashcard.term;
 
   return (
     <div

@@ -1,24 +1,66 @@
-import React from "react";
+import { motion } from "framer-motion";
 
-import { Card, CardContent } from "@acme/ui/card";
+import { useMatchModeContext } from "~/contexts/match-mode-context";
 
 interface MemoryCardProps {
   index: number;
   content: string;
-  selectCallback: () => void;
 }
 
-const MemoryCard = ({ index, content, selectCallback }: MemoryCardProps) => {
+const MemoryCard = ({ index, content }: MemoryCardProps) => {
+  const { selectCard, selected, matched, mismatched } = useMatchModeContext();
+
+  const isSelected = selected.includes(index);
+  const isMatched = matched.includes(index);
+  const isMismatched = mismatched.includes(index);
+
+  const variants = {
+    selected: {
+      background: "#bfdbfe",
+      borderColor: "#2563eb",
+    },
+    matched: {
+      background: "#bbf7d0",
+      borderColor: "#16a34a",
+      scale: 0,
+      transition: {
+        scale: {
+          duration: 0.2,
+          ease: "linear",
+        },
+      },
+    },
+    mismatch: {
+      background: "#fda4af",
+      borderColor: "#e11d48",
+      rotate: [-2, 0, -2, 0, -2, 0],
+      transition: {
+        rotate: {
+          duration: 0.2,
+        },
+      },
+    },
+  };
+
+  const animation = isSelected
+    ? "selected"
+    : isMatched
+      ? "matched"
+      : isMismatched
+        ? "mismatch"
+        : undefined;
+
   return (
-    <Card
-      id={`card-${index}`}
-      onClick={selectCallback}
-      className="cursor-pointer border-2"
+    <motion.div
+      variants={variants}
+      animate={animation}
+      onClick={() => selectCard(index)}
+      className="cursor-pointer rounded-xl border-2 shadow"
     >
-      <CardContent className="flex min-h-[10rem] items-center justify-center p-4">
+      <div className="flex min-h-[10rem] items-center justify-center p-4">
         <span className="font-medium">{content}</span>
-      </CardContent>
-    </Card>
+      </div>
+    </motion.div>
   );
 };
 

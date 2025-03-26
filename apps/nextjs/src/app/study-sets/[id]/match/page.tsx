@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import MatchGame from "~/components/match-mode/match-game";
+import MatchModeProvider from "~/contexts/match-mode-context";
 import { api, HydrateClient } from "~/trpc/server";
 
 interface MatchModeProps {
@@ -26,7 +27,9 @@ export default async function MatchMode({
 
   return (
     <HydrateClient>
-      <MatchGame />
+      <MatchModeProvider id={id}>
+        <MatchGame id={id} />
+      </MatchModeProvider>
     </HydrateClient>
   );
 }

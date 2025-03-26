@@ -1,7 +1,5 @@
 "use client";
 
-import type { MouseEvent } from "react";
-import React, { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { RotateCcw, Undo2 } from "lucide-react";
 
@@ -9,66 +7,26 @@ import type { Session } from "@acme/auth";
 import { Progress } from "@acme/ui/progress";
 import { Separator } from "@acme/ui/separator";
 
-import { api } from "~/trpc/react";
+import { useLearnMode } from "~/hooks/use-learn-mode";
 import FlashcardCard from "../shared/flashcard-card";
 import GameResult from "../shared/game-result";
 import MultipleChoiceCard from "../shared/multiple-choice-card";
 
 const LearnMode = ({ session }: { session: Session | null }) => {
   const { id }: { id: string } = useParams();
-  const [flashcards] = api.studySet.learnCards.useSuspenseQuery(
-    { id },
-    {
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    },
-  );
-  const [cardIndex, setCardIndex] = useState<number>(0);
-  const [disabled, setDisabled] = useState<boolean>(false);
-  const [correct, setCorrect] = useState<number>(0);
-  const utils = api.useUtils();
+
   const router = useRouter();
 
-  const currentCard = flashcards[cardIndex];
-
-  const resetLearning = async () => {
-    await utils.studySet.learnCards.invalidate();
-    setCardIndex(0);
-    setCorrect(0);
-  };
-
-  const chooseAnswer = (index: number, event: MouseEvent) => {
-    const selectedAnswer = currentCard?.answers[index];
-
-    if (disabled || !selectedAnswer) return;
-
-    setDisabled(true);
-
-    const button = event.currentTarget as HTMLDivElement;
-
-    let borderColor: string;
-    let backgroundColor: string;
-
-    if (selectedAnswer === currentCard.definition) {
-      borderColor = "#16a34a";
-      backgroundColor = "#bbf7d0";
-      setCorrect((prev) => prev + 1);
-    } else {
-      borderColor = "#e11d48";
-      backgroundColor = "#fda4af";
-    }
-
-    button.style.background = backgroundColor;
-    button.style.borderColor = borderColor;
-
-    setTimeout(() => {
-      button.style.background = "hsla(var(--background))";
-      button.style.borderColor = "hsla(var(--input))";
-      setDisabled(false);
-      setCardIndex((prev) => prev + 1);
-    }, 1000);
-  };
+  const {
+    chooseAnswer,
+    currentCard,
+    reset,
+    index,
+    progress,
+    isCompleted,
+    flashcards,
+    correct,
+  } = useLearnMode(id);
 
   const backToStudySet = () => {
     router.push(`/study-sets/${id}`);
@@ -76,19 +34,16 @@ const LearnMode = ({ session }: { session: Session | null }) => {
 
   return (
     <>
-      <Progress
-        value={(cardIndex / flashcards.length) * 100}
-        className="mb-4"
-      />
+      <Progress value={progress} className="mb-4" />
       {currentCard && (
         <MultipleChoiceCard
           term={currentCard.term}
           answers={currentCard.answers}
-          index={cardIndex}
+          index={index}
           callback={chooseAnswer}
         />
       )}
-      {cardIndex === flashcards.length && (
+      {isCompleted && (
         <>
           <div className="mb-8 text-2xl font-bold">U finished learning</div>
           <GameResult
@@ -98,7 +53,7 @@ const LearnMode = ({ session }: { session: Session | null }) => {
               text: "Learn with new set",
               description: "Learn with new set",
               Icon: <RotateCcw size={20} />,
-              callback: resetLearning,
+              callback: reset,
             }}
             secondButton={{
               text: "Back to study set",

@@ -1,16 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client";
 
-interface MatchGameTimerProps {
-  updateEllapsedTime: (time: number) => void;
-}
+import { useEffect, useRef, useState } from "react";
 
-const MatchGameTimer = ({ updateEllapsedTime }: MatchGameTimerProps) => {
-  const [ellapsedTime, setEllapsedTime] = useState<number>(0);
+import { useMatchModeContext } from "~/contexts/match-mode-context";
+
+const MatchGameTimer = () => {
+  const { setEllapsedTime } = useMatchModeContext();
+  const [timer, setTimer] = useState<number>(0);
   const timeRef = useRef<number>(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setEllapsedTime((prev) => {
+      setTimer((prev) => {
         timeRef.current = prev + 0.1;
         return prev + 0.1;
       });
@@ -18,13 +19,13 @@ const MatchGameTimer = ({ updateEllapsedTime }: MatchGameTimerProps) => {
 
     return () => {
       clearInterval(interval);
-      updateEllapsedTime(timeRef.current);
+      setEllapsedTime(timeRef.current);
     };
   }, []);
 
   return (
     <span className="mb-4 inline-block text-xl tabular-nums">
-      {ellapsedTime.toFixed(1)} sec.
+      {timer.toFixed(1)} sec.
     </span>
   );
 };

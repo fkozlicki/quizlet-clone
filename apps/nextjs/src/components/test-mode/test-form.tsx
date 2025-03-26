@@ -4,7 +4,7 @@ import type { RouterOutputs } from "@acme/api";
 import { Button } from "@acme/ui/button";
 import { Form, FormField, useFieldArray, useForm } from "@acme/ui/form";
 
-import type { Answer } from "./test-mode";
+import type { Answers } from "./test-mode";
 import MultipleChoiceCard from "../shared/multiple-choice-card";
 import TrueFalseCard from "../shared/true-false-card";
 import WrittenCard from "../shared/written-card";
@@ -34,7 +34,7 @@ const testSchema = z.object({
 
 interface TestFormProps {
   test: RouterOutputs["studySet"]["testCards"];
-  onSubmit: (answer: Answer) => void;
+  onSubmit: (answer: Answers) => void;
 }
 
 const TestForm = ({ test, onSubmit }: TestFormProps) => {
