@@ -14,8 +14,6 @@ import StudySetInfo from "~/components/study-set/study-set-info";
 import FlashcardsModeProvider from "~/contexts/flashcards-mode-context";
 import { api, HydrateClient } from "~/trpc/server";
 
-export const dynamic = "force-cache";
-
 interface StudySetProps {
   params: { id: string };
 }

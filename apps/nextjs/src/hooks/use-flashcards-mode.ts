@@ -100,6 +100,8 @@ export function useFlashcardsMode(id: string) {
     }
 
     if (sorting) {
+      dispatch({ type: "MARK_KNOWN" });
+
       await animateMessage(
         messageRef.current,
         {
