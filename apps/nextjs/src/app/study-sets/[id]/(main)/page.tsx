@@ -11,6 +11,7 @@ import StudyModes from "~/components/study-set/study-modes";
 import StudySetCTA from "~/components/study-set/study-set-cta";
 import StudySetFlashcards from "~/components/study-set/study-set-flashcards";
 import StudySetInfo from "~/components/study-set/study-set-info";
+import FlashcardsModeProvider from "~/contexts/flashcards-mode-context";
 import { api, HydrateClient } from "~/trpc/server";
 
 export const dynamic = "force-cache";
@@ -47,26 +48,28 @@ export default async function StudySet({ params: { id } }: StudySetProps) {
 
   return (
     <HydrateClient>
-      <div className="m-auto max-w-3xl">
-        <StudySetInfo />
-        <StudyModes studySetId={id} />
-        <FlashcardsGame session={session} />
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <CreatedBy user={user} />
-          <StudySetCTA session={session} userId={userId} id={id} />
+      <FlashcardsModeProvider id={id}>
+        <div className="m-auto max-w-3xl">
+          <StudySetInfo />
+          <StudyModes studySetId={id} />
+          <FlashcardsGame session={session} />
+          <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <CreatedBy user={user} />
+            <StudySetCTA session={session} userId={userId} id={id} />
+          </div>
+          <StudySetFlashcards session={session} />
+          {userId === session?.user.id && (
+            <Link href={`/study-sets/${id}/edit`}>
+              <Button size="lg" className="m-auto mb-8 block">
+                Add or Remove Terms
+              </Button>
+            </Link>
+          )}
+          {otherStudySets.length > 0 && (
+            <OtherStudySets studySets={otherStudySets} />
+          )}
         </div>
-        <StudySetFlashcards session={session} />
-        {userId === session?.user.id && (
-          <Link href={`/study-sets/${id}/edit`}>
-            <Button size="lg" className="m-auto mb-8 block">
-              Add or Remove Terms
-            </Button>
-          </Link>
-        )}
-        {otherStudySets.length > 0 && (
-          <OtherStudySets studySets={otherStudySets} />
-        )}
-      </div>
+      </FlashcardsModeProvider>
     </HydrateClient>
   );
 }
