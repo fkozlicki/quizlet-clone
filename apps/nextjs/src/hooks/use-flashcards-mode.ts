@@ -42,8 +42,7 @@ export function useFlashcardsMode(id: string) {
 
   const currentCard = flashcards[index];
 
-  const disableStarredOnly =
-    initialFlashcards.filter((card) => card.starred).length === 0;
+  const disableStarredOnly = starredCards.length === 0;
 
   const count = flashcards.length;
 
