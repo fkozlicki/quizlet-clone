@@ -7,7 +7,6 @@ import { skipCSRFCheck } from "@auth/core";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import Github from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
-import Resend from "next-auth/providers/resend";
 
 import { db } from "@acme/db/client";
 import { Account, Session, User } from "@acme/db/schema";
@@ -40,14 +39,7 @@ export const authConfig = {
       }
     : {}),
   secret: env.AUTH_SECRET,
-  providers: [
-    Google,
-    Github,
-    Resend({
-      apiKey: env.AUTH_RESEND_KEY,
-      from: env.AUTH_EMAIL_FROM,
-    }),
-  ],
+  providers: [Google, Github],
   callbacks: {
     session: (opts) => {
       if (!("user" in opts))

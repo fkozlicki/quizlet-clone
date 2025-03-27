@@ -1,7 +1,6 @@
 import { Auth } from "@auth/core";
 import GitHub from "@auth/core/providers/github";
 import Google from "@auth/core/providers/google";
-import Resend from "@auth/core/providers/resend";
 import { eventHandler, toWebRequest } from "h3";
 
 export default eventHandler(async (event) =>
@@ -18,10 +17,6 @@ export default eventHandler(async (event) =>
       GitHub({
         clientId: process.env.AUTH_GITHUB_ID,
         clientSecret: process.env.AUTH_GITHUB_SECRET,
-      }),
-      Resend({
-        apiKey: process.env.AUTH_RESEND_KEY,
-        from: process.env.AUTH_EMAIL_FROM,
       }),
     ],
   }),
