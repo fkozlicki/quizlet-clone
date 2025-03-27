@@ -9,7 +9,7 @@ import { Card, CardContent } from "@acme/ui/card";
 import { Separator } from "@acme/ui/separator";
 
 import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
-import useStar from "~/hooks/useStar";
+import useStar from "~/hooks/use-star";
 import EditFlashcardDialog from "./edit-flashcard-dialog";
 
 interface FlashcardCardProps {

@@ -9,7 +9,7 @@ import { Form, FormField, FormItem, FormMessage, useForm } from "@acme/ui/form";
 import { Input } from "@acme/ui/input";
 import { Label } from "@acme/ui/label";
 
-import { signInAction } from "./sign-in-action";
+import { signInAction } from "~/actions/sign-in";
 
 const signInSchema = z.object({
   email: z.string().min(1, "Enter your email").email(),
@@ -30,10 +30,7 @@ const SignInWithEmail = () => {
   const onSubmit = async ({ email }: SignInValues) => {
     setLoading(true);
 
-    await signInAction("resend", {
-      redirectTo: "/latest",
-      email,
-    });
+    await signInAction(email);
 
     setLoading(false);
   };

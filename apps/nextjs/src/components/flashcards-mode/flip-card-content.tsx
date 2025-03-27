@@ -9,7 +9,7 @@ import { cn } from "@acme/ui";
 import { Button } from "@acme/ui/button";
 
 import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
-import useStar from "~/hooks/useStar";
+import useStar from "~/hooks/use-star";
 import EditFlashcardDialog from "../shared/edit-flashcard-dialog";
 
 interface FlipCardContentProps {

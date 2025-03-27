@@ -1,6 +1,6 @@
 import type { MouseEvent } from "react";
 
-import { useLearnModeReducer } from "~/hooks/learn-mode-reducer";
+import { useLearnModeReducer } from "~/hooks/use-learn-mode-reducer";
 import { api } from "~/trpc/react";
 
 export function useLearnMode(id: string) {
