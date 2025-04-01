@@ -11,7 +11,6 @@ import {
 } from "@acme/ui/dialog";
 
 import { useSignInDialogContext } from "~/contexts/sign-in-dialog-context";
-import SignInWithEmail from "./sign-in-with-email";
 
 const SignInDialog = ({ children }: PropsWithChildren) => {
   const { open, onOpenChange } = useSignInDialogContext();
@@ -26,15 +25,7 @@ const SignInDialog = ({ children }: PropsWithChildren) => {
             remove your account.
           </DialogDescription>
         </DialogHeader>
-        <div>
-          {children}
-          <div className="my-4 flex items-center gap-4">
-            <div className="h-px flex-1 bg-border"></div>
-            <span className="text-sm text-muted-foreground">OR</span>
-            <div className="h-px flex-1 bg-border"></div>
-          </div>
-          <SignInWithEmail />
-        </div>
+        <div>{children}</div>
       </DialogContent>
     </Dialog>
   );

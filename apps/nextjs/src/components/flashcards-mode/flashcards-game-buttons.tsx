@@ -46,8 +46,8 @@ const FlashcardsGameButtons = ({ fullscreen }: FlashcardButtonsProps) => {
         >
           {sorting ? <X /> : <ArrowLeft />}
         </Button>
-        <span className="select-none font-semibold tracking-[0.4em] text-muted-foreground">
-          {index + 1}/{count}
+        <span className="select-none font-semibold text-muted-foreground">
+          {index + 1} / {count}
         </span>
         <Button
           variant="outline"
