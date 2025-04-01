@@ -14,7 +14,7 @@ const StudySetCard = ({
   const { id, title, flashcardCount, user } = studySet;
 
   return (
-    <Card className="relative cursor-pointer hover:border-primary">
+    <Card className="relative cursor-pointer hover:shadow-md">
       <Link
         href={`/study-sets/${id}`}
         className="absolute left-0 top-0 h-full w-full"
@@ -30,7 +30,7 @@ const StudySetCard = ({
             <AvatarImage src={user.image ?? undefined} alt="author avatar" />
             <AvatarFallback className="text-sm">U</AvatarFallback>
           </Avatar>
-          <Button variant="link" className="p-0">
+          <Button variant="link" className="p-0 text-foreground">
             {user.name}
           </Button>
         </Link>

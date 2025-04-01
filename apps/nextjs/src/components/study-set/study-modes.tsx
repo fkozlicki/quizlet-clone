@@ -15,9 +15,12 @@ const StudyModes = ({ studySetId }: { studySetId: string }) => {
     <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
       {modes.map(({ href, Icon, text }, index) => (
         <Link href={href} key={index}>
-          <Card className="hover:border-primary">
+          <Card className="group hover:shadow-md">
             <CardContent className="flex items-center gap-2 p-4">
-              <Icon size={20} />
+              <Icon
+                size={20}
+                className="transition-colors duration-300 group-hover:text-primary"
+              />
               <span>{text}</span>
             </CardContent>
           </Card>

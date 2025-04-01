@@ -24,7 +24,9 @@ const Navbar = ({ session }: { session: Session | null }) => {
           href={session ? "/latest" : "/"}
           className="mx-2 hidden md:inline"
         >
-          <Button variant="link">Home</Button>
+          <Button variant="link" className="text-foreground">
+            Home
+          </Button>
         </Link>
         <CreateOptionsDropdown session={session} />
       </div>

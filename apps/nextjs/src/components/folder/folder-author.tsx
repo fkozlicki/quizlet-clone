@@ -25,7 +25,7 @@ const FolderAuthor = () => {
               <User size={16} />
             </AvatarFallback>
           </Avatar>
-          <Button className="p-0" variant="link">
+          <Button className="p-0 text-foreground" variant="link">
             {user.name}
           </Button>
         </Link>

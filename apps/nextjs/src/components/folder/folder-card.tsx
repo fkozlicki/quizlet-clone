@@ -15,7 +15,7 @@ const FolderCard = ({
 
   return (
     <Link href={`/users/${userId}/folders/${slug}`}>
-      <Card className="hover:border-primary">
+      <Card className="transition duration-200 hover:shadow-md">
         <CardContent className="p-6">
           <Badge className="mb-3">{studySetsCount} sets</Badge>
           <div className="flex items-center gap-2">
