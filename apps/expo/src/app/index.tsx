@@ -1,46 +1,35 @@
-import { Fragment } from "react";
-import { Button, Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Stack } from "expo-router";
+import { Redirect } from "expo-router";
 
-import { useSignIn, useSignOut, useUser } from "~/utils/auth";
-
-function MobileAuth() {
-  const user = useUser();
-  const signIn = useSignIn();
-  const signOut = useSignOut();
-
-  return (
-    <Fragment>
-      <Text className="pb-2 text-center text-xl font-semibold text-white">
-        {user?.name ?? "Not logged in"}
-      </Text>
-      <Button
-        onPress={() => (user ? signOut() : signIn())}
-        title={user ? "Sign Out" : "Sign In With Discord"}
-        color={"#5B65E9"}
-      />
-    </Fragment>
-  );
-}
+import { api } from "~/utils/api";
+import { useSignIn } from "~/utils/auth";
 
 export default function Index() {
+  const { data: session } = api.auth.getSession.useQuery();
+  const signIn = useSignIn();
+
+  if (session) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   return (
-    <SafeAreaView className="bg-background">
-      {/* Changes page title visible on the header */}
-      <Stack.Screen options={{ title: "Home Page" }} />
-      <View className="h-full w-full bg-background p-4">
-        <Text className="pb-2 text-center text-5xl font-bold text-foreground">
-          Create <Text className="text-primary">T3</Text> Turbo
+    <SafeAreaView className="flex-1 items-center justify-center bg-primary">
+      <View className="items-center">
+        <Text className="text-center text-5xl font-semibold text-white">
+          Quizlet
         </Text>
 
-        <MobileAuth />
-
-        <View className="py-2">
-          <Text className="font-semibold italic text-primary">
-            Press on a post
-          </Text>
-        </View>
+        {session === null && (
+          <TouchableOpacity
+            onPress={signIn}
+            className="mt-5 rounded-full bg-white"
+          >
+            <Text className="px-8 py-2 text-center text-xl font-medium">
+              Sign In
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );

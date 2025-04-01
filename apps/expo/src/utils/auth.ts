@@ -26,7 +26,12 @@ export const signIn = async () => {
 
 export const useUser = () => {
   const { data: session } = api.auth.getSession.useQuery();
-  return session?.user ?? null;
+
+  if (!session) {
+    throw new Error("No session found");
+  }
+
+  return session.user;
 };
 
 export const useSignIn = () => {
