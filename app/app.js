@@ -276,23 +276,24 @@ function curatedLibrarySources(query){
 }
 async function searchLibrary(){
  const query=$("libraryQuery").value.trim();if(query.length<2)return toast("Digite pelo menos duas letras para pesquisar.");
- const btn=$("librarySearchButton");btn.disabled=true;btn.textContent="Pesquisando...";$("libraryResults").innerHTML='<div class="panel small muted">Ampliando a pesquisa e consultando materiais gratuitos...</div>';
+ const btn=$("librarySearchButton");btn.disabled=true;btn.textContent="Pesquisando...";$("libraryResults").innerHTML='<div class="panel small muted">Pesquisando na internet, lendo páginas públicas e preparando resumo e cartões...</div>';
  try{
-  const variants=libraryQueryVariants(query);
-  const responses=await Promise.all(variants.map(async term=>{
-   const url="https://pt.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(term)+"&gsrnamespace=0&gsrlimit=6&prop=extracts%7Cinfo&explaintext=1&exchars=18000&inprop=url&format=json&origin=*";
-   const response=await fetch(url);if(!response.ok)throw new Error("A fonte não respondeu.");
-   const data=await response.json();return Object.values(data.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0));
-  }));
-  const seen=new Set();
-  librarySearchResults=responses.flat().filter(p=>p.extract&&p.extract.trim()).filter(p=>{const k=p.title.toLocaleLowerCase("pt-BR");if(seen.has(k))return false;seen.add(k);return true}).slice(0,12).map(p=>({title:p.title,content:p.extract,source_url:p.fullurl||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(p.title.replace(/ /g,"_"))),source_name:"Wikipédia",summary:p.extract.slice(0,360)}));
-  const refs=curatedLibrarySources(query).filter(x=>!libraryItems.some(saved=>saved.source_url===x.source_url));
-  const wikiHtml=librarySearchResults.map((p,i)=>'<article class="set-card"><span class="tag">Wikipédia · português</span><h3>'+esc(p.title)+'</h3><p class="small muted">'+esc(p.summary)+'...</p><div class="set-meta"><span>Texto disponível para salvar</span><button class="primary" data-savelibrary="'+i+'">＋ Salvar na biblioteca</button></div></article>').join("");
-  const refsHtml=refs.map((p,i)=>'<article class="set-card"><span class="tag">Fonte educacional</span><h3>'+esc(p.title)+'</h3><p class="small muted">'+esc(p.summary)+'</p><div class="set-meta"><span>'+esc(p.source_name)+'</span><a class="soft" href="'+esc(p.source_url)+'" target="_blank" rel="noopener">Abrir material ↗</a></div></article>').join("");
-  $("libraryResults").innerHTML=(wikiHtml?'<h3>Conteúdos que você pode salvar</h3><div class="grid">'+wikiHtml+'</div>':'')+(refsHtml?'<h3>Materiais e fontes para aprofundar</h3><div class="grid">'+refsHtml+'</div>':'')+(!wikiHtml&&!refsHtml?'<div class="empty">Não encontrei materiais com esse termo. Experimente pesquisar pelo assunto principal, por exemplo: anatomia animal, sistema digestório ou osteologia.</div>':'');
-  document.querySelectorAll("[data-savelibrary]").forEach(b=>b.onclick=()=>saveLibraryItem(Number(b.dataset.savelibrary),b));
- }catch(e){$("libraryResults").innerHTML='<div class="empty">Não foi possível pesquisar agora. Verifique sua conexão e tente novamente.<p class="small">'+esc(errMsg(e))+'</p></div>'}
- finally{btn.disabled=false;btn.textContent="Pesquisar materiais"}
+  const materials=await searchWebStudyMaterials(query);
+  const cards=createCardsFromResearch(materials,query);
+  if(!materials.length||!cards.length){
+   $("libraryResults").innerHTML='<div class="empty"><h3>Não encontrei conteúdo público suficiente</h3><p>Experimente outro termo ou uma pesquisa mais específica. Algumas páginas bloqueiam leitura automática ou exigem login.</p><p class="small muted">Nenhum cartão foi inventado: só são sugeridos cartões quando há texto consultável e relacionado ao assunto.</p></div>';return;
+  }
+  const sources=materials.map((m,i)=>'<article class="set-card"><span class="tag">Fonte '+(i+1)+'</span><h3>'+esc(m.title)+'</h3><p class="small muted">'+esc(String(m.content||"").replace(/[#*_>\n]/g," ").replace(/\s+/g," ").slice(0,420))+'...</p><div class="set-meta"><span>'+esc(m.source_name||"Fonte pública")+'</span><a class="soft" href="'+esc(m.source_url)+'" target="_blank" rel="noopener">Abrir original ↗</a></div></article>').join("");
+  const options=sets.map(s=>'<option value="'+s.id+'">'+esc(s.title)+'</option>').join("");
+  const generated=cards.slice(0,24);
+  $("libraryResults").innerHTML='<div class="toolbar"><div><h2 style="margin:0">Resultados da pesquisa</h2><p class="small muted">'+materials.length+' fontes consultadas · '+generated.length+' cartões criados a partir dos textos encontrados</p></div></div><div class="grid">'+sources+'</div><div class="panel" style="margin-top:18px"><h2>Resumo do que foi encontrado</h2><p class="small muted">Os cartões abaixo foram extraídos dos trechos públicos consultados. Confira a fonte de cada um antes de estudar.</p><div class="field"><label for="researchTargetSet">Adicionar os cartões a qual conjunto?</label><select id="researchTargetSet">'+options+'</select></div><div class="toolbar" style="margin:12px 0"><label class="small" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="researchSelectAll" checked> Selecionar todos</label><span class="small muted" id="researchSelectedCount">'+generated.length+' selecionados</span></div><div id="researchCardChoices">'+generated.map((c,i)=>'<label style="display:flex;gap:10px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line);cursor:pointer"><input type="checkbox" class="research-card-choice" data-research-card="'+i+'" checked style="margin-top:4px;flex:0 0 auto"><span style="min-width:0"><strong>'+esc(c.question)+'</strong><p class="small muted" style="margin:5px 0">'+esc(c.answer)+'</p><span class="small muted">Fonte: '+esc(c.source||"Material público")+' · <a href="'+esc(c.source_url||"#")+'" target="_blank" rel="noopener">consultar original</a></span></span></label>').join("")+'</div><div class="actions" style="margin-top:14px"><button type="button" class="soft" id="researchCreateSet">Criar conjunto "'+esc(query.slice(0,65))+'"</button><button type="button" class="primary" id="researchAddSelected">Adicionar '+generated.length+' cartões</button></div></div>';
+  const choices=[...document.querySelectorAll(".research-card-choice")],all=$("researchSelectAll"),count=$("researchSelectedCount"),add=$("researchAddSelected"),target=$("researchTargetSet");
+  const refresh=()=>{const n=choices.filter(x=>x.checked).length;count.textContent=n+" selecionados";add.textContent="Adicionar "+n+" cartões";add.disabled=!n;all.checked=n===choices.length;all.indeterminate=n>0&&n<choices.length};
+  choices.forEach(x=>x.addEventListener("change",refresh));all.onchange=()=>{choices.forEach(x=>x.checked=all.checked);refresh()};
+  $("researchCreateSet").onclick=async()=>{const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:query.slice(0,120),description:"Conjunto criado a partir de pesquisa online: "+query}).select().single();if(error)return toast(errMsg(error));sets.unshift(data);target.insertAdjacentHTML("beforeend",'<option value="'+data.id+'">'+esc(data.title)+'</option>');target.value=data.id;toast("Conjunto criado. Agora adicione os cartões selecionados.")};
+  add.onclick=async()=>{const id=target.value;if(!id)return toast("Crie um conjunto primeiro.");const selected=choices.filter(x=>x.checked).map(x=>generated[Number(x.dataset.researchCard)]);if(!selected.length)return toast("Selecione pelo menos um cartão.");await saveLibraryCards(materials[0],selected,id)};
+ }catch(error){$("libraryResults").innerHTML='<div class="empty">Não foi possível concluir a pesquisa. Verifique sua conexão e tente novamente.<p class="small">'+esc(errMsg(error))+'</p></div>'}
+ finally{btn.disabled=false;btn.textContent="Pesquisar na internet"}
 }
 async function saveLibraryItem(index,button){
  const item=librarySearchResults[index];if(!item)return;button.disabled=true;button.textContent="Salvando...";
