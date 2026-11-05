@@ -212,6 +212,9 @@ function curatedLibrarySources(query){
  const t=String(query||"").toLocaleLowerCase("pt-BR");
  if(!/anatomia|veterin|animal/.test(t))return [];
  return [
+  {title:"Anatomia Animal — materiais e disciplina",source_url:"https://www.passeidireto.com/disciplina/anatomia-animal",source_name:"Passei Direto",summary:"Página da disciplina com materiais de estudo, documentos e conteúdos populares específicos de anatomia dos animais."},
+  {title:"ANATOMIA ANIMAL Aula 1 — Introdução",source_url:"https://www.passeidireto.com/arquivo/166117443/anatomia-animal-aula-1-introducao",source_name:"Passei Direto",summary:"Prévia pública de aula com cronograma, osteologia, artrologia, miologia, sistema nervoso, tegumento, planos e eixos anatômicos."},
+  {title:"Introdução à Anatomia Animal — UFPel",source_url:"https://www.passeidireto.com/arquivo/65121027/introducao-a-anatomia-animal",source_name:"Passei Direto · UFPel",summary:"Material introdutório sobre estrutura do corpo animal, anatomia macroscópica, anatomia comparada e anatomia sistemática."},
   {title:"Fundamentos da Anatomia Animal — material didático",source_url:"https://stecine.azureedge.net/repositorio/00212ti/200616/ptbr/index.html",source_name:"Material educacional",summary:"Conteúdo introdutório sobre fundamentos, organização do corpo animal, anatomia sistêmica e topográfica. Abra a fonte para consultar o material completo."},
   {title:"Anatomia Aplicada à Radiologia Veterinária",source_url:"https://stecine.azureedge.net/repositorio/anatomia_aplicada_a_radiologia_veterinaria/index.html",source_name:"Material educacional",summary:"Planos e eixos anatômicos, sistema locomotor e sistemas orgânicos dos animais vertebrados."},
   {title:"Atlas de Anatomia Veterinária — UAB/UFRA",source_url:"https://www.anatomiaveterinaria-uab-ufra.com/introducao",source_name:"UAB / UFRA",summary:"Atlas online com imagens e explicações de músculos, ossos, vasos sanguíneos, nervos e organização do organismo animal."},
