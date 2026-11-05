@@ -113,8 +113,7 @@ $("authForm").onsubmit=async e=>{e.preventDefault();const email=$("email").value
 async function enterApp(u){user=u;$("authScreen").classList.add("hidden");$("app").classList.remove("hidden");$("userEmail").textContent=u.email||"";try{await loadData()}catch(e){toast("Erro ao carregar: "+errMsg(e))}}
 $("logout").onclick=async()=>{await sb.auth.signOut();user=null;$("app").classList.add("hidden");$("authScreen").classList.remove("hidden")};
 async function resetCardsProgress(query,successMessage){
- const resetAt=new Date().toISOString();
- const {error}=await query.update({attempts:0,correct_count:0,wrong_count:0,streak:0,interval_days:0,due_at:resetAt,last_reviewed_at:null,mastery_level:0});
+ const {error}=await query;
  if(error){toast(errMsg(error));return false}
  await loadData();
  if(page==="detail"&&currentSet)openSet(currentSet.id);
@@ -124,12 +123,12 @@ async function resetCardsProgress(query,successMessage){
 }
 $("resetProgress").onclick=async()=>{
  if(!confirm("Apagar todo o seu progresso? Seus conjuntos, pastas e cartões serão mantidos, mas acertos, erros, tentativas e revisões serão zerados. Os cartões ficarão disponíveis para estudar novamente."))return;
- await resetCardsProgress(sb.from("study_cards").update({}).eq("user_id",user.id),"Todo o progresso foi zerado. Seus conteúdos foram mantidos.");
+ await resetCardsProgress(sb.from("study_cards").update({attempts:0,correct_count:0,wrong_count:0,streak:0,interval_days:0,due_at:new Date().toISOString(),last_reviewed_at:null,mastery_level:0}).eq("user_id",user.id),"Todo o progresso foi zerado. Seus conteúdos foram mantidos.");
 };
 $("resetSetProgress").onclick=async()=>{
  if(!currentSet)return;
  if(!confirm('Zerar o progresso de "'+currentSet.title+'"? Apenas as estatísticas e revisões deste conjunto serão apagadas. Os cartões e os demais conjuntos serão mantidos.'))return;
- await resetCardsProgress(sb.from("study_cards").update({}).eq("user_id",user.id).eq("set_id",currentSet.id),'Progresso de "'+currentSet.title+'" zerado.');
+ await resetCardsProgress(sb.from("study_cards").update({attempts:0,correct_count:0,wrong_count:0,streak:0,interval_days:0,due_at:new Date().toISOString(),last_reviewed_at:null,mastery_level:0}).eq("user_id",user.id).eq("set_id",currentSet.id),'Progresso de "'+currentSet.title+'" zerado.');
 };
 $("newSet").onclick=$("newSetSide").onclick=openSetModal;$("addCard").onclick=()=>openCardModal();$("editSet").onclick=()=>{const s=currentSet;openModal("Editar conjunto",'<form id="editSetForm"><div class="field"><label>Nome</label><input name="title" required value="'+esc(s.title)+'"></div><div class="field" style="margin-top:12px"><label>Descrição</label><textarea name="description">'+esc(s.description||"")+'</textarea></div><div class="field" style="margin-top:12px"><label>Pasta</label><select name="folder_id"><option value="">Sem pasta</option>'+folders.map(f=>'<option value="'+f.id+'" '+(f.id===s.folder_id?"selected":"")+'>'+esc(f.name)+'</option>').join("")+'</select></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Salvar</button></div></form>');$("cancelModal").onclick=closeModal;$("editSetForm").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const {error}=await sb.from("study_sets").update({title:d.title,description:d.description,folder_id:d.folder_id||null,updated_at:new Date().toISOString()}).eq("id",s.id);if(error)return toast(errMsg(error));closeModal();await loadData();openSet(s.id)}};
 $("startFlash").onclick=()=>startStudy("all",currentSet.id);$("startQuiz").onclick=()=>{startStudy("all",currentSet.id);quizMode=true;$("studyModeLabel").textContent="TESTE";renderStudy()};$("startSetDue").onclick=()=>startStudy("due",currentSet.id);$("startDueHome").onclick=()=>startStudy("due");$("startDuePage").onclick=()=>startStudy("due");$("startWeak").onclick=()=>startStudy("weak");$("startAll").onclick=()=>startStudy("all");$("backHome").onclick=()=>showPage("home");$("exitStudy").onclick=async()=>{await loadData();$("prevCard").classList.remove("hidden");$("nextCard").classList.remove("hidden");showPage(currentSet?"detail":"home");if(currentSet)openSet(currentSet.id)};$("prevCard").onclick=()=>{if(studyIndex>0){studyIndex--;flipped=false;quizAnswered=false;renderStudy()}};$("nextCard").onclick=()=>{if(studyIndex<studyCards.length-1){studyIndex++;flipped=false;quizAnswered=false;renderStudy()}else{studyIndex=studyCards.length;finishStudy()}};$("search").oninput=e=>renderSets(sets.filter(s=>(s.title+" "+s.description).toLowerCase().includes(e.target.value.toLowerCase())));
