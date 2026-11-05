@@ -58,6 +58,20 @@ function buildCardSuggestions(set){
  const raw=(topic+" "+(set?.description||"")).toLocaleLowerCase("pt-BR");
  const t=raw.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"");
  const groups=[
+  {keys:["anatomia animal","anatomia veterinaria","anatomia dos animais"],cards:[
+   ["O que é Anatomia Animal?","É a área que estuda a forma, a estrutura, a localização e as relações entre as partes do corpo dos animais."],
+   ["Qual é a diferença entre Anatomia e Fisiologia?","Anatomia estuda a estrutura e a organização do corpo; Fisiologia estuda como essas estruturas funcionam."],
+   ["O que é posição anatômica?","É uma posição de referência padronizada que facilita descrever a localização e a orientação das estruturas do corpo animal."],
+   ["O que são planos anatômicos?","São planos imaginários usados para dividir o corpo e descrever estruturas. Entre eles estão os planos mediano, sagital, dorsal e transversal."],
+   ["O que é o plano mediano?","É o plano longitudinal que divide o corpo em metades direita e esquerda, aproximadamente iguais."],
+   ["O que é osteologia?","É a parte da Anatomia que estuda os ossos, incluindo sua forma, localização, estrutura e classificação."],
+   ["O que é artrologia?","É o estudo das articulações, isto é, das conexões entre dois ou mais ossos ou entre partes do esqueleto."],
+   ["O que é miologia?","É a área da Anatomia que estuda os músculos, sua organização, localização e inserções."],
+   ["Quais são as principais funções do sistema esquelético?","Sustentar o corpo, proteger órgãos, auxiliar nos movimentos, armazenar minerais e participar da formação de células sanguíneas na medula óssea."],
+   ["Quais são os principais sistemas do corpo animal?","Entre eles estão os sistemas tegumentar, esquelético, muscular, nervoso, endócrino, circulatório, respiratório, digestório, urinário e reprodutor."],
+   ["O que é Anatomia Comparada?","É o estudo das semelhanças e diferenças entre estruturas anatômicas de diferentes espécies animais."],
+   ["O que significa Anatomia Sistêmica?","É o estudo do corpo organizado por sistemas, analisando os órgãos que trabalham em conjunto para desempenhar funções."]
+  ]},
   {keys:["python"],cards:[
    ["O que é Python?","É uma linguagem de programação de alto nível, conhecida pela sintaxe legível e por sua versatilidade."],
    ["O que é uma variável em Python?","É um nome que referencia um valor armazenado durante a execução do programa."],
