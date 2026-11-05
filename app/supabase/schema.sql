@@ -22,11 +22,20 @@ create table if not exists public.study_cards (
   answer text not null,
   is_favorite boolean not null default false,
   position integer not null default 0,
+  attempts integer not null default 0,
+  correct_count integer not null default 0,
+  wrong_count integer not null default 0,
+  streak integer not null default 0,
+  interval_days integer not null default 0,
+  due_at timestamptz not null default now(),
+  last_reviewed_at timestamptz,
+  mastery_level integer not null default 0,
   created_at timestamptz not null default now()
 );
 create index if not exists study_sets_user_idx on public.study_sets(user_id);
 create index if not exists study_cards_set_idx on public.study_cards(set_id, position);
 create index if not exists study_cards_user_fav_idx on public.study_cards(user_id, is_favorite);
+create index if not exists study_cards_due_idx on public.study_cards(user_id, due_at);
 alter table public.study_folders enable row level security;
 alter table public.study_sets enable row level security;
 alter table public.study_cards enable row level security;
