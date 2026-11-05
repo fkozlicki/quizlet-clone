@@ -334,11 +334,11 @@ async function saveLibraryCards(item,items,setId){
 }
 
 function studyNormalize(value){
- return String(value||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("pt-BR").replace(/[^a-z0-9]+/g," ").trim();
+ return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLocaleLowerCase("pt-BR").replace(/[^a-z0-9]+/g," ").trim();
 }
 function studyTopicTerms(topic){
  const ignored=new Set(["sobre","para","com","uma","umas","uns","dos","das","que","por","the","and","principais","principal","conceitos","conceito","fundamentos","fundamento","introducao","basico","basicos","estudo","materiais","material"]);
- return studyNormalize(topic).split(/\\s+/).filter(w=>w.length>2&&!ignored.has(w));
+ return studyNormalize(topic).split(/\s+/).filter(w=>w.length>2&&!ignored.has(w));
 }
 function studyIsRelevant(item,topic){
  const terms=studyTopicTerms(topic),text=studyNormalize([item.title,item.content].join(" "));
@@ -352,8 +352,7 @@ function studyIsRelevant(item,topic){
 }
 async function searchWebStudyMaterials(topic){
  const query=String(topic||"").trim();if(!query)return [];
- const normalized=studyNormalize(query);
- const specific=/\\bjava\\b/i.test(query)?query+" linguagem de programação":query;
+ const specific=/\bjava\b/i.test(query)?query+" linguagem de programação":query;
  const queries=[
   'site:infoescola.com "'+specific+'"',
   'site:passeidireto.com "'+specific+'"',
@@ -363,23 +362,23 @@ async function searchWebStudyMaterials(topic){
  ];
  const found=[],seen=new Set();
  const add=(title,url,source,body)=>{
-  const clean=String(body||"").replace(/\\r/g,"").trim(),link=String(url||"").trim();
-  if(!clean||clean.length<180||!/^https?:\\/\\//i.test(link)||seen.has(link))return;
-  let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\\./,"")}catch(e){}
-  const item={title:String(title||query).replace(/^#+\\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)};
+  const clean=String(body||"").replace(/\r/g,"").trim(),link=String(url||"").trim();
+  if(!clean||clean.length<180||!/^https?:\/\//i.test(link)||seen.has(link))return;
+  let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\./,"")}catch(e){}
+  const item={title:String(title||query).replace(/^#+\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)};
   if(studyIsRelevant(item,query)){seen.add(link);found.push(item)}
  };
  const results=await Promise.allSettled(queries.map(async q=>{const r=await fetch("https://s.jina.ai/"+encodeURIComponent(q),{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Pesquisa indisponível");return r.text()}));
  for(const result of results){
   if(result.status!=="fulfilled")continue;
-  for(const chunk of result.value.split(/(?=URL Source:\\s*https?:\\/\\/)/i)){
-   const url=(chunk.match(/URL Source:\\s*(https?:\\/\\/[^\\s]+)/i)||[])[1];if(!url)continue;
-   const title=(chunk.match(/Title:\\s*(.+)/i)||[])[1]||url;
-   const body=chunk.replace(/^.*?Markdown Content:\\s*/is,"").trim();
+  for(const chunk of result.value.split(/(?=URL Source:\s*https?:\/\/)/i)){
+   const url=(chunk.match(/URL Source:\s*(https?:\/\/[^\s]+)/i)||[])[1];if(!url)continue;
+   const title=(chunk.match(/Title:\s*(.+)/i)||[])[1]||url;
+   const body=chunk.replace(/^.*?Markdown Content:\s*/is,"").trim();
    add(title,url,"",body);
   }
  }
- const preferred=found.filter(x=>/infoescola\\.com|passeidireto\\.com|\\.edu\\.br|universidade|uf[a-z]{2}\\.br|usp\\.br|scielo/i.test(x.source_url+" "+x.source_name));
+ const preferred=found.filter(x=>/infoescola\.com|passeidireto\.com|\.edu\.br|universidade|uf[a-z]{2}\.br|usp\.br|scielo/i.test(x.source_url+" "+x.source_name));
  const candidates=[...preferred,...found.filter(x=>!preferred.includes(x))].slice(0,15);
  const pages=await Promise.allSettled(candidates.slice(0,12).map(async item=>{
   const r=await fetch("https://r.jina.ai/"+item.source_url,{headers:{Accept:"text/plain"}});
