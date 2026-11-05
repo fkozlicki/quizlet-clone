@@ -33,7 +33,25 @@ function openSetModal(folderId=null){
  const form=$("setForm"),title=form.elements.namedItem("title");
  title.oninput=()=>renderSuggestionButtons(title.value,"setSuggestions","set");
  $("cancelModal").onclick=closeModal;
- form.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:d.title.trim(),description:d.description.trim(),folder_id:d.folder_id||null}).select().single();if(error)return toast(errMsg(error));sets.unshift(data);closeModal();renderDashboard();openSet(data.id);toast("Conjunto criado!")};
+ form.onsubmit=async e=>{
+  e.preventDefault();const d=Object.fromEntries(new FormData(e.target)),topic=d.title.trim();
+  const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:topic,description:d.description.trim(),folder_id:d.folder_id||null}).select().single();
+  if(error)return toast(errMsg(error));
+  sets.unshift(data);closeModal();renderDashboard();openSet(data.id);
+  const addMaterial=confirm('Conjunto criado!\n\nQuer pesquisar conteúdos gratuitos sobre "'+topic+'" para adicionar à sua Biblioteca?');
+  const addCards=confirm('Quer adicionar cartões com perguntas e respostas sobre "'+topic+'" a este conjunto?');
+  if(addCards){
+   const suggestions=buildCardSuggestions(data);
+   if(suggestions.length){
+    const rows=suggestions.map((c,i)=>({user_id:user.id,set_id:data.id,question:c[0]||c.question,answer:c[1]||c.answer,position:i,due_at:new Date().toISOString()}));
+    const valid=rows.filter(x=>x.question&&x.answer);
+    if(valid.length){const result=await sb.from("study_cards").insert(valid);if(result.error)toast(errMsg(result.error));else{await loadData();openSet(data.id);toast(valid.length+" cartões adicionados ao conjunto!")}}
+   }else toast("Ainda não há cartões prontos para esse tema. Você pode criá-los manualmente ou usar a Biblioteca.");
+  }
+  if(addMaterial){
+   showPage("libraries");$("libraryQuery").value=topic;await searchLibrary();
+  }
+ };
 }
 function buildCardSuggestions(set){
  const topic=(set?.title||"").trim();
@@ -171,7 +189,7 @@ function libraryQueryVariants(raw){
  const tokens=lower.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\s]/g," ").split(/\\s+/).filter(w=>w.length>2&&!stop.has(w));
  const variants=[clean,tokens.join(" ")];
  if(tokens.some(w=>w==="anatomia")&&tokens.some(w=>w==="animal")){
-  variants.push("anatomia animal","anatomia veterinaria","anatomia comparada","sistemas do corpo dos animais","anatomia");
+  variants.push('"anatomia animal"',"anatomia dos animais","anatomia veterinaria animal","anatomia comparada dos animais","sistemas do corpo dos animais");
  }
  if(tokens.some(w=>w==="python"))variants.push("linguagem de programação Python");
  return [...new Set(variants.map(x=>x.trim()).filter(x=>x.length>1))].slice(0,6);
