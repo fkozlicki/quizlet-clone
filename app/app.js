@@ -342,44 +342,56 @@ function studyTopicTerms(topic){
  return studyNormalize(topic).split(/\s+/).filter(w=>w.length>2&&!ignored.has(w));
 }
 function studyIsRelevant(item,topic){
- const terms=studyTopicTerms(topic),text=studyNormalize([item.title,item.content].join(" "));
- if(!terms.length)return false;
+ const normalizedTopic=studyNormalize(topic),text=studyNormalize([item.title,item.content].join(" "));
+ if(!normalizedTopic||!text)return false;
+ if(normalizedTopic.includes("anatomia animal")){
+  const anatomy=/anatomia|osteologia|artrologia|miologia|esplancnologia|sistema esquelet|sistema muscular|sistema digest|sistema respir|sistema nervos|sistema reprodut|topografia/.test(text);
+  const animal=/animal|veterin|zootec|vertebr|mamif|equino|bovino|canino|felino|aves|anatomia comparada|medicina veterinaria/.test(text);
+  if(!anatomy||!animal||/anatomia vegetal|botanica|plantas/.test(text))return false;
+  return true;
+ }
+ const terms=studyTopicTerms(topic);if(!terms.length)return false;
  const matched=terms.filter(term=>text.includes(term));
- if(matched.length<terms.length)return false;
- const normalizedTopic=studyNormalize(topic);
- if(normalizedTopic.includes("anatomia animal")&&/anatomia vegetal|botanica|plantas/.test(text))return false;
+ const required=terms.length===1?1:Math.max(1,Math.ceil(terms.length*0.6));
+ if(matched.length<required)return false;
  if(/^java( |$)/.test(normalizedTopic)&&/indonesia|ilha de java|mar de java|povo javanes/.test(text)&&!/linguagem de programacao|programacao java|java virtual machine|jvm|jdk|javac/.test(text))return false;
  return true;
 }
 async function searchWebStudyMaterials(topic){
  const query=String(topic||"").trim();if(!query)return [];
- const specific=/\bjava\b/i.test(query)?query+" linguagem de programação":query;
- const queries=[
-  'site:infoescola.com "'+specific+'"',
-  'site:passeidireto.com "'+specific+'"',
-  '"'+specific+'" material de estudo',
-  '"'+specific+'" apostila universidade OR faculdade',
-  '"'+specific+'" explicação conceitos'
+ const normalized=studyNormalize(query);
+ let queries=[query,query+" material didático",query+" universidade",query+" conceitos e sistemas"];
+ if(normalized.includes("anatomia animal"))queries=[
+  '"anatomia animal" sistemas do corpo',
+  '"anatomia veterinária" osteologia miologia',
+  '"anatomia dos animais" vertebrados',
+  'anatomia animal material de estudo universidade',
+  'anatomia veterinaria sistemas anatomicos'
  ];
+ else if(/\bjava\b/i.test(query))queries=[query+" linguagem de programação",query+" JVM JDK conceitos",query+" material de estudo programação"];
  const found=[],seen=new Set();
- const add=(title,url,source,body)=>{
+ const add=(title,url,body)=>{
   const clean=String(body||"").replace(/\r/g,"").trim(),link=String(url||"").trim();
-  if(!clean||clean.length<180||!/^https?:\/\//i.test(link)||seen.has(link))return;
-  let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\./,"")}catch(e){}
+  if(!clean||clean.length<100||!/^https?:\/\//i.test(link)||seen.has(link))return;
+  let host="";try{host=new URL(link).hostname.replace(/^www\./,"")}catch(e){}
   const item={title:String(title||query).replace(/^#+\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)};
   if(studyIsRelevant(item,query)){seen.add(link);found.push(item)}
  };
- const results=await Promise.allSettled(queries.map(async q=>{const r=await fetch("https://s.jina.ai/"+encodeURIComponent(q),{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Pesquisa indisponível");return r.text()}));
- for(const result of results){
+ const searchResults=await Promise.allSettled(queries.map(async q=>{
+  const r=await fetch("https://s.jina.ai/"+encodeURIComponent(q),{headers:{Accept:"text/plain"}});
+  if(!r.ok)throw Error("Pesquisa indisponível");
+  return r.text();
+ }));
+ for(const result of searchResults){
   if(result.status!=="fulfilled")continue;
   for(const chunk of result.value.split(/(?=URL Source:\s*https?:\/\/)/i)){
    const url=(chunk.match(/URL Source:\s*(https?:\/\/[^\s]+)/i)||[])[1];if(!url)continue;
    const title=(chunk.match(/Title:\s*(.+)/i)||[])[1]||url;
-   const body=chunk.replace(/^.*?Markdown Content:\s*/is,"").trim();
-   add(title,url,"",body);
+   const body=(chunk.match(/Markdown Content:\s*([\s\S]*)/i)||[])[1]||chunk;
+   add(title,url,body);
   }
  }
- const preferred=found.filter(x=>/infoescola\.com|passeidireto\.com|\.edu\.br|universidade|uf[a-z]{2}\.br|usp\.br|scielo/i.test(x.source_url+" "+x.source_name));
+ const preferred=found.filter(x=>/\.edu\.br|universidade|uf[a-z]{2}\.br|usp\.br|scielo|infoescola|mundoeducacao|brasilescola/i.test(x.source_url+" "+x.source_name));
  const candidates=[...preferred,...found.filter(x=>!preferred.includes(x))].slice(0,15);
  const pages=await Promise.allSettled(candidates.slice(0,12).map(async item=>{
   const r=await fetch("https://r.jina.ai/"+item.source_url,{headers:{Accept:"text/plain"}});
@@ -388,8 +400,7 @@ async function searchWebStudyMaterials(topic){
  }));
  const merged=new Map();
  for(const x of pages)if(x.status==="fulfilled"&&studyIsRelevant(x.value,query))merged.set(x.value.source_url,x.value);
- for(const x of candidates)if(!merged.has(x.source_url)&&studyIsRelevant(x,query))merged.set(x.source_url,x);
- // A Wikipédia foi retirada porque seus resultados ambíguos estavam desviando assuntos específicos.
+ for(const x of candidates)if(!merged.has(x.source_url))merged.set(x.source_url,x);
  return [...merged.values()].slice(0,12);
 }
 function createCardsFromResearch(materials,topic){
