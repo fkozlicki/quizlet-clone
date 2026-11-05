@@ -84,9 +84,8 @@ async function createSuggestedSet(folderId,item){
  toast('Conjunto "'+item.title+'" adicionado à pasta!');
 }
 function openFolderModal(){
- openModal("Criar pasta e receber sugestões",'<form id="folderForm"><div class="field"><label>Qual assunto você quer estudar?</label><input name="name" required maxlength="100" placeholder="Ex.: JavaScript, Excel, Direito..."></div><div id="folderSuggestions" style="margin-top:12px"></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Criar pasta</button></div></form>');
+ openModal("Criar pasta e receber sugestões",'<form id="folderForm"><div class="field"><label>Qual assunto você quer estudar?</label><input name="name" required maxlength="100" placeholder="Ex.: JavaScript, Excel, Direito..."></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Criar pasta</button></div></form>');
  const input=$("folderForm").elements.namedItem("name");
- input.oninput=()=>renderSuggestionButtons(input.value,"folderSuggestions","folder");
  $("cancelModal").onclick=closeModal;
  $("folderForm").onsubmit=async e=>{
   e.preventDefault();const name=input.value.trim();if(!name)return;
