@@ -36,20 +36,121 @@ function openSetModal(folderId=null){
  form.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:d.title.trim(),description:d.description.trim(),folder_id:d.folder_id||null}).select().single();if(error)return toast(errMsg(error));sets.unshift(data);closeModal();renderDashboard();openSet(data.id);toast("Conjunto criado!")};
 }
 function buildCardSuggestions(set){
- const topic=(set?.title||"").trim(),t=(topic+" "+(set?.description||"")).toLocaleLowerCase("pt-BR");
+ const topic=(set?.title||"").trim();
+ const raw=(topic+" "+(set?.description||"")).toLocaleLowerCase("pt-BR");
+ const t=raw.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"");
  const groups=[
- {keys:["javascript","programação","programacao"],cards:[["O que é JavaScript?","Linguagem de programação usada para criar interatividade e aplicações web."],["Qual a diferença entre let e const?","let permite reatribuir o valor; const não permite reatribuição."],["O que é uma função?","Bloco reutilizável de código que executa uma tarefa."],["O que é um array?","Estrutura que armazena uma lista ordenada de valores."],["Para que serve addEventListener?","Registra uma função para ser executada quando um evento ocorre."],["O que é uma Promise?","Objeto que representa o resultado futuro de uma operação assíncrona."]]},
- {keys:["lógica","logica","algoritmo"],cards:[["O que é um algoritmo?","Sequência finita e ordenada de passos para resolver um problema."],["O que é uma variável?","Espaço identificado usado para armazenar um valor."],["O que é uma condição?","Estrutura que escolhe um caminho conforme uma expressão lógica."],["Para que serve um laço de repetição?","Executa um bloco de código várias vezes."]]},
- {keys:["inglês","ingles","english"],cards:[["Como se diz bom dia em inglês?","Good morning."],["Qual é o passado de go?","Went."],["Como se diz eu estou aprendendo?","I am learning."],["O que significa usually?","Geralmente; normalmente."]]},
- {keys:["matemática","matematica"],cards:[["Como calcular 10% de um valor?","Multiplique o valor por 0,10."],["O que é uma fração?","Forma de representar partes de um todo."],["Como calcular a média aritmética?","Some os valores e divida pela quantidade."]]},
- {keys:["engenharia de software","software"],cards:[["O que é engenharia de software?","Aplicação de métodos e práticas para desenvolver e manter software."],["O que é um requisito funcional?","Descreve uma função ou comportamento que o sistema deve oferecer."],["Para que serve a UML?","Para visualizar, especificar e documentar sistemas."],["O que é um teste de software?","Verificação para identificar falhas e avaliar o comportamento do sistema."]]},
- {keys:["biologia","ciências","ciencias"],cards:[["O que é uma célula?","Unidade estrutural e funcional básica dos seres vivos."],["Qual é a função do DNA?","Armazenar as informações genéticas de um organismo."],["O que é um ecossistema?","Conjunto dos seres vivos e fatores não vivos que interagem em uma área."]]},
- {keys:["história","historia"],cards:[["O que são fontes históricas?","Vestígios e registros usados para estudar o passado."],["Qual a diferença entre causa e consequência?","Causa explica por que algo ocorreu; consequência é o resultado."]]},
- {keys:["direito"],cards:[["O que é uma Constituição?","Norma fundamental que organiza o Estado e estabelece direitos e garantias."],["O que é jurisprudência?","Conjunto de decisões judiciais sobre determinada matéria."]]}
+  {keys:["python"],cards:[
+   ["O que é Python?","É uma linguagem de programação de alto nível, conhecida pela sintaxe legível e por sua versatilidade."],
+   ["O que é uma variável em Python?","É um nome que referencia um valor armazenado durante a execução do programa."],
+   ["Como criar uma variável em Python?","Basta atribuir um valor, por exemplo: nome = \"Ana\". Não é necessário declarar o tipo."],
+   ["Quais são os tipos básicos de dados em Python?","Entre os principais estão int, float, str e bool."],
+   ["Qual é a diferença entre int e float?","int representa números inteiros; float representa números com casas decimais."],
+   ["Para que serve a função print()?","Exibe informações ou resultados no console."],
+   ["Para que serve a função input()?","Recebe um dado digitado pelo usuário e retorna esse conteúdo como texto."],
+   ["Como fazer uma condição em Python?","Use if, podendo combinar com elif e else para tratar alternativas."],
+   ["Qual é a diferença entre for e while?","for percorre itens de uma sequência ou iterável; while repete enquanto uma condição for verdadeira."],
+   ["O que é uma lista em Python?","É uma coleção ordenada e mutável que pode armazenar vários valores."],
+   ["Como acessar um item de uma lista?","Use seu índice entre colchetes; o primeiro elemento fica no índice 0."],
+   ["O que é uma tupla?","É uma coleção ordenada e imutável, normalmente escrita entre parênteses."],
+   ["O que é um dicionário em Python?","É uma estrutura que armazena pares de chave e valor."],
+   ["Para que serve uma função (def)?","Permite agrupar instruções reutilizáveis e pode receber parâmetros e retornar resultados."],
+   ["Qual é a finalidade do return?","Encerra a chamada da função e devolve um resultado para quem a chamou."],
+   ["O que é uma biblioteca em Python?","É um conjunto de módulos e recursos reutilizáveis que facilita a implementação de funcionalidades."],
+   ["Para que serve try e except?","Permite tratar exceções e definir como o programa deve reagir a erros durante a execução."],
+   ["O que significa pip?","É o instalador de pacotes usado para instalar e gerenciar bibliotecas Python."]
+  ]},
+  {keys:["sql","banco de dados","banco dados"],cards:[
+   ["O que é SQL?","É uma linguagem usada para consultar e manipular dados em bancos de dados relacionais."],
+   ["Para que serve SELECT?","Para consultar e retornar dados de uma ou mais tabelas."],
+   ["Qual é a função do WHERE?","Filtra registros de acordo com uma condição."],
+   ["Qual é a diferença entre INSERT e UPDATE?","INSERT adiciona registros; UPDATE altera registros existentes."],
+   ["Para que serve DELETE?","Remove registros de uma tabela, conforme a condição informada."],
+   ["O que é uma chave primária?","É uma coluna ou conjunto de colunas que identifica unicamente cada registro da tabela."],
+   ["O que é uma chave estrangeira?","É uma coluna que referencia uma chave de outra tabela, relacionando os dados."],
+   ["Para que serve o JOIN?","Combina linhas de tabelas relacionadas usando uma condição de junção."],
+   ["Qual é a diferença entre INNER JOIN e LEFT JOIN?","INNER JOIN retorna correspondências nas duas tabelas; LEFT JOIN mantém todas as linhas da tabela à esquerda."],
+   ["O que é normalização de dados?","É a organização das tabelas para reduzir redundâncias e evitar anomalias de inserção, atualização e exclusão."]
+  ]},
+  {keys:["javascript","js"],cards:[
+   ["O que é JavaScript?","É uma linguagem de programação muito usada para adicionar comportamento e interatividade a páginas e aplicações."],
+   ["Qual é a diferença entre let e const?","let permite reatribuir a variável; const impede a reatribuição do vínculo."],
+   ["O que é uma função?","É um bloco reutilizável de código que pode receber parâmetros e retornar um valor."],
+   ["O que é um array?","É uma estrutura ordenada usada para armazenar uma coleção de valores."],
+   ["O que é um objeto em JavaScript?","É uma estrutura que organiza dados em propriedades associadas a valores."],
+   ["Para que serve addEventListener?","Registra uma função para responder a um evento, como clique ou digitação."],
+   ["O que é o DOM?","É a representação estruturada do documento HTML que permite acessar e alterar seus elementos."],
+   ["O que é uma Promise?","É um objeto que representa a conclusão futura, bem-sucedida ou não, de uma operação assíncrona."],
+   ["Para que serve async/await?","Simplifica a escrita de código assíncrono, permitindo aguardar uma Promise dentro de uma função async."],
+   ["Qual é a diferença entre == e ===?","== compara com conversão de tipos; === compara valor e tipo sem conversão."]
+  ]},
+  {keys:["html"],cards:[
+   ["O que é HTML?","É a linguagem de marcação usada para estruturar o conteúdo de páginas web."],
+   ["O que significa HTML?","HyperText Markup Language, ou Linguagem de Marcação de Hipertexto."],
+   ["Para que serve a tag <h1>?","Define um título de nível principal na estrutura do documento."],
+   ["Qual é a função da tag <p>?","Representa um parágrafo de texto."],
+   ["Para que serve a tag <a>?","Cria um link para outra página, arquivo ou seção."],
+   ["Qual é a função do atributo alt em imagens?","Fornece um texto alternativo que descreve a imagem."],
+   ["O que é HTML semântico?","É o uso de elementos que comunicam o significado e a função do conteúdo, como header, nav, main e footer."]
+  ]},
+  {keys:["css"],cards:[
+   ["O que é CSS?","É a linguagem usada para definir a apresentação visual de documentos HTML."],
+   ["O que significa CSS?","Cascading Style Sheets, ou Folhas de Estilo em Cascata."],
+   ["Qual é a diferença entre class e id no CSS?","class pode ser reutilizada em vários elementos; id identifica um elemento específico no documento."],
+   ["O que é o modelo de caixa (box model)?","É o modelo que considera conteúdo, padding, borda e margem de um elemento."],
+   ["Para que serve display: flex?","Ativa o Flexbox, facilitando o alinhamento e a distribuição de elementos em uma dimensão."],
+   ["Para que serve uma media query?","Aplica estilos conforme características do dispositivo ou da tela, como a largura."]
+  ]},
+  {keys:["logica","algoritmo"],cards:[
+   ["O que é um algoritmo?","É uma sequência finita e ordenada de passos para resolver um problema ou executar uma tarefa."],
+   ["O que é uma variável?","É um espaço identificado usado para armazenar ou referenciar um valor."],
+   ["O que é uma estrutura condicional?","É uma estrutura que escolhe qual caminho executar com base em uma condição."],
+   ["Para que serve um laço de repetição?","Para executar um bloco de instruções várias vezes, conforme uma sequência ou condição."],
+   ["O que é pseudocódigo?","É uma forma simplificada e independente de linguagem para descrever os passos de um algoritmo."],
+   ["O que é uma estrutura de dados?","É uma forma de organizar e armazenar dados para permitir seu uso eficiente."]
+  ]},
+  {keys:["ingles","english"],cards:[
+   ["O que significa 'usually'?","Geralmente; normalmente."],
+   ["Qual é o passado do verbo 'go'?","Went."],
+   ["Como se diz 'bom dia' em inglês?","Good morning."],
+   ["Quando usar 'do' e 'does'?","Do acompanha I, you, we e they; does acompanha he, she e it no presente simples."],
+   ["Qual é a diferença entre 'much' e 'many'?","Much é usado com substantivos incontáveis; many com substantivos contáveis no plural."]
+  ]},
+  {keys:["matematica"],cards:[
+   ["Como calcular porcentagem de um valor?","Converta a porcentagem em decimal e multiplique pelo valor. Ex.: 10% = 0,10."],
+   ["O que é uma fração?","É uma representação de partes de um todo, expressa por numerador e denominador."],
+   ["Como calcular a média aritmética?","Some todos os valores e divida pela quantidade de valores."],
+   ["O que são números primos?","São números naturais maiores que 1 que possuem exatamente dois divisores positivos: 1 e eles mesmos."],
+   ["O que é uma equação?","É uma igualdade matemática que contém uma ou mais incógnitas."]
+  ]},
+  {keys:["engenharia de software","requisitos de software"],cards:[
+   ["O que é engenharia de software?","É a aplicação sistemática de métodos, técnicas e ferramentas para desenvolver e manter software."],
+   ["O que é um requisito funcional?","Descreve uma função ou comportamento que o sistema deve oferecer."],
+   ["O que é um requisito não funcional?","Define atributos ou restrições de qualidade, como desempenho, segurança e usabilidade."],
+   ["Para que serve a UML?","Para visualizar, especificar, construir e documentar elementos de sistemas."],
+   ["O que é um teste de software?","É uma atividade que avalia o sistema para identificar defeitos e verificar se atende aos requisitos."],
+   ["O que é controle de versão?","É o registro das alterações feitas em arquivos ao longo do tempo, permitindo acompanhar e recuperar versões."]
+  ]},
+  {keys:["biologia","ciencias"],cards:[
+   ["O que é uma célula?","É a unidade estrutural e funcional básica dos seres vivos."],
+   ["Qual é a função do DNA?","Armazenar e transmitir informações genéticas."],
+   ["O que é um ecossistema?","É o conjunto de seres vivos e fatores não vivos que interagem em determinada área."],
+   ["O que é fotossíntese?","É o processo pelo qual organismos como plantas usam energia luminosa para produzir matéria orgânica a partir de água e dióxido de carbono."]
+  ]},
+  {keys:["historia"],cards:[
+   ["O que são fontes históricas?","São vestígios e registros materiais ou imateriais utilizados para estudar e interpretar o passado."],
+   ["Qual é a diferença entre causa e consequência histórica?","Causa ajuda a explicar por que um fato ocorreu; consequência é um resultado produzido por ele."],
+   ["O que é contexto histórico?","É o conjunto de condições políticas, sociais, econômicas e culturais de uma época."]
+  ]},
+  {keys:["direito","constituicao"],cards:[
+   ["O que é uma Constituição?","É a norma fundamental que organiza o Estado e estabelece direitos, garantias e limites ao poder."],
+   ["O que é jurisprudência?","É o conjunto de decisões judiciais que orientam a interpretação e aplicação do direito."],
+   ["O que é o princípio da legalidade?","Em linhas gerais, determina que a atuação estatal deve estar fundamentada na lei."]
+  ]}
  ];
  const found=groups.find(g=>g.keys.some(k=>t.includes(k)));
  if(found)return found.cards.map(c=>({question:c[0],answer:c[1]}));
- return topic?[["O que é "+topic+"?","Escreva uma definição clara e objetiva de "+topic+"."],["Quais são os principais conceitos de "+topic+"?","Liste e explique os conceitos fundamentais do assunto."],["Quais termos importantes preciso conhecer em "+topic+"?","Registre os termos essenciais e seus significados."],["Como "+topic+" é aplicado na prática?","Descreva uma aplicação prática e um exemplo."]].map(c=>({question:c[0],answer:c[1]})):[];
+ return [];
 }
 async function addSuggestedCard(item,button){
  if(!currentSet)return;
