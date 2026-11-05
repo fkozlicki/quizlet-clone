@@ -213,9 +213,11 @@ function curatedLibrarySources(query){
  const t=raw.toLocaleLowerCase("pt-BR");
  if(!raw)return [];
  const passeDiretoSearch="https://www.google.com/search?q="+encodeURIComponent("site:passeidireto.com "+raw);
+ const infoEscolaSearch="https://www.google.com/search?q="+encodeURIComponent("site:infoescola.com "+raw);
  const passeDireto=[{title:"Pesquisar “"+raw+"” no Passei Direto",source_url:passeDiretoSearch,source_name:"Passei Direto · busca por assunto",summary:"Abre resultados indexados do Passei Direto para este tema. A disponibilidade de cada material depende das permissões e do acesso oferecido pela plataforma."}];
- if(!/anatomia|veterin|animal/.test(t))return passeDireto;
- return [...passeDireto,
+ const infoEscola=[{title:"Pesquisar “"+raw+"” no InfoEscola",source_url:infoEscolaSearch,source_name:"InfoEscola · busca por assunto",summary:"Busca artigos e conteúdos educacionais do InfoEscola relacionados ao tema. O link leva aos resultados encontrados no domínio do site."}];
+ if(!/anatomia|veterin|animal/.test(t))return [...passeDireto,...infoEscola];
+ return [...passeDireto,...infoEscola,
   {title:"Anatomia Animal — materiais e disciplina",source_url:"https://www.passeidireto.com/disciplina/anatomia-animal",source_name:"Passei Direto",summary:"Página da disciplina com materiais de estudo, documentos e conteúdos populares específicos de anatomia dos animais."},
   {title:"ANATOMIA ANIMAL Aula 1 — Introdução",source_url:"https://www.passeidireto.com/arquivo/166117443/anatomia-animal-aula-1-introducao",source_name:"Passei Direto",summary:"Prévia pública de aula com cronograma, osteologia, artrologia, miologia, sistema nervoso, tegumento, planos e eixos anatômicos."},
   {title:"Introdução à Anatomia Animal — UFPel",source_url:"https://www.passeidireto.com/arquivo/65121027/introducao-a-anatomia-animal",source_name:"Passei Direto · UFPel",summary:"Material introdutório sobre estrutura do corpo animal, anatomia macroscópica, anatomia comparada e anatomia sistemática."},
