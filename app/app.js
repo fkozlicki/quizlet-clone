@@ -57,7 +57,7 @@ function buildSuggestions(topic){
  ];
  const found=groups.find(g=>g.keys.some(k=>t.includes(k)));
  const items=found?found.items:["Fundamentos de "+clean,"Conceitos principais de "+clean,"Termos e definições de "+clean,"Aplicações práticas de "+clean,"Exemplos e exercícios de "+clean,"Revisão geral de "+clean];
- return items.map((title,i)=>({title,description:"Conjunto de estudo sobre "+title.toLocaleLowerCase("pt-BR")+".",position:i}));
+ return items.map((item,i)=>{const title=found?clean+" — "+item:item;return {title,description:"Conjunto de estudo sobre "+title.toLocaleLowerCase("pt-BR")+".",position:i};});
 }
 function renderSuggestionButtons(topic,containerId,mode){
  const box=$(containerId);if(!box)return;
