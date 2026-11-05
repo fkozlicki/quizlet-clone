@@ -333,10 +333,27 @@ async function saveLibraryCards(item,items,setId){
  await loadData();closeModal();currentSet=sets.find(s=>s.id===setId);openSet(setId);toast(items.length+" cartão(ões) adicionado(s) ao conjunto "+set.title+".")
 }
 
+function studyNormalize(value){
+ return String(value||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLocaleLowerCase("pt-BR").replace(/[^a-z0-9]+/g," ").trim();
+}
+function studyTopicTerms(topic){
+ const ignored=new Set(["sobre","para","com","uma","umas","uns","dos","das","que","por","the","and","principais","principal","conceitos","conceito","fundamentos","fundamento","introducao","basico","basicos","estudo","materiais","material"]);
+ return studyNormalize(topic).split(/\\s+/).filter(w=>w.length>2&&!ignored.has(w));
+}
+function studyIsRelevant(item,topic){
+ const terms=studyTopicTerms(topic),text=studyNormalize([item.title,item.content].join(" "));
+ if(!terms.length)return false;
+ const matched=terms.filter(term=>text.includes(term));
+ if(matched.length<terms.length)return false;
+ const normalizedTopic=studyNormalize(topic);
+ if(normalizedTopic.includes("anatomia animal")&&/anatomia vegetal|botanica|plantas/.test(text))return false;
+ if(/^java( |$)/.test(normalizedTopic)&&/indonesia|ilha de java|mar de java|povo javanes/.test(text)&&!/linguagem de programacao|programacao java|java virtual machine|jvm|jdk|javac/.test(text))return false;
+ return true;
+}
 async function searchWebStudyMaterials(topic){
  const query=String(topic||"").trim();if(!query)return [];
- const normalized=query.toLocaleLowerCase("pt-BR");
- const specific= /\bjava\b/i.test(query) ? query+" linguagem de programação Java" : query;
+ const normalized=studyNormalize(query);
+ const specific=/\\bjava\\b/i.test(query)?query+" linguagem de programação":query;
  const queries=[
   'site:infoescola.com "'+specific+'"',
   'site:passeidireto.com "'+specific+'"',
@@ -345,24 +362,45 @@ async function searchWebStudyMaterials(topic){
   '"'+specific+'" explicação conceitos'
  ];
  const found=[],seen=new Set();
- const add=(title,url,source,content)=>{const clean=String(content||"").replace(/\r/g,"").trim(),link=String(url||"").trim();if(!clean||clean.length<180||!/^https?:\/\//i.test(link)||seen.has(link))return;let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\./,"")}catch(e){};found.push({title:String(title||query).replace(/^#+\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)})};
+ const add=(title,url,source,body)=>{
+  const clean=String(body||"").replace(/\\r/g,"").trim(),link=String(url||"").trim();
+  if(!clean||clean.length<180||!/^https?:\\/\\//i.test(link)||seen.has(link))return;
+  let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\\./,"")}catch(e){}
+  const item={title:String(title||query).replace(/^#+\\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)};
+  if(studyIsRelevant(item,query)){seen.add(link);found.push(item)}
+ };
  const results=await Promise.allSettled(queries.map(async q=>{const r=await fetch("https://s.jina.ai/"+encodeURIComponent(q),{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Pesquisa indisponível");return r.text()}));
- for(const result of results){if(result.status!=="fulfilled")continue;for(const chunk of result.value.split(/(?=URL Source:\s*https?:\/\/)/i)){const url=(chunk.match(/URL Source:\s*(https?:\/\/[^\s]+)/i)||[])[1];if(!url)continue;const title=(chunk.match(/Title:\s*(.+)/i)||[])[1]||url;const body=chunk.replace(/^.*?Markdown Content:\s*/is,"").trim();add(title,url,"",body)}}
- const preferred=found.filter(x=>/infoescola\.com|passeidireto\.com|\.edu\.br|universidade|uf[a-z]{2}\.br|usp\.br|scielo/i.test(x.source_url+" "+x.source_name));
- const candidates=[...preferred,...found.filter(x=>!preferred.includes(x))].slice(0,12);
- const pages=await Promise.allSettled(candidates.slice(0,10).map(async item=>{const r=await fetch("https://r.jina.ai/"+item.source_url,{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Leitura indisponível");return {...item,content:(await r.text()).slice(0,16000)}}));
- const merged=new Map();for(const x of pages)if(x.status==="fulfilled")merged.set(x.value.source_url,x.value);for(const x of candidates)if(!merged.has(x.source_url))merged.set(x.source_url,x);
- // Não consultar a Wikipédia: seus resultados ambíguos estavam desviando temas como Java para a ilha da Indonésia.
+ for(const result of results){
+  if(result.status!=="fulfilled")continue;
+  for(const chunk of result.value.split(/(?=URL Source:\\s*https?:\\/\\/)/i)){
+   const url=(chunk.match(/URL Source:\\s*(https?:\\/\\/[^\\s]+)/i)||[])[1];if(!url)continue;
+   const title=(chunk.match(/Title:\\s*(.+)/i)||[])[1]||url;
+   const body=chunk.replace(/^.*?Markdown Content:\\s*/is,"").trim();
+   add(title,url,"",body);
+  }
+ }
+ const preferred=found.filter(x=>/infoescola\\.com|passeidireto\\.com|\\.edu\\.br|universidade|uf[a-z]{2}\\.br|usp\\.br|scielo/i.test(x.source_url+" "+x.source_name));
+ const candidates=[...preferred,...found.filter(x=>!preferred.includes(x))].slice(0,15);
+ const pages=await Promise.allSettled(candidates.slice(0,12).map(async item=>{
+  const r=await fetch("https://r.jina.ai/"+item.source_url,{headers:{Accept:"text/plain"}});
+  if(!r.ok)throw Error("Leitura indisponível");
+  return {...item,content:(await r.text()).slice(0,16000)};
+ }));
+ const merged=new Map();
+ for(const x of pages)if(x.status==="fulfilled"&&studyIsRelevant(x.value,query))merged.set(x.value.source_url,x.value);
+ for(const x of candidates)if(!merged.has(x.source_url)&&studyIsRelevant(x,query))merged.set(x.source_url,x);
+ // A Wikipédia foi retirada porque seus resultados ambíguos estavam desviando assuntos específicos.
  return [...merged.values()].slice(0,12);
 }
 function createCardsFromResearch(materials,topic){
  const out=[],seen=new Set(),skip=/^(menu|início|inicio|home|login|cadastre-se|entrar|compartilhar|referências|referencias|bibliografia|leia também|veja também)$/i;
  for(const item of materials||[]){
+  if(!studyIsRelevant(item,topic))continue;
   const lines=String(item.content||"").split(/\n+/).map(x=>x.replace(/^\s*#+\s*/,"").replace(/\[([^\]]+)\]\([^)]*\)/g,"$1").replace(/[*_>|]/g,"").trim()).filter(Boolean);
   let heading=item.title||topic,paragraphs=[];
   for(const line of lines){if(line.length<100&&!/[.!?]$/.test(line)&&!skip.test(line)){heading=line.slice(0,120);continue}if(line.length>=100&&line.length<=1800&&!skip.test(line))paragraphs.push({heading,text:line})}
   if(!paragraphs.length){const plain=String(item.content||"").replace(/https?:\/\/\S+/g," ").replace(/[#*_>|]/g," ");paragraphs=plain.split(/\n\s*\n/).filter(x=>x.trim().length>130).slice(0,8).map((text,i)=>({heading:(item.title||topic)+" — trecho "+(i+1),text:text.trim()}))}
-  for(const p of paragraphs){const sentences=(p.text.match(/[^.!?]+[.!?]?/g)||[p.text]).map(x=>x.trim()).filter(x=>x.length>20),answer=sentences.slice(0,3).join(" ").slice(0,850);if(answer.length<75)continue;const section=(p.heading||item.title||topic).replace(/\s+/g," ").trim().slice(0,110);let question="O que o material explica sobre "+section+"?";if(seen.has(question.toLowerCase()))question="Quais pontos importantes sobre "+topic+" aparecem neste trecho?";const key=answer.toLowerCase().slice(0,100);if(seen.has(key))continue;seen.add(key);seen.add(question.toLowerCase());out.push({question,answer,source:item.source_name,source_url:item.source_url});if(out.length>=30)return out}
+  for(const p of paragraphs){if(!studyIsRelevant({title:p.heading,content:p.text},topic))continue;const sentences=(p.text.match(/[^.!?]+[.!?]?/g)||[p.text]).map(x=>x.trim()).filter(x=>x.length>20),answer=sentences.slice(0,3).join(" ").slice(0,850);if(answer.length<75)continue;const section=(p.heading||item.title||topic).replace(/\s+/g," ").trim().slice(0,110);let question="O que o material explica sobre "+section+"?";if(seen.has(question.toLowerCase()))question="Quais pontos importantes sobre "+topic+" aparecem neste trecho?";const key=answer.toLowerCase().slice(0,100);if(seen.has(key))continue;seen.add(key);seen.add(question.toLowerCase());out.push({question,answer,source:item.source_name,source_url:item.source_url});if(out.length>=30)return out}
  }
  return out;
 }
