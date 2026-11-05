@@ -31,7 +31,7 @@ function closeModal(){$("modal").classList.add("hidden")}
 function openSetModal(folderId=null){
  openModal("Criar conjunto",'<form id="setForm"><div class="field"><label>Nome do assunto ou conjunto</label><input name="title" required maxlength="120" placeholder="Ex.: Excel, JavaScript, Direito..."></div><div class="field" style="margin-top:12px"><label>Descrição</label><textarea name="description" placeholder="O que você vai estudar?"></textarea></div><div class="field" style="margin-top:12px"><label>Pasta</label><select name="folder_id"><option value="">Sem pasta</option>'+folders.map(f=>'<option value="'+f.id+'" '+(f.id===folderId?"selected":"")+'">'+esc(f.name)+'</option>').join("")+'</select></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Salvar conjunto</button></div></form>');
  const form=$("setForm");$("cancelModal").onclick=closeModal;
- form.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target)),topic=d.title.trim();const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:topic,description:d.description.trim(),folder_id:d.folder_id||null}).select().single();if(error)return toast(errMsg(error));sets.unshift(data);closeModal();renderDashboard();openSet(data.id);if(saveMaterials){toast("Pesquisando materiais gratuitos sobre "+topic+"...");const found=await searchWebStudyMaterials(topic);if(found.length){const rows=found.map(x=>({user_id:user.id,title:x.title.slice(0,240),source_url:x.source_url,source_name:x.source_name,content:x.content,summary:x.content.slice(0,360),language:"pt",updated_at:new Date().toISOString()}));const saved=await sb.from("study_library_items").upsert(rows,{onConflict:"user_id,source_url"});if(saved.error)toast("Conjunto criado, mas não consegui guardar os materiais: "+errMsg(saved.error));else{await loadData();openSet(data.id);toast(found.length+" materiais encontrados e guardados. Os cartões serão gerados quando você clicar em Novo cartão.")}}else toast("Conjunto criado. Não encontrei textos acessíveis agora; você pode pesquisar novamente ao adicionar cartões.")}};
+ form.onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const {data,error}=await sb.from("study_sets").insert({user_id:user.id,title:d.title.trim(),description:(d.description||"").trim(),folder_id:d.folder_id||null}).select().single();if(error)return toast(errMsg(error));sets.unshift(data);closeModal();renderDashboard();openSet(data.id);toast("Conjunto criado!")};
 }
 function buildCardSuggestions(set){
  const topic=(set?.title||"").trim();
@@ -336,7 +336,7 @@ async function saveLibraryCards(item,items,setId){
 async function searchWebStudyMaterials(topic){
  const query=String(topic||"").trim();if(!query)return [];
  const normalized=query.toLocaleLowerCase("pt-BR");
- const specific= /\\bjava\\b/i.test(query) ? query+" linguagem de programação Java" : query;
+ const specific= /\bjava\b/i.test(query) ? query+" linguagem de programação Java" : query;
  const queries=[
   'site:infoescola.com "'+specific+'"',
   'site:passeidireto.com "'+specific+'"',
@@ -345,10 +345,10 @@ async function searchWebStudyMaterials(topic){
   '"'+specific+'" explicação conceitos'
  ];
  const found=[],seen=new Set();
- const add=(title,url,source,content)=>{const clean=String(content||"").replace(/\\r/g,"").trim(),link=String(url||"").trim();if(!clean||clean.length<180||!/^https?:\\/\\//i.test(link)||seen.has(link))return;let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\\./,"")}catch(e){};found.push({title:String(title||query).replace(/^#+\\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)})};
+ const add=(title,url,source,content)=>{const clean=String(content||"").replace(/\r/g,"").trim(),link=String(url||"").trim();if(!clean||clean.length<180||!/^https?:\/\//i.test(link)||seen.has(link))return;let host=source||"";try{host=host||new URL(link).hostname.replace(/^www\./,"")}catch(e){};found.push({title:String(title||query).replace(/^#+\s*/,"").slice(0,220),source_url:link,source_name:host,content:clean.slice(0,16000)})};
  const results=await Promise.allSettled(queries.map(async q=>{const r=await fetch("https://s.jina.ai/"+encodeURIComponent(q),{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Pesquisa indisponível");return r.text()}));
- for(const result of results){if(result.status!=="fulfilled")continue;for(const chunk of result.value.split(/(?=URL Source:\\s*https?:\\/\\/)/i)){const url=(chunk.match(/URL Source:\\s*(https?:\\/\\/[^\\s]+)/i)||[])[1];if(!url)continue;const title=(chunk.match(/Title:\\s*(.+)/i)||[])[1]||url;const body=chunk.replace(/^.*?Markdown Content:\\s*/is,"").trim();add(title,url,"",body)}}
- const preferred=found.filter(x=>/infoescola\\.com|passeidireto\\.com|\\.edu\\.br|universidade|uf[a-z]{2}\\.br|usp\\.br|scielo/i.test(x.source_url+" "+x.source_name));
+ for(const result of results){if(result.status!=="fulfilled")continue;for(const chunk of result.value.split(/(?=URL Source:\s*https?:\/\/)/i)){const url=(chunk.match(/URL Source:\s*(https?:\/\/[^\s]+)/i)||[])[1];if(!url)continue;const title=(chunk.match(/Title:\s*(.+)/i)||[])[1]||url;const body=chunk.replace(/^.*?Markdown Content:\s*/is,"").trim();add(title,url,"",body)}}
+ const preferred=found.filter(x=>/infoescola\.com|passeidireto\.com|\.edu\.br|universidade|uf[a-z]{2}\.br|usp\.br|scielo/i.test(x.source_url+" "+x.source_name));
  const candidates=[...preferred,...found.filter(x=>!preferred.includes(x))].slice(0,12);
  const pages=await Promise.allSettled(candidates.slice(0,10).map(async item=>{const r=await fetch("https://r.jina.ai/"+item.source_url,{headers:{Accept:"text/plain"}});if(!r.ok)throw Error("Leitura indisponível");return {...item,content:(await r.text()).slice(0,16000)}}));
  const merged=new Map();for(const x of pages)if(x.status==="fulfilled")merged.set(x.value.source_url,x.value);for(const x of candidates)if(!merged.has(x.source_url))merged.set(x.source_url,x);
