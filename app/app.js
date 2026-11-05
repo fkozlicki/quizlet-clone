@@ -184,6 +184,72 @@ function buildCardSuggestions(set){
  if(found)return found.cards.map(c=>({question:c[0],answer:c[1]}));
  return [];
 }
+ 
+function buildMoreCardSuggestions(set,shown=[]){
+ const raw=((set?.title||"")+" "+(set?.description||"")).toLocaleLowerCase("pt-BR").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"");
+ const banks=[
+  {keys:["anatomia animal","anatomia veterinaria","anatomia dos animais"],cards:[
+   ["O que é anatomia topográfica?","Estuda a localização e as relações entre estruturas em regiões específicas do corpo."],
+   ["O que é anatomia macroscópica?","Estuda estruturas do corpo que podem ser observadas sem auxílio de microscópio."],
+   ["O que é anatomia microscópica?","Analisa estruturas que exigem microscópio, como tecidos e células."],
+   ["Qual é a função do sistema tegumentar?","Revestir e proteger o corpo, além de participar da percepção sensorial e da regulação térmica."],
+   ["Qual é a função do sistema muscular?","Produzir movimentos, manter a postura e contribuir para a produção de calor."],
+   ["Qual é a função do sistema nervoso?","Receber e processar informações e coordenar respostas do organismo."],
+   ["O que são estruturas bilaterais?","São estruturas organizadas em pares, uma de cada lado do plano mediano."],
+   ["O que significa proximal em Anatomia?","Indica uma estrutura mais próxima da origem de um membro ou ponto de referência."],
+   ["O que significa distal em Anatomia?","Indica uma estrutura mais afastada da origem de um membro ou ponto de referência."],
+   ["O que significa cranial?","Indica direção ou localização em sentido à cabeça do animal."],
+   ["O que significa caudal?","Indica direção ou localização em sentido à cauda do animal."],
+   ["O que é esqueleto axial?","É a parte do esqueleto que inclui principalmente crânio, coluna vertebral, costelas e esterno."],
+   ["O que é esqueleto apendicular?","É formado pelos ossos dos membros e pelas estruturas que os conectam ao esqueleto axial."],
+   ["Qual é a diferença entre tendão e ligamento?","Tendões ligam músculos a ossos; ligamentos conectam ossos e ajudam a estabilizar articulações."],
+   ["O que é uma articulação sinovial?","É uma articulação móvel que possui cavidade articular, líquido sinovial e estruturas de revestimento."]
+  ]},
+  {keys:["python"],cards:[
+   ["O que é indentação em Python?","É o recuo que define blocos de código, como o corpo de funções, condições e laços."],
+   ["Para que serve len()?","Retorna a quantidade de elementos de uma sequência ou coleção."],
+   ["Qual é a diferença entre append() e extend()?","append() adiciona um elemento; extend() adiciona individualmente os elementos de um iterável."],
+   ["Para que serve range()?","Gera uma sequência de números, frequentemente usada em laços for."],
+   ["O que é um módulo em Python?","É um arquivo Python que reúne código reutilizável, como funções, classes e variáveis."],
+   ["O que é uma exceção?","É um evento de erro ou condição inesperada que interrompe o fluxo normal do programa."],
+   ["Para que serve __init__?","É um método especial chamado na criação de uma instância de uma classe."],
+   ["O que é uma classe em Python?","É uma estrutura que define atributos e comportamentos para criar objetos."],
+   ["O que é list comprehension?","É uma forma concisa de criar listas a partir de iteráveis, podendo incluir condições."],
+   ["Para que serve open()?","Abre um arquivo para leitura, escrita ou outros modos de acesso."]
+  ]},
+  {keys:["sql","banco de dados","banco dados"],cards:[
+   ["Para que serve ORDER BY?","Ordena os resultados de uma consulta por uma ou mais colunas."],
+   ["Para que serve GROUP BY?","Agrupa linhas que possuem valores iguais em determinadas colunas, geralmente com funções de agregação."],
+   ["O que faz COUNT() no SQL?","Conta registros ou valores, conforme a expressão informada."],
+   ["O que é uma transação no banco de dados?","É um conjunto de operações tratado como uma unidade de trabalho."],
+   ["O que significa ACID?","Atomicidade, Consistência, Isolamento e Durabilidade: propriedades importantes de transações."],
+   ["Para que serve o comando CREATE TABLE?","Cria uma nova tabela e define suas colunas e restrições."]
+  ]},
+  {keys:["javascript","js"],cards:[
+   ["O que é escopo de variável?","É a região do código em que uma variável pode ser acessada."],
+   ["O que é uma arrow function?","É uma forma concisa de escrever funções usando a sintaxe =>."],
+   ["Para que serve JSON.stringify()?","Converte um valor JavaScript em uma string no formato JSON."],
+   ["Para que serve JSON.parse()?","Converte uma string JSON em um valor JavaScript."],
+   ["O que é event bubbling?","É a propagação de um evento de um elemento filho para seus elementos ancestrais."],
+   ["O que significa null em JavaScript?","Representa intencionalmente a ausência de um valor de objeto."]
+  ]},
+  {keys:["html"],cards:[
+   ["Para que serve a tag <form>?","Agrupa controles para coletar e enviar dados informados pelo usuário."],
+   ["Qual é a função da tag <label>?","Associa um texto descritivo a um controle de formulário."],
+   ["Para que serve a tag <section>?","Representa uma seção temática de conteúdo, normalmente com um título."]
+  ]},
+  {keys:["css"],cards:[
+   ["O que é especificidade no CSS?","É o critério usado para resolver conflitos entre seletores que definem a mesma propriedade."],
+   ["Para que serve z-index?","Controla a ordem de sobreposição de elementos posicionados."],
+   ["Qual é a diferença entre margin e padding?","margin cria espaço externo; padding cria espaço interno entre conteúdo e borda."]
+  ]}
+ ];
+ const found=banks.find(g=>g.keys.some(k=>raw.includes(k)));
+ if(!found)return [];
+ const seen=new Set(shown.map(c=>(c.question||"").toLocaleLowerCase("pt-BR").trim()));
+ return found.cards.filter(c=>!seen.has(c[0].toLocaleLowerCase("pt-BR"))).map(c=>({question:c[0],answer:c[1]}));
+}
+
 async function addSuggestedCard(item,button){
  if(!currentSet)return;
  button.disabled=true;button.textContent="Adicionando...";
@@ -288,12 +354,17 @@ async function saveLibraryCards(item,items,setId){
 }
 
 function openCardModal(id=null){
- const old=id?cards.find(c=>c.id===id):null,base=old?[]:buildCardSuggestions(currentSet),fromLibrary=old?[]:libraryItems.filter(x=>{const t=(currentSet?.title||"").toLowerCase(),n=x.title.toLowerCase();return t.includes(n)||n.includes(t)||t.split(/\s+/).some(w=>w.length>4&&n.includes(w))}).flatMap(makeLibraryCards),suggestions=[...base,...fromLibrary].filter((x,i,a)=>a.findIndex(y=>y.question===x.question&&y.answer===x.answer)===i);
- openModal(old?"Editar cartão":"Novo cartão",'<form id="cardForm"><div class="field"><label>Frente — pergunta ou termo</label><textarea name="question" required>'+esc(old?.question||"")+'</textarea></div><div class="field" style="margin-top:12px"><label>Verso — resposta ou definição</label><textarea name="answer" required>'+esc(old?.answer||"")+'</textarea></div><div id="cardSuggestions" class="panel" style="padding:14px;margin-top:18px"><strong>Sugestões de perguntas e respostas para '+esc(currentSet?.title||"este conjunto")+'</strong><p class="small muted">Cada sugestão já vem com pergunta e resposta. As sugestões também podem aproveitar materiais salvos em Bibliotecas.</p><div id="cardSuggestionList"></div></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Salvar cartão</button></div></form>');
+ const old=id?cards.find(c=>c.id===id):null,base=old?[]:buildCardSuggestions(currentSet),fromLibrary=old?[]:libraryItems.filter(x=>{const t=(currentSet?.title||"").toLowerCase(),n=x.title.toLowerCase();return t.includes(n)||n.includes(t)||t.split(/\\s+/).some(w=>w.length>4&&n.includes(w))}).flatMap(makeLibraryCards),suggestions=[...base,...fromLibrary].filter((x,i,a)=>a.findIndex(y=>y.question===x.question&&y.answer===x.answer)===i);
+ openModal(old?"Editar cartão":"Novo cartão",'<form id="cardForm"><div class="field"><label>Frente — pergunta ou termo</label><textarea name="question" required>'+esc(old?.question||"")+'</textarea></div><div class="field" style="margin-top:12px"><label>Verso — resposta ou definição</label><textarea name="answer" required>'+esc(old?.answer||"")+'</textarea></div><div id="cardSuggestions" class="panel" style="padding:14px;margin-top:18px"><strong>Sugestões de perguntas e respostas para '+esc(currentSet?.title||"este conjunto")+'</strong><p class="small muted">Escolha os cartões que deseja adicionar. Use o botão para buscar novas sugestões sobre o mesmo assunto.</p><div class="actions" style="margin:10px 0"><button type="button" class="soft" id="refreshCardSuggestions">Gerar mais sugestões</button></div><div id="cardSuggestionList"></div></div><div class="actions" style="justify-content:flex-end;margin-top:18px"><button type="button" class="soft" id="cancelModal">Cancelar</button><button class="primary">Salvar cartão</button></div></form>');
  const panel=$("cardSuggestions"),list=$("cardSuggestionList");
  if(old)panel.classList.add("hidden");
- list.innerHTML=suggestions.map((item,i)=>'<div style="padding:11px 0;border-top:1px solid var(--line)"><strong class="small">'+esc(item.question)+'</strong><p class="small muted" style="margin:4px 0">'+esc(item.answer)+'</p><button type="button" class="soft" data-card-suggestion="'+i+'">Adicionar cartão</button></div>').join("")||'<p class="small muted">Não há sugestões para este tema ainda.</p>';
- list.querySelectorAll("[data-card-suggestion]").forEach(b=>b.onclick=()=>addSuggestedCard(suggestions[Number(b.dataset.cardSuggestion)],b));if(suggestions.length){list.insertAdjacentHTML("beforeend",'<div style="padding-top:12px"><button type="button" class="primary" id="addAllCardSuggestions">Adicionar todas ('+suggestions.length+')</button></div>');$("addAllCardSuggestions").onclick=async()=>{const offset=setCards(currentSet.id).length,rows=suggestions.map((x,i)=>({user_id:user.id,set_id:currentSet.id,question:x.question,answer:x.answer,position:offset+i,due_at:new Date().toISOString()}));const {error}=await sb.from("study_cards").insert(rows);if(error)return toast(errMsg(error));closeModal();await loadData();openSet(currentSet.id);toast(suggestions.length+" cartões adicionados!")}}
+ const renderSuggestions=()=>{
+  list.innerHTML=suggestions.map((item,i)=>'<div style="padding:11px 0;border-top:1px solid var(--line)"><strong class="small">'+esc(item.question)+'</strong><p class="small muted" style="margin:4px 0">'+esc(item.answer)+'</p><button type="button" class="soft" data-card-suggestion="'+i+'">Adicionar cartão</button></div>').join("")||'<p class="small muted">Ainda não há sugestões para este tema. Salve materiais na Biblioteca para gerar mais cartões.</p>';
+  list.querySelectorAll("[data-card-suggestion]").forEach(b=>b.onclick=()=>addSuggestedCard(suggestions[Number(b.dataset.cardSuggestion)],b));
+  if(suggestions.length){list.insertAdjacentHTML("beforeend",'<div style="padding-top:12px"><button type="button" class="primary" id="addAllCardSuggestions">Adicionar todas ('+suggestions.length+')</button></div>');$("addAllCardSuggestions").onclick=async()=>{const target=currentSet.id,offset=setCards(target).length,rows=suggestions.map((x,i)=>({user_id:user.id,set_id:target,question:x.question,answer:x.answer,position:offset+i,due_at:new Date().toISOString()}));const {error}=await sb.from("study_cards").insert(rows);if(error)return toast(errMsg(error));closeModal();await loadData();openSet(target);toast(suggestions.length+" cartões adicionados!")}}
+ };
+ renderSuggestions();
+ $("refreshCardSuggestions").onclick=()=>{const more=buildMoreCardSuggestions(currentSet,suggestions);if(!more.length)return toast("Não há novas sugestões pré-cadastradas para este tema. Salve mais materiais na Biblioteca para ampliar os cartões.");suggestions.push(...more);renderSuggestions();toast(more.length+" novas sugestões geradas!")};
  $("cancelModal").onclick=closeModal;
  $("cardForm").onsubmit=async e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));let result;if(old)result=await sb.from("study_cards").update({question:d.question.trim(),answer:d.answer.trim()}).eq("id",id);else result=await sb.from("study_cards").insert({user_id:user.id,set_id:currentSet.id,question:d.question.trim(),answer:d.answer.trim(),position:setCards(currentSet.id).length}).select().single();if(result.error)return toast(errMsg(result.error));closeModal();await loadData();openSet(currentSet.id);toast("Cartão salvo!")};
 }
