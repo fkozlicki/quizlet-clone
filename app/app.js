@@ -165,15 +165,44 @@ function renderLibraries(){
  document.querySelectorAll("[data-readlibrary]").forEach(b=>b.onclick=()=>openLibraryItem(b.dataset.readlibrary));
  document.querySelectorAll("[data-dellibrary]").forEach(b=>b.onclick=async()=>{const item=libraryItems.find(x=>x.id===b.dataset.dellibrary);if(!item||!confirm('Excluir "'+item.title+'" da sua biblioteca?'))return;const {error}=await sb.from("study_library_items").delete().eq("id",item.id).eq("user_id",user.id);if(error)return toast(errMsg(error));await loadData();renderLibraries();toast("Material removido da biblioteca.")});
 }
+function libraryQueryVariants(raw){
+ const clean=String(raw||"").trim(),lower=clean.toLocaleLowerCase("pt-BR");
+ const stop=new Set(["conceito","conceitos","principal","principais","introducao","introdução","fundamento","fundamentos","estudo","estudos","sobre","de","da","do","das","dos","para","com","e","a","o","as","os","um","uma"]);
+ const tokens=lower.normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9\\s]/g," ").split(/\\s+/).filter(w=>w.length>2&&!stop.has(w));
+ const variants=[clean,tokens.join(" ")];
+ if(tokens.some(w=>w==="anatomia")&&tokens.some(w=>w==="animal")){
+  variants.push("anatomia animal","anatomia veterinaria","anatomia comparada","sistemas do corpo dos animais","anatomia");
+ }
+ if(tokens.some(w=>w==="python"))variants.push("linguagem de programação Python");
+ return [...new Set(variants.map(x=>x.trim()).filter(x=>x.length>1))].slice(0,6);
+}
+function curatedLibrarySources(query){
+ const t=String(query||"").toLocaleLowerCase("pt-BR");
+ if(!/anatomia|veterin|animal/.test(t))return [];
+ return [
+  {title:"Fundamentos da Anatomia Animal — material didático",source_url:"https://stecine.azureedge.net/repositorio/00212ti/200616/ptbr/index.html",source_name:"Material educacional",summary:"Conteúdo introdutório sobre fundamentos, organização do corpo animal, anatomia sistêmica e topográfica. Abra a fonte para consultar o material completo."},
+  {title:"Anatomia Aplicada à Radiologia Veterinária",source_url:"https://stecine.azureedge.net/repositorio/anatomia_aplicada_a_radiologia_veterinaria/index.html",source_name:"Material educacional",summary:"Planos e eixos anatômicos, sistema locomotor e sistemas orgânicos dos animais vertebrados."},
+  {title:"Atlas de Anatomia Veterinária — UAB/UFRA",source_url:"https://www.anatomiaveterinaria-uab-ufra.com/introducao",source_name:"UAB / UFRA",summary:"Atlas online com imagens e explicações de músculos, ossos, vasos sanguíneos, nervos e organização do organismo animal."},
+  {title:"Anatomia Animal I — Universidade de São Paulo",source_url:"https://uspdigital.usp.br/jupiterweb/obterDisciplina?sgldis=ZMV1303",source_name:"Universidade de São Paulo",summary:"Ementa universitária com conceitos gerais, nomenclatura anatômica, osteologia, articulações, músculos e sistemas."},
+  {title:"Programa de Anatomia Animal — Universidade Federal de Santa Catarina",source_url:"https://medicinaveterinaria.paginas.ufsc.br/files/2021/10/ABF7601-Anatomia-Animal-I.pdf",source_name:"Universidade Federal de Santa Catarina",summary:"Programa de disciplina com introdução, princípios de construção do corpo animal, planos, eixos e termos anatômicos."}
+ ];
+}
 async function searchLibrary(){
  const query=$("libraryQuery").value.trim();if(query.length<2)return toast("Digite pelo menos duas letras para pesquisar.");
- const btn=$("librarySearchButton");btn.disabled=true;btn.textContent="Pesquisando...";$("libraryResults").innerHTML='<div class="panel small muted">Consultando a Wikipédia em português...</div>';
+ const btn=$("librarySearchButton");btn.disabled=true;btn.textContent="Pesquisando...";$("libraryResults").innerHTML='<div class="panel small muted">Ampliando a pesquisa e consultando materiais gratuitos...</div>';
  try{
-  const url="https://pt.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(query)+"&gsrnamespace=0&gsrlimit=8&prop=extracts%7Cinfo&explaintext=1&exchars=18000&inprop=url&format=json&origin=*";
-  const response=await fetch(url);if(!response.ok)throw new Error("A fonte não respondeu. Tente novamente.");
-  const data=await response.json(),pages=Object.values(data.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0));
-  librarySearchResults=pages.filter(p=>p.extract&&p.extract.trim()).map(p=>({title:p.title,content:p.extract,source_url:p.fullurl||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(p.title.replace(/ /g,"_"))),source_name:"Wikipédia",summary:p.extract.slice(0,360)}));
-  $("libraryResults").innerHTML=librarySearchResults.length?'<h3>Resultados encontrados</h3><div class="grid">'+librarySearchResults.map((p,i)=>'<article class="set-card"><span class="tag">Wikipédia · português</span><h3>'+esc(p.title)+'</h3><p class="small muted">'+esc(p.summary)+'...</p><div class="set-meta"><span>Material gratuito</span><button class="primary" data-savelibrary="'+i+'">＋ Salvar na biblioteca</button></div></article>').join("")+'</div>':'<div class="empty">Não encontrei material para esse termo. Tente pesquisar com outras palavras.</div>';
+  const variants=libraryQueryVariants(query);
+  const responses=await Promise.all(variants.map(async term=>{
+   const url="https://pt.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(term)+"&gsrnamespace=0&gsrlimit=6&prop=extracts%7Cinfo&explaintext=1&exchars=18000&inprop=url&format=json&origin=*";
+   const response=await fetch(url);if(!response.ok)throw new Error("A fonte não respondeu.");
+   const data=await response.json();return Object.values(data.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0));
+  }));
+  const seen=new Set();
+  librarySearchResults=responses.flat().filter(p=>p.extract&&p.extract.trim()).filter(p=>{const k=p.title.toLocaleLowerCase("pt-BR");if(seen.has(k))return false;seen.add(k);return true}).slice(0,12).map(p=>({title:p.title,content:p.extract,source_url:p.fullurl||("https://pt.wikipedia.org/wiki/"+encodeURIComponent(p.title.replace(/ /g,"_"))),source_name:"Wikipédia",summary:p.extract.slice(0,360)}));
+  const refs=curatedLibrarySources(query).filter(x=>!libraryItems.some(saved=>saved.source_url===x.source_url));
+  const wikiHtml=librarySearchResults.map((p,i)=>'<article class="set-card"><span class="tag">Wikipédia · português</span><h3>'+esc(p.title)+'</h3><p class="small muted">'+esc(p.summary)+'...</p><div class="set-meta"><span>Texto disponível para salvar</span><button class="primary" data-savelibrary="'+i+'">＋ Salvar na biblioteca</button></div></article>').join("");
+  const refsHtml=refs.map((p,i)=>'<article class="set-card"><span class="tag">Fonte educacional</span><h3>'+esc(p.title)+'</h3><p class="small muted">'+esc(p.summary)+'</p><div class="set-meta"><span>'+esc(p.source_name)+'</span><a class="soft" href="'+esc(p.source_url)+'" target="_blank" rel="noopener">Abrir material ↗</a></div></article>').join("");
+  $("libraryResults").innerHTML=(wikiHtml?'<h3>Conteúdos que você pode salvar</h3><div class="grid">'+wikiHtml+'</div>':'')+(refsHtml?'<h3>Materiais e fontes para aprofundar</h3><div class="grid">'+refsHtml+'</div>':'')+(!wikiHtml&&!refsHtml?'<div class="empty">Não encontrei materiais com esse termo. Experimente pesquisar pelo assunto principal, por exemplo: anatomia animal, sistema digestório ou osteologia.</div>':'');
   document.querySelectorAll("[data-savelibrary]").forEach(b=>b.onclick=()=>saveLibraryItem(Number(b.dataset.savelibrary),b));
  }catch(e){$("libraryResults").innerHTML='<div class="empty">Não foi possível pesquisar agora. Verifique sua conexão e tente novamente.<p class="small">'+esc(errMsg(e))+'</p></div>'}
  finally{btn.disabled=false;btn.textContent="Pesquisar materiais"}
