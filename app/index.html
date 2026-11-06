@@ -259,12 +259,27 @@ input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4p
 }
 @media(max-width:360px){.study-quick-actions{grid-template-columns:1fr 1fr}.study-quick:last-child{grid-column:1/-1}}
 
+
+/* Menu compacto no celular: recolhido por padrão */
+.side-toggle{display:none}
+@media(max-width:920px){
+ .side{position:relative!important;top:auto!important}
+ .side-toggle{display:flex;width:100%;align-items:center;gap:10px;min-height:42px;padding:8px 12px;background:#f5f4ff;color:#514be1;border:1px solid #e5e3ff;border-radius:12px;text-align:left;box-shadow:none;font-size:13px}
+ .side-toggle span:first-of-type{font-weight:800}
+ .side-current{margin-left:auto;color:#777b98;font-size:12px;font-weight:650}
+ .side-chevron{font-size:18px;transition:transform .18s}
+ .side.is-open .side-chevron{transform:rotate(180deg)}
+ .side .nav,.side>div{display:none!important}
+ .side.is-open .nav{display:flex!important;flex-wrap:wrap;overflow:visible;margin-top:8px}
+ .side.is-open .nav button{flex:1 1 auto}
+ .side.is-open>div{display:block!important;margin-top:9px!important}
+}
 </style>
 </head>
 <body>
 <div id="authScreen" class="auth"><div class="auth-card"><div class="logo">estuda<span>.</span></div><h1 id="authTitle">Entre na sua conta</h1><p class="muted" id="authDesc">Seus estudos sempre com você.</p><form id="authForm"><div class="field"><label>E-mail</label><input id="email" type="email" required autocomplete="email" placeholder="voce@email.com"></div><div class="field"><label>Senha</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div><button class="primary" style="width:100%" id="authSubmit">Entrar</button></form><p class="small muted" style="text-align:center;margin-top:18px"><span id="authSwitchText">Ainda não tem conta?</span> <a href="#" id="authSwitch">Criar conta</a></p><p id="authError" class="small" style="color:var(--danger)"></p><p class="small muted">Use o mesmo e-mail e senha do ControlePeso.</p></div></div>
 <div id="app" class="hidden"><div class="wrap"><header class="top"><div><div class="logo">estuda<span>.</span></div><div class="small muted">Aprenda melhor, um cartão por vez.</div></div><div class="actions"><span id="userEmail" class="small muted"></span><button class="plain" id="logout">Sair</button></div></header>
-<div class="layout"><aside class="side"><nav class="nav"><button class="active" data-page="home" onclick="estudaNavigate(&quot;home&quot;)">⌂ Início</button><button data-page="review" onclick="estudaNavigate(&quot;review&quot;)">↻ Revisar</button><button data-page="insights" onclick="estudaNavigate(&quot;insights&quot;)">▥ Desempenho</button><button data-page="folders" onclick="estudaNavigate(&quot;folders&quot;)">▣ Pastas</button><button data-page="favorites" onclick="estudaNavigate(&quot;favorites&quot;)">★ Favoritos</button><button data-page="libraries" onclick="estudaNavigate(&quot;libraries&quot;)">▤ Bibliotecas</button></nav><div style="margin-top:18px"><button class="primary" style="width:100%" id="newSetSide">＋ Criar conjunto</button></div></aside>
+<div class="layout"><aside class="side" id="mainSide"><button type="button" class="side-toggle" id="sideToggle" aria-expanded="false" aria-controls="mainNav">☰ <span>Menu</span><span class="side-current" id="sideCurrent">Início</span><span class="side-chevron">⌄</span></button><nav class="nav" id="mainNav"><button class="active" data-page="home" onclick="estudaNavigate(&quot;home&quot;)">⌂ Início</button><button data-page="review" onclick="estudaNavigate(&quot;review&quot;)">↻ Revisar</button><button data-page="insights" onclick="estudaNavigate(&quot;insights&quot;)">▥ Desempenho</button><button data-page="folders" onclick="estudaNavigate(&quot;folders&quot;)">▣ Pastas</button><button data-page="favorites" onclick="estudaNavigate(&quot;favorites&quot;)">★ Favoritos</button><button data-page="libraries" onclick="estudaNavigate(&quot;libraries&quot;)">▤ Bibliotecas</button></nav><div style="margin-top:18px"><button class="primary" style="width:100%" id="newSetSide">＋ Criar conjunto</button></div></aside>
 <main class="content">
 <section id="homePage">
  <div class="study-welcome"><div><div class="study-eyebrow">SEU ESPAÇO DE APRENDIZADO</div><h1>O que vamos aprender?</h1><p class="sub">Um passo de cada vez. Seu progresso fica salvo automaticamente.</p></div></div>
@@ -304,4 +319,14 @@ window.estudaNavigate = function(name) {
 };
 </script>
 <script src="./app.js"></script>
+<script>
+(function(){
+ const side=document.getElementById("mainSide"),toggle=document.getElementById("sideToggle"),current=document.getElementById("sideCurrent");
+ if(!side||!toggle)return;
+ toggle.addEventListener("click",function(){const open=side.classList.toggle("is-open");toggle.setAttribute("aria-expanded",String(open));});
+ document.querySelectorAll("#mainNav [data-page]").forEach(function(button){
+  button.addEventListener("click",function(){if(current)current.textContent=button.textContent.replace(/^[^\\p{L}\\p{N}]+/u,"").trim();side.classList.remove("is-open");toggle.setAttribute("aria-expanded","false");});
+ });
+})();
+</script>
 </body></html>
