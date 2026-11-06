@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Estuda — aprendizagem inteligente</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -119,6 +119,95 @@ textarea{resize:vertical;min-height:110px}
  .toast{bottom:calc(12px + env(safe-area-inset-bottom))}
 }
 @media(max-width:360px){.wrap{padding:9px}.nav button{padding:9px 10px}.stat-card{padding:10px}.top .actions button{padding:8px;font-size:11px}}
+
+
+/* Redesign mobile-first • Estuda (identidade roxa preservada) */
+:root{color-scheme:light;--bg:#f4f4ff;--panel:#fff;--ink:#202344;--muted:#747995;--line:#e5e6f3;--brand:#514be1;--brand2:#eeedff;--good:#16865d;--goodbg:#e5f6ee;--danger:#bd4652;--dangerbg:#fff0f1;--amber:#98620a;--amberbg:#fff6df;--shadow:0 12px 34px rgba(45,43,112,.075)}
+html{min-height:100%;-webkit-text-size-adjust:100%;scroll-padding-top:18px}
+body{min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse at 90% 0%,#e7e7ff 0,transparent 38%),linear-gradient(180deg,#f8f8ff 0%,#f1f2fc 100%);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+button{min-height:44px;border-radius:13px;-webkit-tap-highlight-color:transparent}
+.primary{background:linear-gradient(135deg,#625cf0,#403ac8);box-shadow:0 5px 14px #5146e52b}
+.soft{background:#eeedff;color:#4842cb}
+input,textarea,select{min-height:48px;border-radius:14px;font-size:16px}
+input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4px #5146e51a}
+.wrap{width:min(100%,1420px);padding:28px}
+.top{margin-bottom:25px}
+.logo{letter-spacing:-1.5px}
+.layout{grid-template-columns:248px minmax(0,1fr);gap:25px}
+.side{padding:12px;border-radius:22px;box-shadow:0 12px 34px rgba(45,43,112,.07);border-color:#e6e6f4}
+.nav{gap:5px}
+.nav button{min-height:46px;border-radius:13px}
+.nav button.active,.nav button:hover{background:#eeedff;color:#4943d0}
+.panel,.set-card,.study-card,.auth-card,.stat-card,.theme-card{border-radius:21px;border-color:#e6e7f4;box-shadow:0 12px 34px rgba(45,43,112,.065)}
+.panel{padding:24px}
+.set-card,.theme-card{padding:21px}
+.set-card:hover,.theme-card:hover{border-color:#c9c7ff;box-shadow:0 16px 32px rgba(45,43,112,.1)}
+.tag,.pill{background:#eeedff;color:#514be1}
+.empty{border-color:#d8d9ef;background:#fbfbff}
+.stat-card{padding:20px;background:linear-gradient(145deg,#fff,#f8f8ff)}
+.progress{height:10px;background:#e9eaf4;border-radius:20px}
+.progress div{background:linear-gradient(90deg,#514be1,#9a96ff)}
+.study-card{background:linear-gradient(145deg,#fff,#f7f7ff);border-radius:24px}
+.auth{min-height:100vh;min-height:100dvh;padding:24px;background:radial-gradient(ellipse at 50% 8%,#e6e7ff,transparent 58%),#f5f5ff}
+.auth-card{padding:34px;border-radius:25px}
+.modal-box{border-radius:24px}
+.toast{padding:13px 18px;border-radius:15px}
+@media(max-width:920px){
+ .wrap{padding:20px}
+ .layout{grid-template-columns:1fr;gap:15px}
+ .side{position:sticky;top:env(safe-area-inset-top);z-index:20;padding:8px;border-radius:17px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+ .nav{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .nav::-webkit-scrollbar{display:none}
+ .nav button{flex:0 0 auto;white-space:nowrap;padding:11px 14px}
+ .side>div{display:none}
+}
+@media(max-width:620px){
+ .wrap{padding:13px}
+ .top{align-items:center;margin-bottom:16px;gap:8px}
+ .logo{font-size:25px}
+ .top .actions{gap:5px}
+ .top .actions button{padding:9px 11px;font-size:12px}
+ .layout{gap:12px}
+ .side{top:env(safe-area-inset-top);margin:0 -1px;border-radius:15px}
+ .nav{gap:4px}
+ .nav button{min-height:42px;padding:10px 12px;font-size:12px}
+ .content h1{font-size:26px;letter-spacing:-.8px}
+ .sub{font-size:13px;margin-bottom:16px}
+ .toolbar{gap:10px}
+ .search{min-width:0;max-width:none;width:100%;flex:1 1 100%}
+ .grid{grid-template-columns:1fr;gap:11px}
+ .set-card,.theme-card{padding:17px;border-radius:18px}
+ .panel{padding:17px;border-radius:18px;margin-bottom:12px}
+ .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+ .stat-card{padding:14px;border-radius:16px}
+ .stat-number{font-size:25px}
+ .form-grid{grid-template-columns:1fr;gap:12px}
+ .field.full{grid-column:1}
+ .card-row{grid-template-columns:minmax(0,1fr);gap:8px;padding:14px 0}
+ .study-card{padding:26px 17px;min-height:230px;border-radius:20px}
+ .study-card h2{font-size:26px}
+ .study-actions{gap:8px}
+ .study-actions button{min-height:48px}
+ .rating-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .rating-row button{min-height:48px}
+ .modal{padding:9px;align-items:end}
+ .modal-box{width:100%;max-height:88vh;max-height:88dvh;padding:18px;border-radius:22px 22px 14px 14px}
+ .library-reader{max-height:62vh;max-height:62dvh;padding:14px}
+ .auth{padding:16px}
+ .auth-card{padding:25px;border-radius:22px}
+ .toast{bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+@media(max-width:360px){
+ .wrap{padding:10px}
+ .nav button{padding:9px 10px}
+ .stat-card{padding:11px}
+ .top .actions button{padding:8px;font-size:11px}
+}
+@supports(padding:max(0px)){
+ body{padding-bottom:env(safe-area-inset-bottom)}
+ .modal{padding-bottom:max(9px,env(safe-area-inset-bottom))}
+}
 
 </style>
 </head>
