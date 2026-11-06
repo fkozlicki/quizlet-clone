@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>Estuda — aprendizagem inteligente</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+
+:root{color-scheme:light;--bg:#f3f5fb;--panel:#fff;--ink:#1b2340;--muted:#74809a;--line:#e4e9f3;--brand:#4c46d8;--brand2:#eeedff;--good:#16865b;--goodbg:#e8f7f0;--danger:#c43d54;--dangerbg:#fff0f2;--amber:#98620a;--amberbg:#fff6df;--shadow:0 14px 36px rgba(34,43,88,.07)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 85% 0%,#e8eaff 0,transparent 36%),var(--bg);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer;border:0;border-radius:12px;padding:10px 15px;font-weight:750;transition:transform .15s,filter .15s,box-shadow .15s}
+button:active{transform:scale(.985)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.primary{background:linear-gradient(135deg,#514be1,#3934b9);color:#fff;box-shadow:0 5px 14px #5146e52b}
+.soft{background:#eeedff;color:#4842cb}.plain{background:transparent;color:var(--muted)}.danger{background:var(--dangerbg);color:var(--danger)}.good{background:var(--goodbg);color:var(--good)}.warn{background:var(--amberbg);color:var(--amber)}
+.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}
+.wrap{width:min(100%,1380px);margin:auto;padding:26px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:24px}
+.logo{font-size:28px;font-weight:900;letter-spacing:-1.4px;color:#25245c}.logo span{color:var(--brand)}
+.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.layout{display:grid;grid-template-columns:235px minmax(0,1fr);gap:24px;align-items:start}
+.side{padding:13px;height:max-content;position:sticky;top:18px;background:#fff;border:1px solid var(--line);border-radius:21px;box-shadow:var(--shadow)}
+.nav{display:flex;flex-direction:column;gap:6px}
+.nav button{text-align:left;background:transparent;color:#69738d;padding:12px 13px;border-radius:13px;box-shadow:none}
+.nav button.active,.nav button:hover{background:var(--brand2);color:var(--brand)}
+.content{min-width:0}
+.content h1{font-size:clamp(26px,3vw,34px);letter-spacing:-1.2px;line-height:1.15;margin:0 0 6px;font-weight:850}
+.sub{color:var(--muted);margin:0 0 22px;line-height:1.6}
+.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px}
+.search{min-width:220px;flex:1;max-width:560px}
+input,textarea,select{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none;min-height:45px;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4px #5146e51a}
+textarea{resize:vertical;min-height:110px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:16px}
+.side,.panel,.set-card,.study-card,.auth-card,.stat-card,.theme-card{background:var(--panel);border:1px solid var(--line);border-radius:19px;box-shadow:var(--shadow)}
+.set-card,.theme-card{padding:19px;cursor:pointer;transition:transform .16s,border-color .16s,box-shadow .16s}
+.set-card:hover,.theme-card:hover{transform:translateY(-2px);border-color:#c9c7ff;box-shadow:0 16px 30px rgba(34,43,88,.09)}
+.set-card h3,.theme-card h3{margin:9px 0 6px;font-size:18px;line-height:1.3;letter-spacing:-.3px}
+.set-meta{display:flex;justify-content:space-between;gap:9px;color:var(--muted);font-size:12px;margin-top:17px;align-items:center;flex-wrap:wrap}
+.tag,.pill{font-size:11px;color:var(--brand);background:var(--brand2);padding:5px 10px;border-radius:20px;display:inline-flex;align-items:center;font-weight:800}.pill{white-space:nowrap}
+.empty{padding:42px 20px;text-align:center;border:1px dashed #cfd5e7;border-radius:17px;color:var(--muted);grid-column:1/-1;background:#fafbff}
+.panel{padding:22px;margin-bottom:17px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.field{display:flex;flex-direction:column;gap:7px;min-width:0}
+.field.full{grid-column:1/-1}
+.field label{font-size:12px;font-weight:800;color:#5d6882}
+.modal{position:fixed;inset:0;background:#10142e99;display:grid;place-items:center;padding:18px;z-index:50;backdrop-filter:blur(5px)}
+.modal-box{background:#fff;border:1px solid #e6e8f3;border-radius:22px;padding:24px;width:min(680px,100%);max-height:90vh;overflow:auto;box-shadow:0 25px 80px #11152e40}
+.modal-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:17px}
+.modal-head h2{margin:0;font-size:21px}
+.card-row{padding:15px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) minmax(110px,.6fr) auto;gap:13px;align-items:center}
+.card-row:last-child{border:0}
+.card-row p{margin:0;overflow-wrap:anywhere}
+.study-card{padding:40px;min-height:280px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;background:linear-gradient(145deg,#fff,#f8f8ff)}
+.study-card .muted{font-size:12px;text-transform:uppercase;letter-spacing:1px}
+.study-card h2{font-size:clamp(24px,4vw,36px);margin:20px 0;white-space:pre-wrap}
+.progress{height:9px;background:#e9eaf4;border-radius:9px;overflow:hidden;margin:16px 0}
+.progress div{height:100%;background:linear-gradient(90deg,#4c46d8,#8c88ff);transition:width .2s}
+.study-actions{display:flex;justify-content:space-between;align-items:center;margin-top:17px;gap:10px}
+.auth{min-height:100vh;display:grid;place-items:center;padding:22px;background:radial-gradient(ellipse at 50% 10%,#e7e8ff,transparent 55%)}
+.auth-card{width:min(440px,100%);padding:32px;background:#fff;border-radius:23px}
+.auth-card h1{margin:0 0 7px;font-size:27px}
+.auth-card .field{margin:15px 0}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#202548;color:white;padding:12px 18px;border-radius:13px;z-index:70;box-shadow:var(--shadow);max-width:90%;text-align:center}
+.stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:18px 0}
+.stat-card{padding:18px;background:linear-gradient(145deg,#fff,#fafaff)}
+.stat-number{font-size:clamp(23px,2.5vw,31px);font-weight:900;letter-spacing:-1px}
+.stat-label{font-size:12px;color:var(--muted)}
+.folder-chip{padding:7px 12px;border-radius:20px;background:#f0f1f8;color:var(--muted);font-size:12px}
+.quiz-option{display:block;width:100%;text-align:left;background:#f7f7fd;color:var(--ink);margin:9px 0;border:1px solid var(--line);white-space:normal;box-shadow:none}
+.quiz-option.correct{border-color:var(--good);background:var(--goodbg)}
+.quiz-option.wrong{border-color:var(--danger);background:var(--dangerbg)}
+.rating-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-top:18px}
+.rating-row button{padding:13px 8px}
+.library-reader{line-height:1.85;max-height:70vh;overflow:auto;padding:18px;background:#fafbff;border-radius:15px}
+@media(max-width:920px){.layout{grid-template-columns:1fr;gap:14px}.side{position:static}.nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.nav button{text-align:center;padding:11px 7px;font-size:13px}}
+@media(max-width:620px){
+ .wrap{padding:12px}
+ .top{align-items:center;margin-bottom:15px;gap:10px}
+ .logo{font-size:24px}
+ .top .actions{gap:6px}
+ .top .actions button{padding:9px 10px;font-size:12px}
+ .layout{gap:12px}
+ .side{padding:8px;border-radius:16px}
+ .nav{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding-bottom:2px}
+ .nav::-webkit-scrollbar{display:none}
+ .nav button{flex:0 0 auto;white-space:nowrap;padding:10px 12px;font-size:12px}
+ .content h1{font-size:25px}
+ .sub{font-size:13px;margin-bottom:16px}
+ .toolbar{align-items:stretch}
+ .toolbar>.actions{width:100%}
+ .toolbar>.actions button{flex:1}
+ .search{min-width:0;max-width:none;width:100%;flex:1 1 100%}
+ .grid{grid-template-columns:1fr;gap:10px}
+ .set-card,.theme-card{padding:16px}
+ .panel{padding:15px;border-radius:17px;margin-bottom:11px}
+ .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:13px 0}
+ .stat-card{padding:13px}
+ .stat-number{font-size:24px}
+ .stat-label{font-size:11px}
+ .form-grid{grid-template-columns:1fr;gap:11px}
+ .field.full{grid-column:1}
+ .card-row{grid-template-columns:minmax(0,1fr);gap:7px;padding:13px 0}
+ .card-row p:nth-child(2){grid-column:auto}
+ .card-row .actions{display:flex;flex-wrap:wrap}
+ .study-card{padding:24px 16px;min-height:220px}
+ .study-card h2{font-size:25px;margin:15px 0}
+ .study-actions{flex-wrap:wrap}
+ .study-actions button{flex:1}
+ .rating-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .rating-row button{padding:12px 7px}
+ .modal{padding:9px;align-items:end}
+ .modal-box{width:100%;max-height:89vh;padding:18px;border-radius:21px 21px 14px 14px}
+ .library-reader{max-height:60vh;padding:13px}
+ .auth-card{padding:24px}
+ .toast{bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+@media(max-width:360px){.wrap{padding:9px}.nav button{padding:9px 10px}.stat-card{padding:10px}.top .actions button{padding:8px;font-size:11px}}
+
+
+/* Redesign mobile-first • Estuda (identidade roxa preservada) */
+:root{color-scheme:light;--bg:#f4f4ff;--panel:#fff;--ink:#202344;--muted:#747995;--line:#e5e6f3;--brand:#514be1;--brand2:#eeedff;--good:#16865d;--goodbg:#e5f6ee;--danger:#bd4652;--dangerbg:#fff0f1;--amber:#98620a;--amberbg:#fff6df;--shadow:0 12px 34px rgba(45,43,112,.075)}
+html{min-height:100%;-webkit-text-size-adjust:100%;scroll-padding-top:18px}
+body{min-height:100vh;min-height:100dvh;background:radial-gradient(ellipse at 90% 0%,#e7e7ff 0,transparent 38%),linear-gradient(180deg,#f8f8ff 0%,#f1f2fc 100%);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit}
+button{min-height:44px;border-radius:13px;-webkit-tap-highlight-color:transparent}
+.primary{background:linear-gradient(135deg,#625cf0,#403ac8);box-shadow:0 5px 14px #5146e52b}
+.soft{background:#eeedff;color:#4842cb}
+input,textarea,select{min-height:48px;border-radius:14px;font-size:16px}
+input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4px #5146e51a}
+.wrap{width:min(100%,1420px);padding:28px}
+.top{margin-bottom:25px}
+.logo{letter-spacing:-1.5px}
+.layout{grid-template-columns:248px minmax(0,1fr);gap:25px}
+.side{padding:12px;border-radius:22px;box-shadow:0 12px 34px rgba(45,43,112,.07);border-color:#e6e6f4}
+.nav{gap:5px}
+.nav button{min-height:46px;border-radius:13px}
+.nav button.active,.nav button:hover{background:#eeedff;color:#4943d0}
+.panel,.set-card,.study-card,.auth-card,.stat-card,.theme-card{border-radius:21px;border-color:#e6e7f4;box-shadow:0 12px 34px rgba(45,43,112,.065)}
+.panel{padding:24px}
+.set-card,.theme-card{padding:21px}
+.set-card:hover,.theme-card:hover{border-color:#c9c7ff;box-shadow:0 16px 32px rgba(45,43,112,.1)}
+.tag,.pill{background:#eeedff;color:#514be1}
+.empty{border-color:#d8d9ef;background:#fbfbff}
+.stat-card{padding:20px;background:linear-gradient(145deg,#fff,#f8f8ff)}
+.progress{height:10px;background:#e9eaf4;border-radius:20px}
+.progress div{background:linear-gradient(90deg,#514be1,#9a96ff)}
+.study-card{background:linear-gradient(145deg,#fff,#f7f7ff);border-radius:24px}
+.auth{min-height:100vh;min-height:100dvh;padding:24px;background:radial-gradient(ellipse at 50% 8%,#e6e7ff,transparent 58%),#f5f5ff}
+.auth-card{padding:34px;border-radius:25px}
+.modal-box{border-radius:24px}
+.toast{padding:13px 18px;border-radius:15px}
+@media(max-width:920px){
+ .wrap{padding:20px}
+ .layout{grid-template-columns:1fr;gap:15px}
+ .side{position:sticky;top:env(safe-area-inset-top);z-index:20;padding:8px;border-radius:17px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+ .nav{display:flex;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+ .nav::-webkit-scrollbar{display:none}
+ .nav button{flex:0 0 auto;white-space:nowrap;padding:11px 14px}
+ .side>div{display:none}
+}
+@media(max-width:620px){
+ .wrap{padding:13px}
+ .top{align-items:center;margin-bottom:16px;gap:8px}
+ .logo{font-size:25px}
+ .top .actions{gap:5px}
+ .top .actions button{padding:9px 11px;font-size:12px}
+ .layout{gap:12px}
+ .side{top:env(safe-area-inset-top);margin:0 -1px;border-radius:15px}
+ .nav{gap:4px}
+ .nav button{min-height:42px;padding:10px 12px;font-size:12px}
+ .content h1{font-size:26px;letter-spacing:-.8px}
+ .sub{font-size:13px;margin-bottom:16px}
+ .toolbar{gap:10px}
+ .search{min-width:0;max-width:none;width:100%;flex:1 1 100%}
+ .grid{grid-template-columns:1fr;gap:11px}
+ .set-card,.theme-card{padding:17px;border-radius:18px}
+ .panel{padding:17px;border-radius:18px;margin-bottom:12px}
+ .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:14px 0}
+ .stat-card{padding:14px;border-radius:16px}
+ .stat-number{font-size:25px}
+ .form-grid{grid-template-columns:1fr;gap:12px}
+ .field.full{grid-column:1}
+ .card-row{grid-template-columns:minmax(0,1fr);gap:8px;padding:14px 0}
+ .study-card{padding:26px 17px;min-height:230px;border-radius:20px}
+ .study-card h2{font-size:26px}
+ .study-actions{gap:8px}
+ .study-actions button{min-height:48px}
+ .rating-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .rating-row button{min-height:48px}
+ .modal{padding:9px;align-items:end}
+ .modal-box{width:100%;max-height:88vh;max-height:88dvh;padding:18px;border-radius:22px 22px 14px 14px}
+ .library-reader{max-height:62vh;max-height:62dvh;padding:14px}
+ .auth{padding:16px}
+ .auth-card{padding:25px;border-radius:22px}
+ .toast{bottom:calc(12px + env(safe-area-inset-bottom))}
+}
+@media(max-width:360px){
+ .wrap{padding:10px}
+ .nav button{padding:9px 10px}
+ .stat-card{padding:11px}
+ .top .actions button{padding:8px;font-size:11px}
+}
+@supports(padding:max(0px)){
+ body{padding-bottom:env(safe-area-inset-bottom)}
+ .modal{padding-bottom:max(9px,env(safe-area-inset-bottom))}
+}
+
+
+/* Home minimalista e ações diretas no Estuda */
+.study-welcome{margin:4px 0 18px}
+.study-eyebrow{font-size:10px;letter-spacing:1.45px;font-weight:850;color:#625cf0}
+.study-welcome h1{margin:5px 0 5px}
+.study-welcome .sub{margin:0;max-width:580px}
+.study-focus{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px;margin:0 0 13px;background:linear-gradient(125deg,#3734a8,#625cf0 72%,#8b86ff);border-radius:23px;color:#fff;box-shadow:0 15px 34px rgba(74,69,202,.2)}
+.study-focus .tag{background:#ffffff22;color:#fff}
+.study-focus-copy{min-width:0}
+.study-focus h2{font-size:21px;letter-spacing:-.6px;margin:10px 0 4px}
+.study-focus p{color:#e2e2ff;margin:0}
+.study-focus-action{display:flex;align-items:center;gap:17px}
+.study-due-number{display:flex;flex-direction:column;align-items:center;min-width:65px}
+.study-due-number strong{font-size:34px;line-height:1;font-weight:900;letter-spacing:-1px}
+.study-due-number span{font-size:10px;color:#e2e2ff;margin-top:5px}
+.study-focus-action .primary{background:#fff;color:#4842c9;box-shadow:none;white-space:nowrap}
+.study-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:0 0 27px}
+.study-quick{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:112px;padding:15px 16px;background:#fff;color:var(--ink);border:1px solid #e6e7f4;border-radius:18px;box-shadow:0 8px 22px rgba(45,43,112,.045);text-align:left}
+.study-quick>span{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;background:#eeedff;color:#514be1;font-size:21px;margin-bottom:3px}
+.study-quick b{font-size:13px}
+.study-quick small{font-size:10px;color:var(--muted);font-weight:500}
+.study-quick.primary{background:#eeedff;color:#4943ca;box-shadow:none;border-color:#d9d7ff}
+.study-sets-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.study-sets-head h2{margin:0;font-size:19px;letter-spacing:-.5px}
+.study-sets-head p{margin:3px 0 0}
+.study-sets-head .actions{flex:1;justify-content:flex-end}
+.study-sets-head .search{max-width:280px;min-width:130px}
+#setsGrid .set-card{border-radius:19px}
+#setsGrid .set-meta{margin-top:13px}
+@media(max-width:620px){
+ .study-welcome{margin:0 1px 14px}
+ .study-welcome h1{font-size:24px}
+ .study-focus{display:block;padding:18px;border-radius:19px;margin-bottom:10px}
+ .study-focus h2{font-size:19px;margin:8px 0 3px}
+ .study-focus-action{justify-content:space-between;margin-top:17px}
+ .study-due-number{align-items:flex-start}
+ .study-due-number strong{font-size:30px}
+ .study-focus-action .primary{flex:1;min-height:47px}
+ .study-quick-actions{gap:8px;margin-bottom:23px}
+ .study-quick{min-height:105px;padding:11px 9px;border-radius:15px;gap:4px}
+ .study-quick>span{width:29px;height:29px;font-size:19px}
+ .study-quick b{font-size:11px;line-height:1.2}
+ .study-quick small{font-size:9px;line-height:1.25}
+ .study-sets-head{align-items:flex-start;flex-direction:column;gap:10px}
+ .study-sets-head .actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .study-sets-head .search{width:100%;max-width:none;min-width:0}
+ .study-sets-head .actions button{white-space:nowrap}
+}
+@media(max-width:360px){.study-quick-actions{grid-template-columns:1fr 1fr}.study-quick:last-child{grid-column:1/-1}}
+
+
+/* Menu compacto no celular: recolhido por padrão */
+.side-toggle{display:none}
+@media(max-width:920px){
+ .side{position:relative!important;top:auto!important}
+ .side-toggle{display:flex;width:100%;align-items:center;gap:10px;min-height:42px;padding:8px 12px;background:#f5f4ff;color:#514be1;border:1px solid #e5e3ff;border-radius:12px;text-align:left;box-shadow:none;font-size:13px}
+ .side-toggle span:first-of-type{font-weight:800}
+ .side-current{margin-left:auto;color:#777b98;font-size:12px;font-weight:650}
+ .side-chevron{font-size:18px;transition:transform .18s}
+ .side.is-open .side-chevron{transform:rotate(180deg)}
+ .side .nav,.side>div{display:none!important}
+ .side.is-open .nav{display:flex!important;flex-wrap:wrap;overflow:visible;margin-top:8px}
+ .side.is-open .nav button{flex:1 1 auto}
+ .side.is-open>div{display:block!important;margin-top:9px!important}
+}
+</style>
+</head>
+<body>
+<div id="authScreen" class="auth"><div class="auth-card"><div class="logo">estuda<span>.</span></div><h1 id="authTitle">Entre na sua conta</h1><p class="muted" id="authDesc">Seus estudos sempre com você.</p><form id="authForm"><div class="field"><label>E-mail</label><input id="email" type="email" required autocomplete="email" placeholder="voce@email.com"></div><div class="field"><label>Senha</label><input id="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Mínimo de 6 caracteres"></div><button class="primary" style="width:100%" id="authSubmit">Entrar</button></form><p class="small muted" style="text-align:center;margin-top:18px"><span id="authSwitchText">Ainda não tem conta?</span> <a href="#" id="authSwitch">Criar conta</a></p><p id="authError" class="small" style="color:var(--danger)"></p><p class="small muted">Use o mesmo e-mail e senha do ControlePeso.</p></div></div>
+<div id="app" class="hidden"><div class="wrap"><header class="top"><div><div class="logo">estuda<span>.</span></div><div class="small muted">Aprenda melhor, um cartão por vez.</div></div><div class="actions"><span id="userEmail" class="small muted"></span><button class="plain" id="logout">Sair</button></div></header>
+<div class="layout"><aside class="side" id="mainSide"><button type="button" class="side-toggle" id="sideToggle" aria-expanded="false" aria-controls="mainNav">☰ <span>Menu</span><span class="side-current" id="sideCurrent">Início</span><span class="side-chevron">⌄</span></button><nav class="nav" id="mainNav"><button class="active" data-page="home" onclick="estudaNavigate(&quot;home&quot;)">⌂ Início</button><button data-page="review" onclick="estudaNavigate(&quot;review&quot;)">↻ Revisar</button><button data-page="insights" onclick="estudaNavigate(&quot;insights&quot;)">▥ Desempenho</button><button data-page="folders" onclick="estudaNavigate(&quot;folders&quot;)">▣ Pastas</button><button data-page="favorites" onclick="estudaNavigate(&quot;favorites&quot;)">★ Favoritos</button><button data-page="libraries" onclick="estudaNavigate(&quot;libraries&quot;)">▤ Bibliotecas</button></nav><div style="margin-top:18px"><button class="primary" style="width:100%" id="newSetSide">＋ Criar conjunto</button></div></aside>
+<main class="content">
+<section id="homePage">
+ <div class="study-welcome"><div><div class="study-eyebrow">SEU ESPAÇO DE APRENDIZADO</div><h1>O que vamos aprender?</h1><p class="sub">Um passo de cada vez. Seu progresso fica salvo automaticamente.</p></div></div>
+ <div class="study-focus">
+  <div class="study-focus-copy"><span class="tag">SUA PRÓXIMA AÇÃO</span><h2>Revisão inteligente</h2><p id="reviewSubtitle" class="muted small">Vamos manter o conteúdo fresco na memória.</p></div>
+  <div class="study-focus-action"><div class="study-due-number"><strong id="statDue">0</strong><span>para revisar</span></div><button class="primary" id="startDueHome">Começar revisão</button></div>
+  <div id="duePreview" class="hidden">Carregando sua fila...</div>
+ </div>
+ <div class="study-quick-actions">
+  <button id="homeCreate" class="study-quick primary"><span>＋</span><b>Criar conjunto</b><small>Monte seus cartões</small></button>
+  <button id="homeExplore" class="study-quick"><span>⌕</span><b>Explorar assunto</b><small>Pesquisar na internet</small></button>
+  <button class="study-quick" data-goto="review"><span>↻</span><b>Revisar</b><small>Treinar o que aprendeu</small></button>
+ </div>
+ <div class="study-sets-head"><div><h2>Meus conjuntos</h2><p class="small muted">Continue de onde parou.</p></div><div class="actions"><input id="search" class="search" placeholder="Buscar conjuntos..."><button class="soft" id="newSet">＋ Novo</button></div></div>
+ <div id="setsGrid" class="grid"></div>
+ <div class="hidden" aria-hidden="true"><span id="statAccuracy">—</span><span id="statAttempts">0</span><span id="statMastered">0</span></div>
+</section>
+<section id="detailPage" class="hidden"><button class="plain" id="backHome">← Voltar ao painel</button><div class="toolbar" style="margin-top:14px"><div><h1 id="detailTitle"></h1><p class="sub" id="detailDesc"></p></div><div class="actions"><button class="danger" id="deleteSet">Excluir conjunto</button><button class="danger" id="resetSetProgress">Zerar progresso deste conjunto</button><button class="soft" id="editSet">Editar</button><button class="primary" id="addCard">＋ Cartão</button></div></div><div class="panel"><div class="toolbar"><strong id="cardCount">Cartões</strong><div class="actions"><button class="soft" id="startFlash">Estudar todos</button><button class="soft" id="startSetDue">Revisar pendentes</button><button class="soft" id="startQuiz">Teste</button></div></div><div id="cardsList"></div></div></section>
+<section id="reviewPage" class="hidden"><h1>Central de revisão</h1><p class="sub">Os cartões errados voltam para a fila. Os que você domina aparecem com menos frequência.</p><div class="stat-grid"><div class="stat-card"><div class="stat-number" id="reviewDueCount">0</div><div class="stat-label">Pendentes agora</div></div><div class="stat-card"><div class="stat-number" id="reviewWeakCount">0</div><div class="stat-label">Precisam de reforço</div></div><div class="stat-card"><div class="stat-number" id="reviewStrongCount">0</div><div class="stat-label">Bem aprendidos</div></div><div class="stat-card"><div class="stat-number" id="reviewNewCount">0</div><div class="stat-label">Ainda não praticados</div></div></div><div class="panel"><h2 style="margin-top:0">Escolha sua sessão</h2><div class="grid"><div class="set-card"><span class="tag">Recomendado</span><h3>Revisão inteligente</h3><p class="muted small">Prioriza os vencidos, os que você errou e os que ainda não aprendeu.</p><button class="primary" id="startDuePage">Começar revisão</button></div><div class="set-card"><span class="tag">Reforço</span><h3>Treinar dificuldades</h3><p class="muted small">Pratique os cartões com menor taxa de acerto.</p><button class="soft" id="startWeak">Treinar erros</button></div><div class="set-card"><span class="tag">Livre</span><h3>Prática geral</h3><p class="muted small">Revise todos os cartões sem alterar a fila de vencimento até responder.</p><button class="soft" id="startAll">Estudar tudo</button></div></div></div><div class="panel"><h2 style="margin-top:0">Fila de revisão</h2><div id="reviewList"></div></div></section>
+
+<section id="insightsPage" class="hidden"><div class="toolbar"><div><h1>Seu desempenho</h1><p class="sub">Acompanhe acertos, dificuldades e evolução dos seus conjuntos.</p></div><button class="danger" id="resetProgress">Apagar progresso</button></div><div class="stat-grid"><div class="stat-card"><div class="stat-number" id="insAttempts">0</div><div class="stat-label">Total de respostas</div></div><div class="stat-card"><div class="stat-number" id="insCorrect">0</div><div class="stat-label">Acertos</div></div><div class="stat-card"><div class="stat-number" id="insWrong">0</div><div class="stat-label">Erros</div></div><div class="stat-card"><div class="stat-number" id="insAccuracy">—</div><div class="stat-label">Precisão geral</div></div></div><div class="panel"><h2 style="margin-top:0">Desempenho por conjunto</h2><div id="setPerformance"></div></div><div class="panel"><h2 style="margin-top:0">O que merece atenção</h2><div id="weakCards"></div></div></section>
+<section id="foldersPage" class="hidden"><h1>Suas pastas</h1><p class="sub">Organize seus conjuntos por assunto.</p><div class="toolbar"><p class="small muted">Crie uma pasta por assunto e receba ideias de conjuntos para organizar nela.</p><button class="primary" id="createFolder">＋ Criar pasta</button></div><div id="foldersList" class="grid"></div></section>
+<section id="folderDetailPage" class="hidden"><button class="plain" id="backFolders">← Voltar às pastas</button><div class="toolbar" style="margin-top:14px"><div><h1 id="folderDetailTitle">Pasta</h1><p class="sub" id="folderDetailDesc"></p></div><button class="primary" id="newSetInFolder">＋ Criar conjunto nesta pasta</button></div><div id="folderSetsGrid" class="grid"></div></section>
+<section id="favoritesPage" class="hidden"><h1>Cartões favoritos</h1><p class="sub">Acesso rápido ao que você marcou.</p><div id="favoritesList" class="grid"></div></section><section id="librariesPage" class="hidden"><h1>Bibliotecas</h1><p class="sub">Pesquise qualquer assunto na internet, consulte as fontes e transforme os textos encontrados em cartões. Nada precisa ser baixado ou salvo como arquivo.</p><div class="panel"><form id="librarySearchForm"><div class="toolbar"><div style="flex:1;min-width:220px"><label for="libraryQuery" class="small"><strong>Pesquisar assunto</strong></label><input id="libraryQuery" placeholder="Ex.: Python, banco de dados, história..." autocomplete="off"></div><button class="primary" id="librarySearchButton">Pesquisar na internet</button></div></form><p class="small muted">A pesquisa consulta fontes públicas de diferentes sites. O conteúdo é lido online; os cartões só são adicionados quando você seleciona.</p></div><div id="libraryResults"></div><div class="toolbar" style="margin-top:26px"><div><h2 style="margin:0">Minha biblioteca</h2><p class="small muted" style="margin:3px 0">Materiais salvos na sua conta.</p></div></div><div id="librarySaved" class="grid"></div></section>
+<section id="studyPage" class="hidden"><button class="plain" id="exitStudy">← Sair da sessão</button><div class="toolbar" style="margin-top:12px"><div><h1 id="studyTitle">Estudando</h1><p class="sub" id="studyCounter"></p></div><span class="pill" id="studyModeLabel">REVISÃO</span></div><div class="progress"><div id="studyProgress" style="width:0%"></div></div><div id="studyStage"></div><div class="study-actions"><button class="soft" id="prevCard">← Anterior</button><span class="small muted" id="studyHint">Pense na resposta antes de revelar.</span><button class="primary" id="nextCard">Próximo →</button></div></section>
+</main></div></div></div>
+<div id="modal" class="modal hidden"><div class="modal-box"><div class="modal-head"><h2 id="modalTitle">Novo conjunto</h2><button class="plain" id="closeModal">✕</button></div><div id="modalBody"></div></div></div><div id="toast" class="toast hidden"></div>
+<script>
+window.estudaNavigate = function(name) {
+  try {
+    if (typeof window.showPage === "function") { window.showPage(name); return; }
+  } catch (e) { console.error("Falha ao renderizar menu:", e); }
+  document.querySelectorAll("main.content > section").forEach(s => s.classList.add("hidden"));
+  const target = document.getElementById(name + "Page");
+  if (target) target.classList.remove("hidden");
+  document.querySelectorAll("[data-page]").forEach(b => b.classList.toggle("active", b.dataset.page === name));
+};
+</script>
+<script src="./app.js"></script>
+<script>
+(function(){
+ const side=document.getElementById("mainSide"),toggle=document.getElementById("sideToggle"),current=document.getElementById("sideCurrent");
+ if(!side||!toggle)return;
+ toggle.addEventListener("click",function(){const open=side.classList.toggle("is-open");toggle.setAttribute("aria-expanded",String(open));});
+ document.querySelectorAll("#mainNav [data-page]").forEach(function(button){
+  button.addEventListener("click",function(){if(current)current.textContent=button.textContent.replace(/^[^\\p{L}\\p{N}]+/u,"").trim();side.classList.remove("is-open");toggle.setAttribute("aria-expanded","false");});
+ });
+})();
+</script>
+</body></html>
