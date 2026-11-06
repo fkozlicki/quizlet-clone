@@ -209,6 +209,56 @@ input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4p
  .modal{padding-bottom:max(9px,env(safe-area-inset-bottom))}
 }
 
+
+/* Home minimalista e ações diretas no Estuda */
+.study-welcome{margin:4px 0 18px}
+.study-eyebrow{font-size:10px;letter-spacing:1.45px;font-weight:850;color:#625cf0}
+.study-welcome h1{margin:5px 0 5px}
+.study-welcome .sub{margin:0;max-width:580px}
+.study-focus{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 24px;margin:0 0 13px;background:linear-gradient(125deg,#3734a8,#625cf0 72%,#8b86ff);border-radius:23px;color:#fff;box-shadow:0 15px 34px rgba(74,69,202,.2)}
+.study-focus .tag{background:#ffffff22;color:#fff}
+.study-focus-copy{min-width:0}
+.study-focus h2{font-size:21px;letter-spacing:-.6px;margin:10px 0 4px}
+.study-focus p{color:#e2e2ff;margin:0}
+.study-focus-action{display:flex;align-items:center;gap:17px}
+.study-due-number{display:flex;flex-direction:column;align-items:center;min-width:65px}
+.study-due-number strong{font-size:34px;line-height:1;font-weight:900;letter-spacing:-1px}
+.study-due-number span{font-size:10px;color:#e2e2ff;margin-top:5px}
+.study-focus-action .primary{background:#fff;color:#4842c9;box-shadow:none;white-space:nowrap}
+.study-quick-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px;margin:0 0 27px}
+.study-quick{display:flex;flex-direction:column;align-items:flex-start;gap:5px;min-height:112px;padding:15px 16px;background:#fff;color:var(--ink);border:1px solid #e6e7f4;border-radius:18px;box-shadow:0 8px 22px rgba(45,43,112,.045);text-align:left}
+.study-quick>span{width:32px;height:32px;display:grid;place-items:center;border-radius:11px;background:#eeedff;color:#514be1;font-size:21px;margin-bottom:3px}
+.study-quick b{font-size:13px}
+.study-quick small{font-size:10px;color:var(--muted);font-weight:500}
+.study-quick.primary{background:#eeedff;color:#4943ca;box-shadow:none;border-color:#d9d7ff}
+.study-sets-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.study-sets-head h2{margin:0;font-size:19px;letter-spacing:-.5px}
+.study-sets-head p{margin:3px 0 0}
+.study-sets-head .actions{flex:1;justify-content:flex-end}
+.study-sets-head .search{max-width:280px;min-width:130px}
+#setsGrid .set-card{border-radius:19px}
+#setsGrid .set-meta{margin-top:13px}
+@media(max-width:620px){
+ .study-welcome{margin:0 1px 14px}
+ .study-welcome h1{font-size:24px}
+ .study-focus{display:block;padding:18px;border-radius:19px;margin-bottom:10px}
+ .study-focus h2{font-size:19px;margin:8px 0 3px}
+ .study-focus-action{justify-content:space-between;margin-top:17px}
+ .study-due-number{align-items:flex-start}
+ .study-due-number strong{font-size:30px}
+ .study-focus-action .primary{flex:1;min-height:47px}
+ .study-quick-actions{gap:8px;margin-bottom:23px}
+ .study-quick{min-height:105px;padding:11px 9px;border-radius:15px;gap:4px}
+ .study-quick>span{width:29px;height:29px;font-size:19px}
+ .study-quick b{font-size:11px;line-height:1.2}
+ .study-quick small{font-size:9px;line-height:1.25}
+ .study-sets-head{align-items:flex-start;flex-direction:column;gap:10px}
+ .study-sets-head .actions{width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto}
+ .study-sets-head .search{width:100%;max-width:none;min-width:0}
+ .study-sets-head .actions button{white-space:nowrap}
+}
+@media(max-width:360px){.study-quick-actions{grid-template-columns:1fr 1fr}.study-quick:last-child{grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -216,7 +266,22 @@ input:focus,textarea:focus,select:focus{border-color:#817cf0;box-shadow:0 0 0 4p
 <div id="app" class="hidden"><div class="wrap"><header class="top"><div><div class="logo">estuda<span>.</span></div><div class="small muted">Aprenda melhor, um cartão por vez.</div></div><div class="actions"><span id="userEmail" class="small muted"></span><button class="plain" id="logout">Sair</button></div></header>
 <div class="layout"><aside class="side"><nav class="nav"><button class="active" data-page="home" onclick="estudaNavigate(&quot;home&quot;)">⌂ Início</button><button data-page="review" onclick="estudaNavigate(&quot;review&quot;)">↻ Revisar</button><button data-page="insights" onclick="estudaNavigate(&quot;insights&quot;)">▥ Desempenho</button><button data-page="folders" onclick="estudaNavigate(&quot;folders&quot;)">▣ Pastas</button><button data-page="favorites" onclick="estudaNavigate(&quot;favorites&quot;)">★ Favoritos</button><button data-page="libraries" onclick="estudaNavigate(&quot;libraries&quot;)">▤ Bibliotecas</button></nav><div style="margin-top:18px"><button class="primary" style="width:100%" id="newSetSide">＋ Criar conjunto</button></div></aside>
 <main class="content">
-<section id="homePage"><h1>Seu painel de estudos</h1><p class="sub">Veja o que precisa revisar e acompanhe sua evolução.</p><div class="stat-grid"><div class="stat-card"><div class="stat-number" id="statDue">0</div><div class="stat-label">Para revisar hoje</div></div><div class="stat-card"><div class="stat-number" id="statAccuracy">—</div><div class="stat-label">Taxa de acerto</div></div><div class="stat-card"><div class="stat-number" id="statAttempts">0</div><div class="stat-label">Respostas praticadas</div></div><div class="stat-card"><div class="stat-number" id="statMastered">0</div><div class="stat-label">Cartões dominados</div></div></div><div class="panel"><div class="toolbar"><div><h2 style="margin:0">Sua próxima revisão</h2><div class="small muted" id="reviewSubtitle">O Estuda organiza os cartões que precisam de atenção.</div></div><button class="primary" id="startDueHome">Começar revisão →</button></div><div id="duePreview" class="muted small">Carregando sua fila...</div></div><div class="toolbar"><div><h2 style="margin:0">Meus conjuntos</h2><p class="small muted" style="margin:3px 0 0">Continue de onde parou.</p></div><div class="actions"><input id="search" class="search" placeholder="Buscar conjuntos..."><button class="soft" id="newSet">＋ Novo conjunto</button></div></div><div id="setsGrid" class="grid"></div></section>
+<section id="homePage">
+ <div class="study-welcome"><div><div class="study-eyebrow">SEU ESPAÇO DE APRENDIZADO</div><h1>O que vamos aprender?</h1><p class="sub">Um passo de cada vez. Seu progresso fica salvo automaticamente.</p></div></div>
+ <div class="study-focus">
+  <div class="study-focus-copy"><span class="tag">SUA PRÓXIMA AÇÃO</span><h2>Revisão inteligente</h2><p id="reviewSubtitle" class="muted small">Vamos manter o conteúdo fresco na memória.</p></div>
+  <div class="study-focus-action"><div class="study-due-number"><strong id="statDue">0</strong><span>para revisar</span></div><button class="primary" id="startDueHome">Começar revisão</button></div>
+  <div id="duePreview" class="hidden">Carregando sua fila...</div>
+ </div>
+ <div class="study-quick-actions">
+  <button id="homeCreate" class="study-quick primary"><span>＋</span><b>Criar conjunto</b><small>Monte seus cartões</small></button>
+  <button id="homeExplore" class="study-quick"><span>⌕</span><b>Explorar assunto</b><small>Pesquisar na internet</small></button>
+  <button class="study-quick" data-goto="review"><span>↻</span><b>Revisar</b><small>Treinar o que aprendeu</small></button>
+ </div>
+ <div class="study-sets-head"><div><h2>Meus conjuntos</h2><p class="small muted">Continue de onde parou.</p></div><div class="actions"><input id="search" class="search" placeholder="Buscar conjuntos..."><button class="soft" id="newSet">＋ Novo</button></div></div>
+ <div id="setsGrid" class="grid"></div>
+ <div class="hidden" aria-hidden="true"><span id="statAccuracy">—</span><span id="statAttempts">0</span><span id="statMastered">0</span></div>
+</section>
 <section id="detailPage" class="hidden"><button class="plain" id="backHome">← Voltar ao painel</button><div class="toolbar" style="margin-top:14px"><div><h1 id="detailTitle"></h1><p class="sub" id="detailDesc"></p></div><div class="actions"><button class="danger" id="deleteSet">Excluir conjunto</button><button class="danger" id="resetSetProgress">Zerar progresso deste conjunto</button><button class="soft" id="editSet">Editar</button><button class="primary" id="addCard">＋ Cartão</button></div></div><div class="panel"><div class="toolbar"><strong id="cardCount">Cartões</strong><div class="actions"><button class="soft" id="startFlash">Estudar todos</button><button class="soft" id="startSetDue">Revisar pendentes</button><button class="soft" id="startQuiz">Teste</button></div></div><div id="cardsList"></div></div></section>
 <section id="reviewPage" class="hidden"><h1>Central de revisão</h1><p class="sub">Os cartões errados voltam para a fila. Os que você domina aparecem com menos frequência.</p><div class="stat-grid"><div class="stat-card"><div class="stat-number" id="reviewDueCount">0</div><div class="stat-label">Pendentes agora</div></div><div class="stat-card"><div class="stat-number" id="reviewWeakCount">0</div><div class="stat-label">Precisam de reforço</div></div><div class="stat-card"><div class="stat-number" id="reviewStrongCount">0</div><div class="stat-label">Bem aprendidos</div></div><div class="stat-card"><div class="stat-number" id="reviewNewCount">0</div><div class="stat-label">Ainda não praticados</div></div></div><div class="panel"><h2 style="margin-top:0">Escolha sua sessão</h2><div class="grid"><div class="set-card"><span class="tag">Recomendado</span><h3>Revisão inteligente</h3><p class="muted small">Prioriza os vencidos, os que você errou e os que ainda não aprendeu.</p><button class="primary" id="startDuePage">Começar revisão</button></div><div class="set-card"><span class="tag">Reforço</span><h3>Treinar dificuldades</h3><p class="muted small">Pratique os cartões com menor taxa de acerto.</p><button class="soft" id="startWeak">Treinar erros</button></div><div class="set-card"><span class="tag">Livre</span><h3>Prática geral</h3><p class="muted small">Revise todos os cartões sem alterar a fila de vencimento até responder.</p><button class="soft" id="startAll">Estudar tudo</button></div></div></div><div class="panel"><h2 style="margin-top:0">Fila de revisão</h2><div id="reviewList"></div></div></section>
 
